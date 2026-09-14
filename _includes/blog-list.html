@@ -10,18 +10,7 @@
 
     <div class="blog-list">
       {% for post in site.posts limit:3 %}
-      {% assign words = post.content | strip_html | number_of_words %}
-      {% assign reading_time = words | divided_by: 200 | at_least: 1 %}
-      <article class="blog-item reveal">
-        <p class="blog-date">{{ post.date | date: "%Y-%m-%d" }}</p>
-        <div class="blog-main">
-          <a href="{{ post.url | relative_url }}">
-            <h3 class="blog-title">{{ post.title }}</h3>
-          </a>
-          <p class="blog-excerpt">{{ post.excerpt }}</p>
-        </div>
-        <p class="blog-time">{{ reading_time }} min read</p>
-      </article>
+        {% include blog-item.html post=post %}
       {% endfor %}
     </div>
 

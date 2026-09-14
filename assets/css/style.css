@@ -1129,9 +1129,55 @@ footer.site-footer {
 .blog-index-section,
 .not-found,
 .post,
-.generic-page {
+.generic-page,
+.notes-section {
   padding-top: calc(var(--nav-h) + 56px);
   border-top: none;
+}
+
+/* ---------- Blog item category/tag badges ---------- */
+.blog-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.blog-tags .tag-pill {
+  font-size: 11px;
+  padding: 4px 10px;
+}
+
+.blog-tags .tag-pill-accent {
+  color: var(--accent);
+  border-color: var(--accent);
+  background: var(--accent-dim);
+}
+
+/* ---------- Notes page (/notes/) ---------- */
+.notes-sub {
+  color: var(--text-secondary);
+  font-size: 1.02rem;
+  max-width: 62ch;
+  margin-top: 8px;
+}
+
+.notes-group {
+  margin-top: 64px;
+}
+
+.notes-group-title {
+  font-size: clamp(1.3rem, 2.4vw, 1.6rem);
+  color: var(--text-primary);
+  margin-bottom: 32px;
+}
+
+.notes-empty {
+  color: var(--text-tertiary);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  padding: 24px 0;
+  border-top: 1px solid var(--border);
 }
 
 .not-found {
@@ -1310,7 +1356,8 @@ footer.site-footer {
   .blog-index-section,
   .not-found,
   .post,
-  .generic-page {
+  .generic-page,
+  .notes-section {
     padding-top: calc(var(--nav-h) + 40px);
   }
 }

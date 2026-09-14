@@ -1,0 +1,23 @@
+<!-- ================================================================
+     BLOG ITEM — shared row markup for blog-list.html, blog.html,
+     and notes.html. Usage: {% include blog-item.html post=post %}
+================================================================= -->
+{% assign words = include.post.content | strip_html | number_of_words %}
+{% assign reading_time = words | divided_by: 200 | at_least: 1 %}
+<article class="blog-item reveal">
+  <p class="blog-date">{{ include.post.date | date: "%Y-%m-%d" }}</p>
+  <div class="blog-main">
+    <a href="{{ include.post.url | relative_url }}">
+      <h3 class="blog-title">{{ include.post.title }}</h3>
+    </a>
+    <p class="blog-excerpt">{{ include.post.excerpt }}</p>
+    {% if include.post.categories.size > 0 or include.post.tags.size > 0 %}
+    <div class="blog-tags">
+      {% if include.post.categories contains "papers" %}<span class="tag-pill tag-pill-accent">Paper</span>{% endif %}
+      {% if include.post.categories contains "book-notes" %}<span class="tag-pill tag-pill-accent">Book Notes</span>{% endif %}
+      {% for tag in include.post.tags limit:3 %}<span class="tag-pill">{{ tag }}</span>{% endfor %}
+    </div>
+    {% endif %}
+  </div>
+  <p class="blog-time">{{ reading_time }} min read</p>
+</article>

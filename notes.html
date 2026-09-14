@@ -1,0 +1,45 @@
+---
+layout: default
+title: "Notes"
+permalink: /notes/
+---
+<section class="notes-section">
+  <div class="container">
+    <div class="section-head reveal">
+      <p class="eyebrow">~/notes</p>
+      <h1 class="section-title">Book &amp; paper notes</h1>
+      <p class="notes-sub">
+        Chapter-by-chapter notes from books I'm reading, and write-ups on
+        research papers I'm working through as part of my ongoing reading
+        hub. Kept separate from the main blog so they're easy to browse
+        (and filter) on their own.
+      </p>
+    </div>
+
+    <div class="notes-group reveal">
+      <p class="eyebrow">~/notes/books</p>
+      <h2 class="notes-group-title">Book notes</h2>
+      <div class="blog-list">
+        {% assign book_posts = site.categories["book-notes"] %}
+        {% for post in book_posts %}
+          {% include blog-item.html post=post %}
+        {% else %}
+          <p class="notes-empty">No book notes yet — check back soon.</p>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="notes-group reveal">
+      <p class="eyebrow">~/notes/papers</p>
+      <h2 class="notes-group-title">Paper notes</h2>
+      <div class="blog-list">
+        {% assign paper_posts = site.categories["papers"] %}
+        {% for post in paper_posts %}
+          {% include blog-item.html post=post %}
+        {% else %}
+          <p class="notes-empty">No paper notes yet — check back soon.</p>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</section>
