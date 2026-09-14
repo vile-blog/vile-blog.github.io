@@ -26,23 +26,26 @@
     </div>
 
     <div class="hero-graphic">
-      <div class="terminal" role="img" aria-label="Stylized code editor window showing a sample JavaScript object describing the engineer's stack">
+      <div class="terminal" role="img" aria-label="Stylized code editor window showing a Go struct describing the engineer's stack">
         <div class="terminal-bar">
           <span class="terminal-dot red" aria-hidden="true"></span>
           <span class="terminal-dot yellow" aria-hidden="true"></span>
           <span class="terminal-dot green" aria-hidden="true"></span>
-          <span class="terminal-title">about-me.js</span>
+          <span class="terminal-title">about-me.go</span>
         </div>
         <div class="terminal-body">
 <code aria-hidden="true"><span class="line-num">1</span><span class="tok-com">// currently building for the web</span>
-<span class="line-num">2</span><span class="tok-kw">const</span> <span class="tok-prop">engineer</span> <span class="tok-punc">=</span> <span class="tok-punc">{</span>
-<span class="line-num">3</span>  <span class="tok-prop">name</span><span class="tok-punc">:</span> <span class="tok-str">"{{ site.author.name }}"</span><span class="tok-punc">,</span>
-<span class="line-num">4</span>  <span class="tok-prop">stack</span><span class="tok-punc">:</span> <span class="tok-punc">[</span>{% for skill in site.author.skills limit:3 %}<span class="tok-str">"{{ skill }}"</span>{% unless forloop.last %}<span class="tok-punc">, </span>{% endunless %}{% endfor %}<span class="tok-punc">]</span><span class="tok-punc">,</span>
-<span class="line-num">5</span>  <span class="tok-prop">status</span><span class="tok-punc">:</span> <span class="tok-str">"shipping"</span><span class="tok-punc">,</span>
-<span class="line-num">6</span>  <span class="tok-prop">openTo</span><span class="tok-punc">:</span> <span class="tok-str">"good conversations"</span>
-<span class="line-num">7</span><span class="tok-punc">}</span><span class="tok-punc">;</span>
-<span class="line-num">8</span>
-<span class="line-num">9</span><span class="tok-kw">export default</span> <span class="tok-fn">engineer</span><span class="tok-punc">;</span></code>
+<span class="line-num">2</span><span class="tok-kw">type</span> <span class="tok-fn">Engineer</span> <span class="tok-kw">struct</span> <span class="tok-punc">{</span>
+<span class="line-num">3</span>  <span class="tok-prop">Name, Status, OpenTo</span> <span class="tok-kw">string</span>
+<span class="line-num">4</span>  <span class="tok-prop">Stack</span>                <span class="tok-punc">[]</span><span class="tok-kw">string</span>
+<span class="line-num">5</span><span class="tok-punc">}</span>
+<span class="line-num">6</span>
+<span class="line-num">7</span><span class="tok-kw">var</span> <span class="tok-prop">me</span> <span class="tok-punc">=</span> <span class="tok-fn">Engineer</span><span class="tok-punc">{</span>
+<span class="line-num">8</span>  <span class="tok-prop">Name</span><span class="tok-punc">:</span>   <span class="tok-str">"{{ site.author.name }}"</span><span class="tok-punc">,</span>
+<span class="line-num">9</span>  <span class="tok-prop">Stack</span><span class="tok-punc">:</span>  <span class="tok-punc">[]</span><span class="tok-kw">string</span><span class="tok-punc">{</span>{% for skill in site.author.skills limit:3 %}<span class="tok-str">"{{ skill }}"</span>{% unless forloop.last %}<span class="tok-punc">, </span>{% endunless %}{% endfor %}<span class="tok-punc">}</span><span class="tok-punc">,</span>
+<span class="line-num">10</span> <span class="tok-prop">Status</span><span class="tok-punc">:</span> <span class="tok-str">"shipping"</span><span class="tok-punc">,</span>
+<span class="line-num">11</span> <span class="tok-prop">OpenTo</span><span class="tok-punc">:</span> <span class="tok-str">"good conversations"</span><span class="tok-punc">,</span>
+<span class="line-num">12</span><span class="tok-punc">}</span></code>
         </div>
       </div>
     </div>
