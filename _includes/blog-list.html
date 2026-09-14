@@ -1,0 +1,35 @@
+<!-- ================================================================
+     BLOG — most recent posts from _posts/
+================================================================= -->
+<section id="blog" aria-labelledby="blog-heading">
+  <div class="container">
+    <div class="section-head reveal">
+      <p class="eyebrow">~/blog</p>
+      <h2 id="blog-heading" class="section-title">Recent writing</h2>
+    </div>
+
+    <div class="blog-list">
+      {% for post in site.posts limit:3 %}
+      {% assign words = post.content | strip_html | number_of_words %}
+      {% assign reading_time = words | divided_by: 200 | at_least: 1 %}
+      <article class="blog-item reveal">
+        <p class="blog-date">{{ post.date | date: "%Y-%m-%d" }}</p>
+        <div class="blog-main">
+          <a href="{{ post.url | relative_url }}">
+            <h3 class="blog-title">{{ post.title }}</h3>
+          </a>
+          <p class="blog-excerpt">{{ post.excerpt }}</p>
+        </div>
+        <p class="blog-time">{{ reading_time }} min read</p>
+      </article>
+      {% endfor %}
+    </div>
+
+    <a class="view-all reveal" href="{{ '/blog/' | relative_url }}">
+      View all posts
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M5 12h14M13 6l6 6-6 6"></path>
+      </svg>
+    </a>
+  </div>
+</section>

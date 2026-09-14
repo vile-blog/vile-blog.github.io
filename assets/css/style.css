@@ -1,0 +1,1316 @@
+/* ==========================================================================
+   Vi Le — Personal Site Mockup
+   Terminal-grade, dark-first developer aesthetic.
+   ========================================================================== */
+
+/* ---------- Design tokens ---------- */
+:root {
+  /* Dark theme (default) */
+  --bg: #0d0f10;
+  --bg-alt: #14171a;
+  --surface: #1a1d1f;
+  --surface-hover: #212528;
+  --border: rgba(232, 232, 230, 0.09);
+  --border-strong: rgba(232, 232, 230, 0.16);
+  --text-primary: #e8e8e6;
+  --text-secondary: #8a8f94;
+  /* AA fix: was #5f6469 (3.21 on --bg, 2.83 on --surface). New value clears
+     4.5:1 on both (5.65 on --bg, 4.99 on --surface). See eval Issue 2. */
+  --text-tertiary: #868c92;
+
+  --accent: #3ee089;
+  --accent-strong: #6bffb0;
+  --accent-dim: rgba(62, 224, 137, 0.14);
+  --accent-glow: rgba(62, 224, 137, 0.28);
+  --accent-contrast: #052013;
+
+  --amber: #ffb454;
+  --amber-dim: rgba(255, 180, 84, 0.14);
+
+  /* Terminal component tokens — intentionally NOT redefined in the light
+     theme below. The code editor stays dark in both themes (eval Issue 5):
+     it reads as an honest, always-on code surface rather than a washed-out
+     inversion, and it keeps the syntax colors + line numbers AA-compliant
+     without needing a second calibrated palette. */
+  --term-surface: #1a1d1f;
+  --term-surface-alt: #14171a;
+  --term-border: rgba(232, 232, 230, 0.16);
+  --term-text-dim: #868c92;
+  --term-code-kw: #6bffb0;
+  --term-code-str: #ffb454;
+  --term-code-com: #868c92;
+  --term-code-fn: #7fd4ff;
+  --term-code-prop: #e8e8e6;
+  --term-code-punc: #8a8f94;
+
+  --shadow-lift: 0 20px 40px -20px rgba(0, 0, 0, 0.55);
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 14px;
+
+  --font-mono: "JetBrains Mono", "SFMono-Regular", Consolas, monospace;
+  --font-sans: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+
+  --container: 1120px;
+  --nav-h: 72px;
+
+  color-scheme: dark;
+}
+
+:root[data-theme="light"] {
+  --bg: #f7f6f3;
+  --bg-alt: #efeee9;
+  --surface: #ffffff;
+  --surface-hover: #f4f3ee;
+  /* Raised from 0.09/0.16 (eval Issue 5: cards read as barely-there on the
+     warm off-white bg). Cards and hairlines now have real definition. */
+  --border: rgba(20, 23, 26, 0.14);
+  --border-strong: rgba(20, 23, 26, 0.22);
+  --text-primary: #14171a;
+  --text-secondary: #52585d;
+  /* AA fix: was #7a8087 (3.69 on --bg). New value clears 4.5:1 (4.98). */
+  --text-tertiary: #656b72;
+
+  /* AA fix: was #1c8f52 — the primary CTA label on this color measured
+     4.02:1 (fails). New value clears 4.5:1 for text use (4.98 on --bg) and
+     white-on-accent (the button) measures 5.38. */
+  --accent: #157a45;
+  --accent-strong: #106339;
+  --accent-dim: rgba(21, 122, 69, 0.1);
+  --accent-glow: rgba(21, 122, 69, 0.22);
+  --accent-contrast: #ffffff;
+
+  --amber: #b9701f;
+  --amber-dim: rgba(185, 112, 31, 0.12);
+
+  --shadow-lift: 0 20px 40px -22px rgba(20, 23, 26, 0.2);
+
+  color-scheme: light;
+}
+
+/* ---------- Reset ---------- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  transition: background-color 0.25s ease, color 0.25s ease;
+  /* overflow-x: hidden was removed here (eval Issue 1) — it was masking a
+     real 375px overflow bug rather than fixing it. The actual fix is
+     min-width: 0 on the hero grid children below; this stays off so any
+     future overflow is visible/scrollable instead of silently clipped. */
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+p {
+  margin: 0;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+::selection {
+  background: var(--accent-glow);
+  color: var(--text-primary);
+}
+
+/* Focus visibility — accessible everywhere */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+.container {
+  max-width: var(--container);
+  margin: 0 auto;
+  padding: 0 32px;
+}
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--accent);
+  letter-spacing: 0.02em;
+  margin-bottom: 16px;
+}
+
+.eyebrow::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 1px;
+  background: var(--accent);
+  box-shadow: 0 0 10px var(--accent-glow);
+}
+
+/* ---------- Background atmosphere ---------- */
+.bg-texture {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image:
+    linear-gradient(var(--border) 1px, transparent 1px),
+    linear-gradient(90deg, var(--border) 1px, transparent 1px);
+  background-size: 64px 64px;
+  opacity: 0.35;
+  mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, black 10%, transparent 75%);
+}
+
+/* Eval Issue 5: --border's alpha is now higher in light mode (0.14 vs the
+   old 0.09), but the grid texture was tuned against the dark theme's own
+   0.09 border and read as almost invisible on the warm off-white page.
+   Boost it back up so the atmosphere survives the toggle. */
+:root[data-theme="light"] .bg-texture {
+  opacity: 0.6;
+}
+
+.bg-glow {
+  position: fixed;
+  top: -10%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 900px;
+  height: 600px;
+  z-index: -1;
+  pointer-events: none;
+  background: radial-gradient(closest-side, var(--accent-dim), transparent 70%);
+  filter: blur(10px);
+}
+
+/* ==========================================================================
+   Navigation
+   ========================================================================== */
+.site-nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  height: var(--nav-h);
+  display: flex;
+  align-items: center;
+  background: color-mix(in srgb, var(--bg) 78%, transparent);
+  backdrop-filter: saturate(140%) blur(14px);
+  -webkit-backdrop-filter: saturate(140%) blur(14px);
+  border-bottom: 1px solid var(--border);
+}
+
+.site-nav .container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 17px;
+  color: var(--text-primary);
+}
+
+.brand-mark {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm);
+  background: var(--accent-dim);
+  border: 1px solid var(--border-strong);
+  color: var(--accent);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.brand-prompt {
+  color: var(--text-tertiary);
+  font-weight: 500;
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.nav-links a {
+  position: relative;
+  padding: 8px 14px;
+  font-family: var(--font-mono);
+  font-size: 14px;
+  color: var(--text-secondary);
+  border-radius: var(--radius-sm);
+  transition: color 0.2s ease;
+}
+
+.nav-links a:hover {
+  color: var(--text-primary);
+}
+
+.nav-links a::after {
+  content: "";
+  position: absolute;
+  left: 14px;
+  right: 14px;
+  bottom: 4px;
+  height: 1px;
+  background: var(--accent);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.25s ease;
+}
+
+.nav-links a:hover::after {
+  transform: scaleX(1);
+}
+
+.nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.icon-btn {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  transition: color 0.2s ease, border-color 0.2s ease, background 0.2s ease, transform 0.2s ease;
+}
+
+.icon-btn:hover {
+  color: var(--text-primary);
+  border-color: var(--border-strong);
+  background: var(--surface);
+  transform: translateY(-1px);
+}
+
+.icon-btn svg {
+  width: 17px;
+  height: 17px;
+}
+
+.theme-toggle {
+  position: relative;
+}
+
+.theme-toggle .icon-sun,
+.theme-toggle .icon-moon {
+  position: absolute;
+  transition: opacity 0.2s ease, transform 0.3s ease;
+}
+
+:root:not([data-theme="light"]) .theme-toggle .icon-sun {
+  opacity: 0;
+  transform: rotate(-40deg) scale(0.6);
+}
+
+:root:not([data-theme="light"]) .theme-toggle .icon-moon {
+  opacity: 1;
+  transform: rotate(0) scale(1);
+}
+
+:root[data-theme="light"] .theme-toggle .icon-sun {
+  opacity: 1;
+  transform: rotate(0) scale(1);
+}
+
+:root[data-theme="light"] .theme-toggle .icon-moon {
+  opacity: 0;
+  transform: rotate(40deg) scale(0.6);
+}
+
+.nav-toggle {
+  display: none;
+  width: 38px;
+  height: 38px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+  align-items: center;
+  justify-content: center;
+}
+
+.nav-toggle svg {
+  width: 18px;
+  height: 18px;
+}
+
+/* Mobile nav */
+@media (max-width: 760px) {
+  .nav-links {
+    position: fixed;
+    top: var(--nav-h);
+    left: 0;
+    right: 0;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+    background: var(--bg-alt);
+    border-bottom: 1px solid var(--border);
+    padding: 8px 16px 16px;
+    transform: translateY(-8px);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s;
+  }
+
+  .nav-links.is-open {
+    opacity: 1;
+    transform: translateY(0);
+    visibility: visible;
+    pointer-events: auto;
+  }
+
+  .nav-links a {
+    padding: 14px 8px;
+    border-bottom: 1px solid var(--border);
+    font-size: 15px;
+  }
+
+  .nav-links a::after {
+    display: none;
+  }
+
+  .nav-toggle {
+    display: inline-flex;
+  }
+}
+
+/* ==========================================================================
+   Hero
+   ========================================================================== */
+.hero {
+  padding: calc(var(--nav-h) + 96px) 0 96px;
+  position: relative;
+}
+
+.hero .container {
+  display: grid;
+  grid-template-columns: 1.05fr 0.95fr;
+  gap: 56px;
+  align-items: center;
+}
+
+/* Fix for eval Issue 1: grid items default to min-width: auto, so
+   .hero-graphic could not shrink below the intrinsic width of the
+   `white-space: pre` code line inside it. That inflated the single-column
+   grid track at ~375px, which widened the container and dragged every
+   sibling off-screen with it. min-width: 0 lets the tracks actually shrink,
+   so .terminal-body's own overflow-x: auto can do its job instead. */
+.hero .container > * {
+  min-width: 0;
+}
+
+.hero-kicker {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  color: var(--accent);
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.hero-kicker::before {
+  content: "$";
+  color: var(--text-tertiary);
+}
+
+.hero-title {
+  font-size: clamp(2.6rem, 5.6vw, 4.4rem);
+  line-height: 1.04;
+  color: var(--text-primary);
+  margin-bottom: 22px;
+}
+
+.hero-title .accent-text {
+  color: var(--accent);
+}
+
+.hero-role {
+  /* Fix for eval Issue 3: this used to be display:flex, which makes the
+     text and the .cursor span two separate flex items. At widths where the
+     text itself wraps to two lines (e.g. 1440px), flex-wrap could shove the
+     cursor — a lone flex item — onto a third line by itself, orphaned. A
+     plain inline flow keeps the cursor glued to whatever word precedes it
+     (no whitespace between them in the markup), on the same line, always. */
+  font-family: var(--font-mono);
+  font-size: clamp(1.05rem, 2vw, 1.3rem);
+  color: var(--text-secondary);
+  margin-bottom: 22px;
+  max-width: 34ch;
+}
+
+.cursor {
+  display: inline-block;
+  width: 0.55ch;
+  height: 1.05em;
+  margin-left: 4px;
+  background: var(--accent);
+  vertical-align: text-bottom;
+  animation: blink 1.05s steps(1) infinite;
+  box-shadow: 0 0 8px var(--accent-glow);
+}
+
+@keyframes blink {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+
+.hero-intro {
+  max-width: 46ch;
+  color: var(--text-secondary);
+  font-size: 1.05rem;
+  margin-bottom: 36px;
+}
+
+.hero-ctas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 13px 24px;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-mono);
+  font-size: 14px;
+  font-weight: 500;
+  border: 1px solid transparent;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+.btn-primary {
+  background: var(--accent);
+  color: var(--accent-contrast);
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 30px -8px var(--accent-glow);
+}
+
+.btn-ghost {
+  background: transparent;
+  border-color: var(--border-strong);
+  color: var(--text-primary);
+}
+
+.btn-ghost:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  transform: translateY(-2px);
+}
+
+/* Terminal window graphic — deliberately stays dark in both page themes
+   (eval Issue 5), styled entirely from the --term-* tokens defined once in
+   :root. min-width: 0 (eval Issue 1) lets this shrink inside the hero grid
+   instead of forcing the whole page wider at narrow viewports. */
+.terminal {
+  min-width: 0;
+  background: var(--term-surface);
+  border: 1px solid var(--term-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lift);
+  overflow: hidden;
+  animation: rise 0.7s ease both;
+  animation-delay: 0.15s;
+}
+
+.terminal-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  background: var(--term-surface-alt);
+  border-bottom: 1px solid var(--term-border);
+}
+
+.terminal-dot {
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: var(--term-border);
+}
+
+.terminal-dot.red { background: #ff6159; }
+.terminal-dot.yellow { background: #ffbd2e; }
+.terminal-dot.green { background: #28c840; }
+
+.terminal-title {
+  margin-left: 8px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--term-text-dim);
+}
+
+.terminal-body {
+  padding: 22px 24px 26px;
+  font-family: var(--font-mono);
+  font-size: 13.5px;
+  line-height: 1.85;
+  overflow-x: auto;
+}
+
+.terminal-body code {
+  white-space: pre;
+}
+
+/* AA fix (eval Issue 2): previously color: var(--text-tertiary) *plus*
+   opacity: 0.6, which re-blended the already-dim token toward the
+   background and dropped the effective ratio to ~2.7:1. Using the
+   AA-compliant --term-text-dim token at full opacity keeps line numbers
+   visually quiet (they're still the dimmest thing in the block) while
+   passing 4.99:1 on the terminal surface. */
+.line-num {
+  display: inline-block;
+  width: 22px;
+  color: var(--term-text-dim);
+  user-select: none;
+}
+
+.tok-kw { color: var(--term-code-kw); }
+.tok-str { color: var(--term-code-str); }
+.tok-com { color: var(--term-code-com); font-style: italic; }
+.tok-fn { color: var(--term-code-fn); }
+.tok-prop { color: var(--term-code-prop); }
+.tok-punc { color: var(--term-code-punc); }
+
+@keyframes rise {
+  from { opacity: 0; transform: translateY(18px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Consolidated breakpoint set (eval Issue 4): 1000 / 760 / 480. The page
+   used to reconfigure at four uncoordinated widths (900, 900, 760, 700,
+   480) — hero, about, projects and blog now all change shape together at
+   the same tablet (1000) and mobile (760) thresholds. */
+@media (max-width: 1000px) {
+  .hero .container {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ==========================================================================
+   Shared section styles
+   ========================================================================== */
+section {
+  padding: 88px 0;
+  border-top: 1px solid var(--border);
+  position: relative;
+}
+
+/* Eval Issue 7: every section previously shared identical padding and
+   weight, so the page read as four equal slabs with no climax. Projects is
+   the section this audience (recruiters, engineers) cares about most, so
+   it gets a full-bleed contrasting band and extra vertical room — one
+   deliberate break in the rhythm instead of decorating everything evenly. */
+#projects {
+  background: var(--bg-alt);
+  padding: 120px 0;
+}
+
+.section-head {
+  max-width: 640px;
+  margin-bottom: 48px;
+}
+
+.section-title {
+  font-size: clamp(1.7rem, 3vw, 2.2rem);
+  color: var(--text-primary);
+}
+
+/* ==========================================================================
+   About
+   ========================================================================== */
+.about-grid {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 64px;
+  align-items: start;
+}
+
+.about-bio {
+  font-size: 1.08rem;
+  color: var(--text-secondary);
+  max-width: 56ch;
+}
+
+.about-bio strong {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.stat-row {
+  display: grid;
+  grid-template-columns: repeat(3, auto);
+  gap: 36px;
+  margin-top: 40px;
+}
+
+.stat-value {
+  font-family: var(--font-mono);
+  font-size: 2rem;
+  color: var(--accent);
+  line-height: 1;
+}
+
+.stat-label {
+  margin-top: 6px;
+  font-size: 13px;
+  color: var(--text-tertiary);
+  font-family: var(--font-mono);
+}
+
+.skills-label {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--text-tertiary);
+  margin-bottom: 14px;
+}
+
+.tag-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.tag-pill {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--text-secondary);
+  padding: 7px 13px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  transition: color 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+}
+
+.tag-pill:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+  transform: translateY(-2px);
+}
+
+@media (max-width: 1000px) {
+  .about-grid {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+  .stat-row {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+  }
+}
+
+/* ==========================================================================
+   Projects
+   ========================================================================== */
+.project-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+
+.project-card {
+  display: flex;
+  flex-direction: column;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 26px 24px 24px;
+  transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+/* Eval Issue 5: in dark mode the card reads fine sitting flush on the page
+   background, but a white card on a near-white light page needs its own
+   resting shadow to read as a raised card rather than a flat outline. */
+:root[data-theme="light"] .project-card {
+  box-shadow: 0 1px 2px rgba(20, 23, 26, 0.04), 0 10px 24px -16px rgba(20, 23, 26, 0.18);
+}
+
+.project-card:hover {
+  transform: translateY(-6px);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent-glow), var(--shadow-lift);
+}
+
+.project-index {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-tertiary);
+  margin-bottom: 14px;
+}
+
+.project-name {
+  font-size: 1.15rem;
+  color: var(--text-primary);
+  margin-bottom: 10px;
+}
+
+.project-desc {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  flex-grow: 1;
+  margin-bottom: 20px;
+}
+
+.project-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 22px;
+}
+
+.project-tags .tag-pill {
+  font-size: 11.5px;
+  padding: 4px 10px;
+}
+
+.project-links {
+  display: flex;
+  gap: 10px;
+  border-top: 1px solid var(--border);
+  padding-top: 16px;
+  margin-top: auto;
+}
+
+.project-links a {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  color: var(--text-secondary);
+  padding: 6px 10px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  transition: color 0.2s ease, border-color 0.2s ease;
+}
+
+.project-links a:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+.project-links svg {
+  width: 13px;
+  height: 13px;
+}
+
+/* Eval Issue 4: was a single 900px 3-col-to-1-col jump, which left tablet
+   widths with a full-width card holding one short line of text. Now steps
+   through a real 2-column tablet layout before collapsing to 1 column
+   alongside the mobile nav breakpoint. */
+@media (max-width: 1000px) {
+  .project-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 760px) {
+  .project-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ==========================================================================
+   Blog
+   ========================================================================== */
+.blog-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.blog-item {
+  display: grid;
+  grid-template-columns: 130px 1fr auto;
+  gap: 28px;
+  align-items: baseline;
+  padding: 26px 0;
+  border-bottom: 1px solid var(--border);
+  transition: padding-left 0.25s ease;
+}
+
+.blog-item:first-child {
+  border-top: 1px solid var(--border);
+}
+
+.blog-item:hover {
+  padding-left: 10px;
+}
+
+.blog-date {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--text-tertiary);
+  white-space: nowrap;
+}
+
+.blog-main a {
+  display: inline-block;
+}
+
+.blog-title {
+  font-family: var(--font-mono);
+  font-size: 1.15rem;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+  background-image: linear-gradient(var(--accent), var(--accent));
+  background-repeat: no-repeat;
+  background-position: 0 100%;
+  background-size: 0% 1.5px;
+  transition: background-size 0.35s ease;
+  padding-bottom: 2px;
+}
+
+/* Eval Issue 6.3: .blog-title is an <h3> and is never itself focusable —
+   the focusable element is the wrapping <a>. `.blog-title:focus-visible`
+   was therefore dead code and keyboard users never got the underline
+   draw-in that mouse users get on hover. Target the anchor's focus state
+   and apply it to the child title instead. */
+.blog-item:hover .blog-title,
+.blog-main a:focus-visible .blog-title {
+  background-size: 100% 1.5px;
+}
+
+.blog-excerpt {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  max-width: 60ch;
+}
+
+.blog-time {
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  color: var(--text-tertiary);
+  white-space: nowrap;
+}
+
+.view-all {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 32px;
+  font-family: var(--font-mono);
+  font-size: 14px;
+  color: var(--accent);
+}
+
+.view-all svg {
+  width: 15px;
+  height: 15px;
+  transition: transform 0.2s ease;
+}
+
+.view-all:hover svg {
+  transform: translateX(4px);
+}
+
+/* Aligned to the consolidated 760px mobile threshold (eval Issue 4) so
+   this changes shape alongside the nav and project grid, not on its own
+   separate 700px breakpoint. */
+@media (max-width: 760px) {
+  .blog-item {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+  .blog-time {
+    order: 3;
+  }
+}
+
+/* ==========================================================================
+   Contact / Footer
+   ========================================================================== */
+.contact {
+  padding-bottom: 0;
+}
+
+.contact-inner {
+  text-align: center;
+  max-width: 620px;
+  margin: 0 auto;
+}
+
+.contact-title {
+  font-size: clamp(1.9rem, 4vw, 2.6rem);
+  margin-bottom: 18px;
+}
+
+.contact-sub {
+  color: var(--text-secondary);
+  font-size: 1.05rem;
+  margin-bottom: 34px;
+}
+
+.contact-email {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-mono);
+  font-size: clamp(1.1rem, 2.4vw, 1.5rem);
+  color: var(--text-primary);
+  padding: 16px 26px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-md);
+  margin-bottom: 34px;
+  transition: border-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
+}
+
+.contact-email:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  transform: translateY(-2px);
+}
+
+.contact-email svg {
+  width: 18px;
+  height: 18px;
+  color: var(--accent);
+}
+
+.social-row {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 64px;
+}
+
+footer.site-footer {
+  border-top: 1px solid var(--border);
+  padding: 24px 0;
+}
+
+.footer-inner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  color: var(--text-tertiary);
+}
+
+.footer-inner a {
+  color: var(--text-tertiary);
+  transition: color 0.2s ease;
+}
+
+.footer-inner a:hover {
+  color: var(--accent);
+}
+
+/* ---------- Reveal-on-scroll ---------- */
+.reveal {
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  .cursor {
+    animation: none;
+    opacity: 1;
+  }
+  .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+  .terminal {
+    animation: none;
+  }
+}
+
+/* ---------- Small screens ---------- */
+@media (max-width: 480px) {
+  .container {
+    padding: 0 20px;
+  }
+  .hero {
+    padding-top: calc(var(--nav-h) + 56px);
+  }
+  section {
+    padding: 64px 0;
+  }
+  #projects {
+    padding: 88px 0;
+  }
+  .hero-ctas {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .btn {
+    justify-content: center;
+  }
+  .contact-email {
+    flex-wrap: wrap;
+    justify-content: center;
+    text-align: center;
+  }
+}
+
+/* ==========================================================================
+   Standalone pages (blog index, single post, 404) — these render as the
+   first thing inside <main>, with no hero above them to clear the fixed
+   nav, so they need their own top padding instead of the hero's.
+   ========================================================================== */
+.blog-index-section,
+.not-found,
+.post,
+.generic-page {
+  padding-top: calc(var(--nav-h) + 56px);
+  border-top: none;
+}
+
+.not-found {
+  text-align: center;
+  padding-bottom: 120px;
+}
+
+.not-found .section-title {
+  margin: 18px 0 14px;
+}
+
+.not-found-sub {
+  color: var(--text-secondary);
+  margin-bottom: 32px;
+}
+
+.not-found .btn {
+  display: inline-flex;
+}
+
+/* ---------- Single post ---------- */
+.post-container {
+  max-width: 760px;
+  padding-bottom: 96px;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--text-tertiary);
+  margin-bottom: 40px;
+  transition: color 0.2s ease;
+}
+
+.back-link:hover {
+  color: var(--accent);
+}
+
+.back-link svg {
+  width: 14px;
+  height: 14px;
+}
+
+.post-header {
+  margin-bottom: 48px;
+}
+
+.post-title {
+  font-size: clamp(1.9rem, 4.4vw, 2.6rem);
+  line-height: 1.15;
+  color: var(--text-primary);
+  margin: 10px 0 16px;
+}
+
+.post-meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--text-tertiary);
+}
+
+/* ---------- Post prose ---------- */
+.post-content {
+  color: var(--text-secondary);
+  font-size: 1.05rem;
+  line-height: 1.8;
+}
+
+.post-content > * + * {
+  margin-top: 22px;
+}
+
+.post-content h2,
+.post-content h3,
+.post-content h4 {
+  color: var(--text-primary);
+  line-height: 1.3;
+  margin-top: 44px;
+}
+
+.post-content h2 {
+  font-size: 1.5rem;
+}
+
+.post-content h3 {
+  font-size: 1.2rem;
+}
+
+.post-content p {
+  margin: 0;
+}
+
+.post-content a {
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-color: var(--accent-glow);
+}
+
+.post-content a:hover {
+  text-decoration-color: var(--accent);
+}
+
+.post-content strong {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.post-content ul,
+.post-content ol {
+  padding-left: 1.4em;
+}
+
+.post-content ul {
+  list-style: disc;
+}
+
+.post-content ol {
+  list-style: decimal;
+}
+
+.post-content li + li {
+  margin-top: 8px;
+}
+
+.post-content blockquote {
+  margin: 0;
+  padding-left: 20px;
+  border-left: 2px solid var(--accent);
+  color: var(--text-tertiary);
+  font-style: italic;
+}
+
+.post-content code {
+  font-family: var(--font-mono);
+  font-size: 0.9em;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 2px 6px;
+  border-radius: 4px;
+  color: var(--text-primary);
+}
+
+.post-content pre {
+  background: var(--term-surface);
+  border: 1px solid var(--term-border);
+  border-radius: var(--radius-md);
+  padding: 18px 20px;
+  overflow-x: auto;
+}
+
+.post-content pre code {
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--text-primary);
+}
+
+.post-content img {
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+}
+
+.post-content hr {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 40px 0;
+}
+
+@media (max-width: 480px) {
+  .blog-index-section,
+  .not-found,
+  .post,
+  .generic-page {
+    padding-top: calc(var(--nav-h) + 40px);
+  }
+}

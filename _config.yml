@@ -1,0 +1,74 @@
+title: Vi Le
+tagline: "Software Engineer — building things for the web"
+description: >-
+  Personal site and blog of Vi Le — software engineer.
+  Projects, writing, and notes on building software.
+url: "https://vile-blog.github.io"
+baseurl: ""
+title_separator: "—"
+
+author:
+  name: Vi Le
+  initials: "VL"
+  role: "Software Engineer"
+  tagline: "building things for the web"
+  email: hello@example.com
+  github: vile-blog
+  linkedin: ""
+  x: ""
+  bio: >-
+    I'm a software engineer who enjoys building clean, fast, and thoughtful
+    products — from backend systems to polished frontend experiences. This
+    site is where I share projects and write about what I'm learning.
+  intro: >-
+    I design and ship products end to end — from backend systems to the
+    pixels people actually touch. This is where I keep my projects and write
+    down what I'm learning.
+  skills:
+    - TypeScript
+    - React
+    - Node.js
+    - Python
+    - PostgreSQL
+    - AWS
+    - Docker
+    - Git
+  stats:
+    - value: "5+"
+      label: "years experience"
+    - value: "20+"
+      label: "projects shipped"
+    - value: "∞"
+      label: "cups of coffee"
+
+# Build settings
+markdown: kramdown
+permalink: /blog/:year/:month/:day/:title/
+timezone: Asia/Ho_Chi_Minh
+
+plugins:
+  - jekyll-feed
+  - jekyll-seo-tag
+  - jekyll-sitemap
+
+feed:
+  path: feed.xml
+
+defaults:
+  - scope:
+      path: ""
+      type: posts
+    values:
+      layout: post
+  - scope:
+      path: ""
+      type: pages
+    values:
+      layout: page
+
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - README.md
+  - node_modules
+  - vendor

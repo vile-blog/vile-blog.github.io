@@ -1,0 +1,37 @@
+<!-- ================================================================
+     ABOUT
+================================================================= -->
+<section id="about" aria-labelledby="about-heading">
+  <div class="container">
+    <div class="section-head reveal">
+      <p class="eyebrow">~/about</p>
+      <h2 id="about-heading" class="section-title">A little more context</h2>
+    </div>
+
+    <div class="about-grid">
+      <div class="reveal">
+        <p class="about-bio">
+          {{ site.author.bio }}
+        </p>
+
+        <div class="stat-row">
+          {% for stat in site.author.stats %}
+          <div>
+            <p class="stat-value">{{ stat.value }}</p>
+            <p class="stat-label">{{ stat.label }}</p>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="reveal">
+        <p class="skills-label">~/stack --list</p>
+        <ul class="tag-list">
+          {% for skill in site.author.skills %}
+          <li class="tag-pill">{{ skill }}</li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>

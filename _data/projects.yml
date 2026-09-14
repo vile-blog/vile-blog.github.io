@@ -1,0 +1,20 @@
+# Edit this file to add/update the projects shown in the Projects section.
+# Each entry: name, description, tags (tech stack), github (url), demo (url, optional)
+
+- name: "Project One"
+  description: "A short description of what this project does and why it matters."
+  tags: ["React", "Node.js"]
+  github: "https://github.com/vile-blog"
+  demo: ""
+
+- name: "Project Two"
+  description: "A short description of what this project does and why it matters."
+  tags: ["Python", "PostgreSQL"]
+  github: "https://github.com/vile-blog"
+  demo: ""
+
+- name: "Project Three"
+  description: "A short description of what this project does and why it matters."
+  tags: ["TypeScript", "AWS"]
+  github: "https://github.com/vile-blog"
+  demo: ""
