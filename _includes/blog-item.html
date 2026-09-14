@@ -19,5 +19,8 @@
     </div>
     {% endif %}
   </div>
-  <p class="blog-time">{{ reading_time_en }} <span data-lang-content="en">min read</span><span data-lang-content="vi">phút đọc</span></p>
+  <div class="blog-side">
+    <p class="blog-time">{{ reading_time_en }} <span data-lang-content="en">min read</span><span data-lang-content="vi">phút đọc</span></p>
+    <img class="view-badge" src="https://hits.sh/{{ include.post.url | absolute_url | remove_first: 'https://' }}.svg?label=views&color=3ee089&labelColor=1a1d1f&style=flat" alt="view count" loading="lazy" width="72" height="20" />
+  </div>
 </article>

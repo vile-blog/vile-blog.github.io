@@ -361,6 +361,176 @@ input:focus-visible {
   height: 17px;
 }
 
+/* ---------- Back to top ---------- */
+.back-to-top {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  z-index: 90;
+  background: var(--surface);
+  box-shadow: var(--shadow-lift);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(12px);
+  transition: opacity 0.25s ease, transform 0.25s ease, visibility 0.25s, border-color 0.2s ease, color 0.2s ease;
+}
+
+.back-to-top.is-visible {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+@media (max-width: 480px) {
+  .back-to-top {
+    right: 16px;
+    bottom: 16px;
+  }
+}
+
+/* ---------- Chat widget (scripted quick-contact bubble) ---------- */
+.chat-widget {
+  position: fixed;
+  left: 24px;
+  bottom: 24px;
+  z-index: 95;
+}
+
+.chat-bubble {
+  position: relative;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: var(--accent-contrast);
+  display: grid;
+  place-items: center;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 10px 30px -8px var(--accent-glow);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.chat-bubble:hover {
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 14px 34px -8px var(--accent-glow);
+}
+
+.chat-bubble-icon {
+  width: 24px;
+  height: 24px;
+}
+
+.chat-bubble-close {
+  display: none;
+  font-size: 26px;
+  line-height: 1;
+}
+
+.chat-widget.is-open .chat-bubble-icon {
+  display: none;
+}
+
+.chat-widget.is-open .chat-bubble-close {
+  display: block;
+}
+
+/* The chat window intentionally always renders dark (--term-* tokens),
+   same reasoning as the hero's terminal graphic: it reads as a distinct,
+   always-on "app window" rather than a themed page element. */
+.chat-panel {
+  position: absolute;
+  left: 0;
+  bottom: 68px;
+  width: min(320px, calc(100vw - 48px));
+  background: var(--term-surface);
+  border: 1px solid var(--term-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lift);
+  overflow: hidden;
+  animation: rise 0.25s ease both;
+}
+
+.chat-panel-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  background: var(--term-surface-alt);
+  border-bottom: 1px solid var(--term-border);
+}
+
+.chat-panel-title {
+  margin-left: 6px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--term-text-dim);
+  flex: 1;
+}
+
+.chat-panel-close {
+  background: none;
+  border: none;
+  color: var(--term-text-dim);
+  cursor: pointer;
+  font-size: 17px;
+  line-height: 1;
+  padding: 2px 6px;
+  transition: color 0.2s ease;
+}
+
+.chat-panel-close:hover {
+  color: #e8e8e6;
+}
+
+.chat-panel-body {
+  padding: 16px;
+}
+
+.chat-line {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--term-code-kw);
+  margin-bottom: 10px;
+}
+
+.chat-message {
+  font-size: 13.5px;
+  color: #cfd3d6;
+  line-height: 1.6;
+  margin-bottom: 16px;
+}
+
+.chat-options {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.chat-option {
+  display: block;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--term-border);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: #e8e8e6;
+  transition: border-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
+}
+
+.chat-option:hover {
+  border-color: var(--term-code-kw);
+  color: var(--term-code-kw);
+  transform: translateX(2px);
+}
+
+@media (max-width: 480px) {
+  .chat-widget {
+    left: 16px;
+    bottom: 16px;
+  }
+}
+
 .theme-toggle {
   position: relative;
 }
@@ -484,6 +654,45 @@ input:focus-visible {
 .hero .container > * {
   min-width: 0;
 }
+
+/* Mouse-follow spotlight — JS updates --spot-x/--spot-y on mousemove;
+   sits behind the content (z-index 0) and only fades in on hover so it
+   never distracts on touch devices where mousemove never fires. */
+.hero-spotlight {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  background: radial-gradient(560px circle at var(--spot-x, 50%) var(--spot-y, 15%), var(--accent-dim), transparent 65%);
+}
+
+.hero:hover .hero-spotlight {
+  opacity: 1;
+}
+
+.hero .container {
+  position: relative;
+  z-index: 1;
+}
+
+/* Staggered entrance for the hero — same rise keyframe already used by
+   the terminal graphic, just applied to each line in sequence so the
+   hero reads as a small "boot sequence" on load. */
+.hero-kicker,
+.hero-title,
+.hero-role,
+.hero-intro,
+.hero-ctas {
+  animation: rise 0.6s ease both;
+}
+
+.hero-kicker { animation-delay: 0.05s; }
+.hero-title { animation-delay: 0.13s; }
+.hero-role { animation-delay: 0.21s; }
+.hero-intro { animation-delay: 0.29s; }
+.hero-ctas { animation-delay: 0.37s; }
 
 .hero-kicker {
   font-family: var(--font-mono);
@@ -806,7 +1015,8 @@ section {
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
   padding: 26px 24px 24px;
-  transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+  transition: transform 0.2s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+  will-change: transform;
 }
 
 /* Eval Issue 5: in dark mode the card reads fine sitting flush on the page
@@ -967,11 +1177,31 @@ section {
   max-width: 60ch;
 }
 
+.blog-side {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+}
+
 .blog-time {
   font-family: var(--font-mono);
   font-size: 12.5px;
   color: var(--text-tertiary);
   white-space: nowrap;
+}
+
+.view-badge {
+  display: block;
+  height: 20px;
+  width: auto;
+  border-radius: 3px;
+  opacity: 0.85;
+  transition: opacity 0.2s ease;
+}
+
+.blog-item:hover .view-badge {
+  opacity: 1;
 }
 
 .view-all {
@@ -1002,7 +1232,10 @@ section {
     grid-template-columns: 1fr;
     gap: 8px;
   }
-  .blog-time {
+  .blog-side {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
     order: 3;
   }
 }
@@ -1116,6 +1349,19 @@ footer.site-footer {
   }
   .terminal {
     animation: none;
+  }
+  .hero-kicker,
+  .hero-title,
+  .hero-role,
+  .hero-intro,
+  .hero-ctas {
+    animation: none;
+  }
+  .hero-spotlight {
+    display: none;
+  }
+  .project-card {
+    transition: border-color 0.25s ease, box-shadow 0.25s ease;
   }
 }
 
@@ -1376,6 +1622,19 @@ footer.site-footer {
   border: none;
   border-top: 1px solid var(--border);
   margin: 40px 0;
+}
+
+/* ---------- Post comments (giscus) ---------- */
+.post-comments {
+  margin-top: 64px;
+  padding-top: 48px;
+  border-top: 1px solid var(--border);
+}
+
+.comments-hint {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  margin-bottom: 24px;
 }
 
 @media (max-width: 480px) {

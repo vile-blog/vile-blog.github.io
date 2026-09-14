@@ -21,11 +21,21 @@ layout: default
         {% assign words = page.content | strip_html | number_of_words %}
         {% assign reading_time = words | divided_by: 200 | at_least: 1 %}
         <span>{{ reading_time }} <span data-lang-content="en">min read</span><span data-lang-content="vi">phút đọc</span></span>
+        <span aria-hidden="true">&middot;</span>
+        <img class="view-badge" src="https://hits.sh/{{ page.url | absolute_url | remove_first: 'https://' }}.svg?label=views&color=3ee089&labelColor=1a1d1f&style=flat" alt="view count" loading="lazy" width="72" height="20" />
       </div>
     </header>
 
     <div class="post-content">
       {{ content }}
+    </div>
+
+    <div class="post-comments">
+      <p class="eyebrow">~/comments</p>
+      <p class="comments-hint">
+        <span data-lang-content="en">Didn't follow a part of this? Ask below — comments use your GitHub account, via GitHub Discussions.</span><span data-lang-content="vi">Có chỗ nào chưa rõ? Hỏi ngay bên dưới — bình luận dùng tài khoản GitHub của bạn, thông qua GitHub Discussions.</span>
+      </p>
+      <div data-giscus-target></div>
     </div>
   </div>
 </article>

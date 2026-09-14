@@ -30,6 +30,7 @@
       /* localStorage unavailable (e.g. private mode) — theme just won't persist */
     }
     syncToggleUI(theme);
+    updateGiscusConfig({ theme: theme });
   }
 
   /* ------------------------------------------------------------------
@@ -55,6 +56,21 @@
       /* localStorage unavailable — language choice just won't persist */
     }
     syncLangToggleUI(lang);
+    updateGiscusConfig({ lang: lang });
+  }
+
+  /* ------------------------------------------------------------------
+     Giscus (comments) — lives in its own iframe, so theme/lang changes
+     after it has loaded require posting a message into it rather than
+     just re-rendering our own markup. Safe to call even when no giscus
+     iframe exists on the current page (e.g. non-post pages).
+  ------------------------------------------------------------------ */
+  function updateGiscusConfig(config) {
+    var frame = document.querySelector("iframe.giscus-frame");
+    if (!frame || !frame.contentWindow) {
+      return;
+    }
+    frame.contentWindow.postMessage({ giscus: { setConfig: config } }, "https://giscus.app");
   }
 
   document.addEventListener("DOMContentLoaded", function () {
@@ -142,6 +158,138 @@
     var yearEl = document.querySelector("[data-year]");
     if (yearEl) {
       yearEl.textContent = new Date().getFullYear();
+    }
+
+    /* ------------------------------------------------------------------
+       Hero mouse-follow spotlight (skipped for reduced motion / touch —
+       mousemove never fires there anyway, so this is a no-op cost).
+    ------------------------------------------------------------------ */
+    var hero = document.querySelector(".hero");
+    if (hero && !prefersReducedMotion) {
+      hero.addEventListener("mousemove", function (e) {
+        var rect = hero.getBoundingClientRect();
+        var x = ((e.clientX - rect.left) / rect.width) * 100;
+        var y = ((e.clientY - rect.top) / rect.height) * 100;
+        hero.style.setProperty("--spot-x", x + "%");
+        hero.style.setProperty("--spot-y", y + "%");
+      });
+    }
+
+    /* ------------------------------------------------------------------
+       Project card tilt-on-hover (mouse-capable pointers only; touch
+       devices keep the plain CSS :hover lift instead)
+    ------------------------------------------------------------------ */
+    var canHoverPrecisely =
+      window.matchMedia && window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+
+    if (canHoverPrecisely && !prefersReducedMotion) {
+      document.querySelectorAll(".project-card").forEach(function (card) {
+        card.addEventListener("mousemove", function (e) {
+          var rect = card.getBoundingClientRect();
+          var px = (e.clientX - rect.left) / rect.width - 0.5;
+          var py = (e.clientY - rect.top) / rect.height - 0.5;
+          var rotateX = (py * -6).toFixed(2);
+          var rotateY = (px * 6).toFixed(2);
+          card.style.transform =
+            "perspective(600px) translateY(-6px) rotateX(" + rotateX + "deg) rotateY(" + rotateY + "deg)";
+        });
+        card.addEventListener("mouseleave", function () {
+          card.style.transform = "";
+        });
+      });
+    }
+
+    /* ------------------------------------------------------------------
+       Back to top
+    ------------------------------------------------------------------ */
+    var backToTop = document.querySelector("[data-back-to-top]");
+    if (backToTop) {
+      window.addEventListener(
+        "scroll",
+        function () {
+          backToTop.classList.toggle("is-visible", window.scrollY > 600);
+        },
+        { passive: true }
+      );
+      backToTop.addEventListener("click", function () {
+        window.scrollTo({ top: 0, behavior: prefersReducedMotion ? "auto" : "smooth" });
+      });
+    }
+
+    /* ------------------------------------------------------------------
+       Chat widget (scripted quick-contact bubble, not a real AI)
+    ------------------------------------------------------------------ */
+    var chatWidget = document.querySelector("[data-chat-widget]");
+    var chatToggle = document.querySelector("[data-chat-toggle]");
+    var chatPanel = document.querySelector("[data-chat-panel]");
+    var chatClose = document.querySelector("[data-chat-close]");
+
+    if (chatWidget && chatToggle && chatPanel) {
+      var openChat = function () {
+        chatPanel.hidden = false;
+        chatWidget.classList.add("is-open");
+        chatToggle.setAttribute("aria-expanded", "true");
+      };
+      var closeChat = function () {
+        chatPanel.hidden = true;
+        chatWidget.classList.remove("is-open");
+        chatToggle.setAttribute("aria-expanded", "false");
+      };
+
+      chatToggle.addEventListener("click", function () {
+        if (chatPanel.hidden) {
+          openChat();
+        } else {
+          closeChat();
+        }
+      });
+
+      if (chatClose) {
+        chatClose.addEventListener("click", closeChat);
+      }
+
+      chatPanel.querySelectorAll("[data-chat-option]").forEach(function (opt) {
+        opt.addEventListener("click", closeChat);
+      });
+
+      document.addEventListener("keydown", function (e) {
+        if (e.key === "Escape" && !chatPanel.hidden) {
+          closeChat();
+          chatToggle.focus();
+        }
+      });
+
+      document.addEventListener("click", function (e) {
+        if (!chatPanel.hidden && !chatWidget.contains(e.target)) {
+          closeChat();
+        }
+      });
+    }
+
+    /* ------------------------------------------------------------------
+       Giscus comments — injected via JS (rather than a static <script>
+       tag) so the initial data-theme/data-lang match whatever the
+       visitor already has set, with no flash of the wrong theme/lang.
+    ------------------------------------------------------------------ */
+    var giscusTarget = document.querySelector("[data-giscus-target]");
+    if (giscusTarget) {
+      var giscusScript = document.createElement("script");
+      giscusScript.src = "https://giscus.app/client.js";
+      giscusScript.setAttribute("data-repo", "vile-blog/vile-blog.github.io");
+      giscusScript.setAttribute("data-repo-id", "R_kgDOUZ4cEg");
+      giscusScript.setAttribute("data-category", "Announcements");
+      giscusScript.setAttribute("data-category-id", "DIC_kwDOUZ4cEs4DFkFR");
+      giscusScript.setAttribute("data-mapping", "pathname");
+      giscusScript.setAttribute("data-strict", "0");
+      giscusScript.setAttribute("data-reactions-enabled", "1");
+      giscusScript.setAttribute("data-emit-metadata", "0");
+      giscusScript.setAttribute("data-input-position", "top");
+      giscusScript.setAttribute("data-theme", root.getAttribute("data-theme") === "light" ? "light" : "dark");
+      giscusScript.setAttribute("data-lang", root.getAttribute("data-lang") === "vi" ? "vi" : "en");
+      giscusScript.setAttribute("data-loading", "lazy");
+      giscusScript.crossOrigin = "anonymous";
+      giscusScript.async = true;
+      giscusTarget.appendChild(giscusScript);
     }
   });
 })();
