@@ -1,8 +1,8 @@
 title: Vi Le
-tagline: "Software Engineer — building things for the web"
+tagline: "Software Engineer — building backend systems & AI agents"
 description: >-
-  Personal site and blog of Vi Le — software engineer.
-  Projects, writing, and notes on building software.
+  Personal site and blog of Vi Le — software engineer, ex-Grab, founder of
+  Hustly Space. Projects, writing, and notes on building software.
 url: "https://vile-blog.github.io"
 baseurl: ""
 title_separator: "—"
@@ -11,32 +11,32 @@ author:
   name: Vi Le
   initials: "VL"
   role: "Software Engineer"
-  tagline: "building things for the web"
-  email: hello@example.com
-  github: vile-blog
-  linkedin: ""
+  tagline: "building backend systems & AI agents"
+  email: vikimmich6@gmail.com
+  github: lcv-engineer
+  linkedin: "https://linkedin.com/in/vilecong"
   x: ""
   bio: >-
-    I'm a software engineer who enjoys building clean, fast, and thoughtful
-    products — from backend systems to polished frontend experiences. This
-    site is where I share projects and write about what I'm learning.
+    I'm a software engineer with 3 years of experience building backend
+    systems — including the messaging platform and experimentation platform
+    teams at Grab. I'm also the founder of Hustly Space, a platform helping
+    students discover competitions and build teams. This site is where I
+    share projects and write about what I'm learning.
   intro: >-
-    I design and ship products end to end — from backend systems to the
-    pixels people actually touch. This is where I keep my projects and write
-    down what I'm learning.
+    I design and ship backend systems and AI products end to end — from
+    messaging and experimentation platforms at Grab to founding Hustly
+    Space. This is where I keep my projects and write down what I'm learning.
   skills:
-    - TypeScript
-    - React
-    - Node.js
-    - Python
-    - PostgreSQL
+    - Go
+    - Kafka
     - AWS
-    - Docker
-    - Git
+    - AI Multi-Agent Systems
+    - PostgreSQL
+    - React
   stats:
-    - value: "5+"
+    - value: "3+"
       label: "years experience"
-    - value: "20+"
+    - value: "6+"
       label: "projects shipped"
     - value: "∞"
       label: "cups of coffee"

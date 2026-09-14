@@ -1,20 +1,38 @@
 # Edit this file to add/update the projects shown in the Projects section.
 # Each entry: name, description, tags (tech stack), github (url), demo (url, optional)
 
-- name: "Project One"
-  description: "A short description of what this project does and why it matters."
-  tags: ["React", "Node.js"]
-  github: "https://github.com/vile-blog"
+- name: "Hustly Space"
+  description: "A platform where Vietnamese students discover hackathons, case competitions, and pitch contests — and find teammates to compete with."
+  tags: ["React", "PostgreSQL", "Product"]
+  github: ""
+  demo: "https://www.hustlyspace.com/"
+
+- name: "OpsCopilot"
+  description: "An AI agent for daily business operations, built during the AMD AI Developer Program."
+  tags: ["Python", "AI Agents", "AMD"]
+  github: "https://github.com/lcv-engineer/amd-developer-hackathon"
   demo: ""
 
-- name: "Project Two"
-  description: "A short description of what this project does and why it matters."
-  tags: ["Python", "PostgreSQL"]
-  github: "https://github.com/vile-blog"
+- name: "VIVA"
+  description: "Top 3 out of 300 teams at FPT Automotive Hackathon 2026."
+  tags: ["Kotlin"]
+  github: "https://github.com/lcv-engineer/fpt-automotive-hackathon-2026"
   demo: ""
 
-- name: "Project Three"
-  description: "A short description of what this project does and why it matters."
-  tags: ["TypeScript", "AWS"]
-  github: "https://github.com/vile-blog"
+- name: "Isymptom"
+  description: "1st place capstone project at Grab Bootcamp 2025."
+  tags: ["Python", "Machine Learning"]
+  github: "https://github.com/lcv-engineer/grab-bootcamp-team13-2025"
+  demo: ""
+
+- name: "ViSafeEval"
+  description: "A Vietnamese-language AI safety benchmark and red-team toolkit for evaluating LLM safety in Vietnamese and regional slang."
+  tags: ["Python", "LLM Safety"]
+  github: "https://github.com/lcv-engineer/AI-safety-hackathon"
+  demo: ""
+
+- name: "cotuongX"
+  description: "A backend and visualization layer connecting real-world Xiangqi board movement data to an online human-vs-AI viewing experience."
+  tags: ["Go"]
+  github: "https://github.com/lcv-engineer/cotuongX"
   demo: ""
