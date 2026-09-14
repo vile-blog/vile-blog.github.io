@@ -11,7 +11,9 @@ author:
   name: Vi Le
   initials: "VL"
   role: "Software Engineer"
+  role_vi: "Kỹ sư phần mềm"
   tagline: "building backend systems & AI agents"
+  tagline_vi: "xây dựng hệ thống backend & AI agent"
   email: vikimmich6@gmail.com
   github: lcv-engineer
   linkedin: "https://linkedin.com/in/vilecong"
@@ -22,10 +24,21 @@ author:
     teams at Grab. I'm also the founder of Hustly Space, a platform helping
     students discover competitions and build teams. This site is where I
     share projects and write about what I'm learning.
+  bio_vi: >-
+    Tôi là kỹ sư phần mềm với 3 năm kinh nghiệm xây dựng hệ thống backend —
+    từng làm việc trong đội messaging platform và experimentation platform
+    tại Grab. Tôi cũng là người sáng lập Hustly Space, nền tảng giúp sinh
+    viên tìm cuộc thi và xây dựng đội nhóm. Đây là nơi tôi chia sẻ dự án và
+    viết về những gì mình đang học.
   intro: >-
     I design and ship backend systems and AI products end to end — from
     messaging and experimentation platforms at Grab to founding Hustly
     Space. This is where I keep my projects and write down what I'm learning.
+  intro_vi: >-
+    Tôi thiết kế và xây dựng hệ thống backend cùng sản phẩm AI từ đầu đến
+    cuối — từ nền tảng messaging và experimentation tại Grab đến việc sáng
+    lập Hustly Space. Đây là nơi tôi lưu lại dự án và ghi chép những gì
+    mình học được.
   skills:
     - Go
     - Kafka
@@ -36,10 +49,13 @@ author:
   stats:
     - value: "3+"
       label: "years experience"
+      label_vi: "năm kinh nghiệm"
     - value: "6+"
       label: "projects shipped"
+      label_vi: "dự án đã triển khai"
     - value: "∞"
       label: "cups of coffee"
+      label_vi: "ly cà phê"
 
 # Build settings
 markdown: kramdown

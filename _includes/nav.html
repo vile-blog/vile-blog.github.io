@@ -10,14 +10,24 @@
       </a>
 
       <ul class="nav-links" data-nav-links>
-        <li><a href="{{ '/' | relative_url }}#about">About</a></li>
-        <li><a href="{{ '/' | relative_url }}#projects">Projects</a></li>
-        <li><a href="{{ '/' | relative_url }}#blog">Blog</a></li>
-        <li><a href="{{ '/notes/' | relative_url }}">Notes</a></li>
-        <li><a href="{{ '/' | relative_url }}#contact">Contact</a></li>
+        <li><a href="{{ '/' | relative_url }}#about">{% include t.html en="About" vi="Giới thiệu" %}</a></li>
+        <li><a href="{{ '/' | relative_url }}#projects">{% include t.html en="Projects" vi="Dự án" %}</a></li>
+        <li><a href="{{ '/' | relative_url }}#blog">{% include t.html en="Blog" vi="Blog" %}</a></li>
+        <li><a href="{{ '/notes/' | relative_url }}">{% include t.html en="Notes" vi="Ghi chú" %}</a></li>
+        <li><a href="{{ '/' | relative_url }}#contact">{% include t.html en="Contact" vi="Liên hệ" %}</a></li>
       </ul>
 
       <div class="nav-actions">
+        <button
+          type="button"
+          class="icon-btn lang-toggle"
+          data-lang-toggle
+          aria-pressed="false"
+          aria-label="Switch language / Đổi ngôn ngữ"
+        >
+          <span data-lang-content="en">VI</span><span data-lang-content="vi">EN</span>
+        </button>
+
         <button
           type="button"
           class="icon-btn theme-toggle"

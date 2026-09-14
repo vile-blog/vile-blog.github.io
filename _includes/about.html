@@ -5,20 +5,20 @@
   <div class="container">
     <div class="section-head reveal">
       <p class="eyebrow">~/about</p>
-      <h2 id="about-heading" class="section-title">A little more context</h2>
+      <h2 id="about-heading" class="section-title">{% include t.html en="A little more context" vi="Đôi nét về tôi" %}</h2>
     </div>
 
     <div class="about-grid">
       <div class="reveal">
         <p class="about-bio">
-          {{ site.author.bio }}
+          <span data-lang-content="en">{{ site.author.bio }}</span><span data-lang-content="vi">{{ site.author.bio_vi }}</span>
         </p>
 
         <div class="stat-row">
           {% for stat in site.author.stats %}
           <div>
             <p class="stat-value">{{ stat.value }}</p>
-            <p class="stat-label">{{ stat.label }}</p>
+            <p class="stat-label"><span data-lang-content="en">{{ stat.label }}</span><span data-lang-content="vi">{{ stat.label_vi }}</span></p>
           </div>
           {% endfor %}
         </div>

@@ -192,6 +192,21 @@ input:focus-visible {
   box-shadow: 0 0 10px var(--accent-glow);
 }
 
+/* ---------- Language content (EN/VI) ----------
+   Every piece of user-facing copy is written twice, wrapped in an
+   element carrying data-lang-content="en" or "vi". Only the block
+   matching <html data-lang="..."> is shown; the other is hidden but
+   still present in the DOM (simplest way to keep a single URL per
+   page/post while making the whole page — nav, chrome, and post
+   bodies — switch language together). */
+:root[data-lang="en"] [data-lang-content="vi"] {
+  display: none;
+}
+
+:root[data-lang="vi"] [data-lang-content="en"] {
+  display: none;
+}
+
 /* ---------- Background atmosphere ---------- */
 .bg-texture {
   position: fixed;
@@ -374,6 +389,17 @@ input:focus-visible {
 :root[data-theme="light"] .theme-toggle .icon-moon {
   opacity: 0;
   transform: rotate(40deg) scale(0.6);
+}
+
+/* ---------- Language toggle (EN/VI) ---------- */
+.lang-toggle {
+  width: auto;
+  min-width: 38px;
+  padding: 0 10px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
 }
 
 .nav-toggle {

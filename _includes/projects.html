@@ -5,7 +5,7 @@
   <div class="container">
     <div class="section-head reveal">
       <p class="eyebrow">~/projects</p>
-      <h2 id="projects-heading" class="section-title">Things I've built</h2>
+      <h2 id="projects-heading" class="section-title">{% include t.html en="Things I've built" vi="Những gì tôi đã xây dựng" %}</h2>
     </div>
 
     <div class="project-grid">
@@ -13,7 +13,7 @@
       <article class="project-card reveal">
         <p class="project-index">{% if forloop.index < 10 %}0{{ forloop.index }}{% else %}{{ forloop.index }}{% endif %}</p>
         <h3 class="project-name">{{ project.name }}</h3>
-        <p class="project-desc">{{ project.description }}</p>
+        <p class="project-desc"><span data-lang-content="en">{{ project.description }}</span><span data-lang-content="vi">{{ project.description_vi }}</span></p>
         <ul class="project-tags">
           {% for tag in project.tags %}
           <li class="tag-pill">{{ tag }}</li>
@@ -29,7 +29,7 @@
           {% if project.demo and project.demo != "" %}
           <a href="{{ project.demo }}" target="_blank" rel="noopener noreferrer">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><path d="M15 3h6v6"></path><path d="M10 14 21 3"></path></svg>
-            Live Demo
+            {% include t.html en="Live Demo" vi="Bản Demo" %}
           </a>
           {% endif %}
         </div>

@@ -7,18 +7,20 @@ layout: default
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
         <path d="M19 12H5M12 19l-7-7 7-7"></path>
       </svg>
-      All posts
+      {% include t.html en="All posts" vi="Tất cả bài viết" %}
     </a>
 
     <header class="post-header">
       <p class="eyebrow">~/blog/{{ page.date | date: "%Y" }}</p>
-      <h1 class="post-title">{{ page.title }}</h1>
+      <h1 class="post-title">
+        <span data-lang-content="en">{{ page.title }}</span><span data-lang-content="vi">{{ page.title_vi | default: page.title }}</span>
+      </h1>
       <div class="post-meta">
         <span>{{ page.date | date: "%Y-%m-%d" }}</span>
         <span aria-hidden="true">&middot;</span>
         {% assign words = page.content | strip_html | number_of_words %}
         {% assign reading_time = words | divided_by: 200 | at_least: 1 %}
-        <span>{{ reading_time }} min read</span>
+        <span>{{ reading_time }} <span data-lang-content="en">min read</span><span data-lang-content="vi">phút đọc</span></span>
       </div>
     </header>
 

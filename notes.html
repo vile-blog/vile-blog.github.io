@@ -7,37 +7,39 @@ permalink: /notes/
   <div class="container">
     <div class="section-head reveal">
       <p class="eyebrow">~/notes</p>
-      <h1 class="section-title">Book &amp; paper notes</h1>
+      <h1 class="section-title"><span data-lang-content="en">Book &amp; paper notes</span><span data-lang-content="vi">Ghi chú sách &amp; bài báo</span></h1>
       <p class="notes-sub">
-        Chapter-by-chapter notes from books I'm reading, and write-ups on
+        <span data-lang-content="en">Chapter-by-chapter notes from books I'm reading, and write-ups on
         research papers I'm working through as part of my ongoing reading
         hub. Kept separate from the main blog so they're easy to browse
-        (and filter) on their own.
+        (and filter) on their own.</span><span data-lang-content="vi">Ghi chú theo từng chương của những cuốn sách tôi đang đọc, và bài viết
+        về các paper nghiên cứu tôi đang tìm hiểu như một phần của việc đọc
+        liên tục. Tách riêng khỏi blog chính để dễ duyệt (và lọc) hơn.</span>
       </p>
     </div>
 
     <div class="notes-group reveal">
       <p class="eyebrow">~/notes/books</p>
-      <h2 class="notes-group-title">Book notes</h2>
+      <h2 class="notes-group-title"><span data-lang-content="en">Book notes</span><span data-lang-content="vi">Ghi chú sách</span></h2>
       <div class="blog-list">
         {% assign book_posts = site.categories["book-notes"] %}
         {% for p in book_posts %}
           {% include blog-item.html post=p %}
         {% else %}
-          <p class="notes-empty">No book notes yet — check back soon.</p>
+          <p class="notes-empty"><span data-lang-content="en">No book notes yet — check back soon.</span><span data-lang-content="vi">Chưa có ghi chú sách nào — quay lại sau nhé.</span></p>
         {% endfor %}
       </div>
     </div>
 
     <div class="notes-group reveal">
       <p class="eyebrow">~/notes/papers</p>
-      <h2 class="notes-group-title">Paper notes</h2>
+      <h2 class="notes-group-title"><span data-lang-content="en">Paper notes</span><span data-lang-content="vi">Ghi chú bài báo</span></h2>
       <div class="blog-list">
         {% assign paper_posts = site.categories["papers"] %}
         {% for p in paper_posts %}
           {% include blog-item.html post=p %}
         {% else %}
-          <p class="notes-empty">No paper notes yet — check back soon.</p>
+          <p class="notes-empty"><span data-lang-content="en">No paper notes yet — check back soon.</span><span data-lang-content="vi">Chưa có ghi chú bài báo nào — quay lại sau nhé.</span></p>
         {% endfor %}
       </div>
     </div>

@@ -8,16 +8,18 @@
       <h1 id="hero-heading" class="hero-title">
         {{ site.author.name }}<span class="accent-text">.</span>
       </h1>
-      <p class="hero-role">{{ site.author.role }} —<br />{{ site.author.tagline }}<span class="cursor" aria-hidden="true"></span></p>
+      <p class="hero-role">
+        <span data-lang-content="en">{{ site.author.role }} —<br />{{ site.author.tagline }}</span><span data-lang-content="vi">{{ site.author.role_vi }} —<br />{{ site.author.tagline_vi }}</span><span class="cursor" aria-hidden="true"></span>
+      </p>
       <p class="hero-intro">
-        {{ site.author.intro }}
+        <span data-lang-content="en">{{ site.author.intro }}</span><span data-lang-content="vi">{{ site.author.intro_vi }}</span>
       </p>
       <div class="hero-ctas">
         <a class="btn btn-primary" href="#projects">
-          View Projects
+          {% include t.html en="View Projects" vi="Xem dự án" %}
         </a>
         <a class="btn btn-ghost" href="#blog">
-          Read the Blog
+          {% include t.html en="Read the Blog" vi="Đọc Blog" %}
         </a>
       </div>
     </div>

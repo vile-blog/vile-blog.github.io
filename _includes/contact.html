@@ -5,10 +5,11 @@
   <div class="container">
     <div class="contact-inner reveal">
       <p class="eyebrow" style="justify-content:center">~/contact</p>
-      <h2 id="contact-heading" class="contact-title">Let's build something.</h2>
+      <h2 id="contact-heading" class="contact-title">{% include t.html en="Let's build something." vi="Cùng xây dựng điều gì đó." %}</h2>
       <p class="contact-sub">
-        Have a project in mind, an opening on your team, or just want to
-        talk shop? My inbox is open.
+        <span data-lang-content="en">Have a project in mind, an opening on your team, or just want to
+        talk shop? My inbox is open.</span><span data-lang-content="vi">Có dự án đang ấp ủ, một vị trí đang tuyển trong đội của bạn, hay đơn giản
+        chỉ muốn trò chuyện về nghề? Hòm thư của tôi luôn mở.</span>
       </p>
 
       <a class="contact-email" href="mailto:{{ site.author.email }}">

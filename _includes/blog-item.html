@@ -1,19 +1,23 @@
-{% assign words = include.post.content | strip_html | number_of_words %}
-{% assign reading_time = words | divided_by: 200 | at_least: 1 %}
+{% assign words_en = include.post.content | strip_html | number_of_words %}
+{% assign reading_time_en = words_en | divided_by: 200 | at_least: 1 %}
 <article class="blog-item reveal">
   <p class="blog-date">{{ include.post.date | date: "%Y-%m-%d" }}</p>
   <div class="blog-main">
     <a href="{{ include.post.url | relative_url }}">
-      <h3 class="blog-title">{{ include.post.title }}</h3>
+      <h3 class="blog-title">
+        <span data-lang-content="en">{{ include.post.title }}</span><span data-lang-content="vi">{{ include.post.title_vi | default: include.post.title }}</span>
+      </h3>
     </a>
-    <p class="blog-excerpt">{{ include.post.excerpt }}</p>
+    <p class="blog-excerpt">
+      <span data-lang-content="en">{{ include.post.excerpt }}</span><span data-lang-content="vi">{{ include.post.excerpt_vi | default: include.post.excerpt }}</span>
+    </p>
     {% if include.post.categories.size > 0 or include.post.tags.size > 0 %}
     <div class="blog-tags">
-      {% if include.post.categories contains "papers" %}<span class="tag-pill tag-pill-accent">Paper</span>{% endif %}
-      {% if include.post.categories contains "book-notes" %}<span class="tag-pill tag-pill-accent">Book Notes</span>{% endif %}
+      {% if include.post.categories contains "papers" %}<span class="tag-pill tag-pill-accent">{% include t.html en="Paper" vi="Bài báo" %}</span>{% endif %}
+      {% if include.post.categories contains "book-notes" %}<span class="tag-pill tag-pill-accent">{% include t.html en="Book Notes" vi="Ghi chú sách" %}</span>{% endif %}
       {% for tag in include.post.tags limit:3 %}<span class="tag-pill">{{ tag }}</span>{% endfor %}
     </div>
     {% endif %}
   </div>
-  <p class="blog-time">{{ reading_time }} min read</p>
+  <p class="blog-time">{{ reading_time_en }} <span data-lang-content="en">min read</span><span data-lang-content="vi">phút đọc</span></p>
 </article>

@@ -32,6 +32,31 @@
     syncToggleUI(theme);
   }
 
+  /* ------------------------------------------------------------------
+     Language toggle (EN/VI, persisted, defaults from navigator.language)
+     Same pattern as the theme toggle: the inline <head> script already
+     applied the initial data-lang before paint; this just wires up the
+     button and keeps localStorage in sync.
+  ------------------------------------------------------------------ */
+  var LANG_STORAGE_KEY = "vile-lang";
+
+  function syncLangToggleUI(lang) {
+    var toggles = document.querySelectorAll("[data-lang-toggle]");
+    toggles.forEach(function (btn) {
+      btn.setAttribute("aria-pressed", lang === "vi" ? "true" : "false");
+    });
+  }
+
+  function setLang(lang) {
+    root.setAttribute("data-lang", lang);
+    try {
+      localStorage.setItem(LANG_STORAGE_KEY, lang);
+    } catch (e) {
+      /* localStorage unavailable — language choice just won't persist */
+    }
+    syncLangToggleUI(lang);
+  }
+
   document.addEventListener("DOMContentLoaded", function () {
     /* Fix for eval Issue 6.1: aria-pressed="false" was hardcoded in the
        markup and only ever updated inside the click handler below. The
@@ -47,6 +72,16 @@
       btn.addEventListener("click", function () {
         var current = root.getAttribute("data-theme") === "light" ? "light" : "dark";
         setTheme(current === "light" ? "dark" : "light");
+      });
+    });
+
+    syncLangToggleUI(root.getAttribute("data-lang") === "vi" ? "vi" : "en");
+
+    var langToggleButtons = document.querySelectorAll("[data-lang-toggle]");
+    langToggleButtons.forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        var current = root.getAttribute("data-lang") === "vi" ? "vi" : "en";
+        setLang(current === "vi" ? "en" : "vi");
       });
     });
 

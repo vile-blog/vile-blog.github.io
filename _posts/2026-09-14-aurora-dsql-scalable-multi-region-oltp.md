@@ -1,13 +1,17 @@
 ---
 title: "Paper Notes: Aurora DSQL — Scalable, Multi-Region OLTP"
+title_vi: "Ghi chú Paper: Aurora DSQL — Scalable, Multi-Region OLTP"
 date: 2026-09-14 10:15:00 +0700
 excerpt: "DSQL gets multi-region strong consistency down to one cross-region round trip per commit, not per statement, by disaggregating literally everything — including who decides if a transaction can commit."
+excerpt_vi: "DSQL đưa strong consistency đa vùng xuống còn một round-trip liên vùng mỗi lần commit, không phải mỗi câu lệnh, bằng cách tách rời gần như mọi thứ — kể cả việc ai là người quyết định một transaction có được commit hay không."
 categories: [papers]
 tags: ["Aurora DSQL", "Distributed SQL", "OLTP", "Multi-Region", "Concurrency Control"]
 paper_title: "Aurora DSQL: Scalable, Multi-Region OLTP"
 paper_authors: "Brooker, Bowes, Hershey, van der Merwe, Morle, Strydom — AWS, arXiv 2026"
 paper_url: "https://arxiv.org/abs/2607.13276"
 ---
+
+<div data-lang-content="en" markdown="1">
 
 *Paper: ["Aurora DSQL: Scalable, Multi-Region OLTP"](https://arxiv.org/abs/2607.13276) — Brooker et al., AWS.*
 
@@ -46,3 +50,46 @@ Section 8 reads like real production scar tissue rather than marketing: transact
 ## How this compares to what I'd expect from Spanner/CockroachDB
 
 The paper's own comparison section is useful: Spanner and CockroachDB are pessimistic, with a single leader per shard and a lock table, replicated via Paxos groups. DSQL is optimistic, has no per-shard leader in the locking sense (adjudicators are stateless conflict-checkers, not lock holders), and replicates via a disaggregated Journal instead of Paxos-per-shard. The closest architectural relative they cite is actually FoundationDB, not Spanner — which tracks, since FoundationDB pioneered the "separate the transaction layer from storage entirely" idea DSQL takes even further.
+
+</div>
+<div data-lang-content="vi" markdown="1">
+
+*Paper: ["Aurora DSQL: Scalable, Multi-Region OLTP"](https://arxiv.org/abs/2607.13276) — Brooker et al., AWS.*
+
+Đây là paper trong đợt này khiến tôi có cảm giác đang đọc một thiết kế hệ phân tán làm từ đầu nhất, chứ không phải một bản tiến hóa của thứ gì đó đã có sẵn. Mục tiêu chính rất thẳng thắn: SQL strongly consistent, đa vùng, active-active, mà không bắt mỗi câu lệnh phải trả giá bằng một round-trip liên vùng. Cơ chế họ chọn là tách database thành nhiều mảnh độc lập hơn bất kỳ hệ thống nào tôi từng thấy, và cực kỳ kỷ luật về *thời điểm* các mảnh đó được phép nói chuyện với nhau.
+
+## Năm service, mỗi cái làm đúng một việc
+
+DSQL tách thành: **Query Processor** (không giữ state, mỗi kết nối active một cái, chạy trong Firecracker microVM với engine PostgreSQL nhúng chỉ để parse/plan/xử lý giao thức), **Storage node** (sharded theo dải key, phục vụ đọc theo MVCC), **Adjudicator** (quyết định một transaction có được commit hay không — sharded theo key, tách biệt với cách shard của storage), **Journal** (một commit log có thứ tự, bền vững, atomic — cùng một nguyên lý AWS tái sử dụng ở S3, DynamoDB, và MemoryDB), và **Crossbar** (gộp các luồng từ nhiều Journal thành một thứ tự theo từng shard để storage tiêu thụ).
+
+Chi tiết tôi thấy thú vị nhất: **việc shard adjudicator và shard storage được cố tình tách biệt hoàn toàn.** Một database có lượng đọc lớn, ghi ít có thể chạy nhiều storage shard đứng sau chỉ một adjudicator shard. Đây là một đòn bẩy thật sự khác so với hầu hết các hệ thống sharded khác — nó tách rời "làm sao scale đọc" khỏi "làm sao scale việc phát hiện xung đột" thay vì ép một lược đồ sharding phải phục vụ cả hai.
+
+## OCC + MVCC thay vì lock — và vì sao điều đó tránh được một failure mode cụ thể
+
+DSQL chọn Optimistic Concurrency Control (OCC) cho ghi và snapshot isolation làm mức isolation duy nhất, với mục đích rõ ràng là tránh lời phàn nàn kinh điển về OCC là tỷ lệ abort cao: MVCC nghĩa là mọi lần đọc đều lấy từ một snapshot nhất quán, nên một transaction không bao giờ bị abort chỉ vì nó đã đọc phải thứ sau đó thay đổi. Snapshot isolation cụ thể nghĩa là transaction chỉ xung đột — và bị abort — khi có xung đột **ghi-ghi** (write-write), không phải xung đột đọc-ghi, và vì hầu hết các ghi trong OLTP (`UPDATE`, `INSERT` với unique key) cũng đồng thời là đọc, đây là một mức giảm tỷ lệ abort thật sự so với serializable isolation.
+
+Điều khiến tôi nhớ nhất là *lý do* họ tránh pessimistic locking ở quy mô cloud, chứ không chỉ là việc họ tránh nó: khi lock được giữ xuyên suốt một round-trip mạng, một client bị khựng lại — một lần GC pause, một cơn bão retry, hay thậm chí một người vận hành đứng dậy khỏi bàn giữa chừng transaction — sẽ chặn mọi client khác đang chờ lock đó. OCC về mặt cấu trúc không thể xảy ra chuyện này: không client nào có thể chặn client khác, vì không có gì bị giữ xuyên suốt một khoảng chờ.
+
+## Giao thức commit: một vòng giao tiếp liên vùng, không phải mỗi câu lệnh một vòng
+
+Đây mới là trọng tâm thật sự của paper. Đọc được phục vụ cục bộ dựa trên một timestamp snapshot mà không cần bất kỳ sự điều phối nào — tầng storage chỉ đơn giản chờ cho tới khi bắt kịp timestamp được yêu cầu. Ghi được buffer *cục bộ ngay trong Query Processor* và không đụng tới gì khác cho tới khi `COMMIT`. Tại thời điểm commit:
+
+1. (Các) adjudicator sở hữu những key được ghi kiểm tra xung đột ghi-ghi với mọi thứ đã commit trong khoảng giữa thời điểm bắt đầu và thời điểm commit của transaction.
+2. Nếu sạch, một adjudicator ghi transaction vào Journal của nó — atomic, và chỉ một lần, ngay cả khi transaction trải rộng qua nhiều adjudicator (biến thể 2PC của họ chọn ra một adjudicator để thực sự thực hiện ghi; các adjudicator còn lại chỉ vote và giữ một lời hứa có giới hạn thời gian là không commit các transaction xung đột).
+3. Trong trường hợp đa vùng, việc ghi Journal đó yêu cầu bền vững ở hai-trên-ba vùng — đúng một vòng giao tiếp liên vùng, chấm hết. Không phải một vòng cho mỗi câu lệnh.
+
+Các con số benchmark làm rõ lợi ích này: RTT trung bình giữa `us-east-1` và `us-west-2` khoảng 62ms, nhưng vì một Journal 3 vùng chỉ cần 2-trên-3 để commit, độ trễ commit thực tế của một triển khai `us-east-1`/`us-west-2`/`us-east-2` bị giới hạn bởi vùng thứ hai *gần nhất* (khoảng 11.5ms p50 tới `us-east-2`) thay vì cả chặng xuyên lục địa. So với một đối thủ dùng pessimistic locking, biểu đồ độ trễ chuẩn hóa của họ cho thấy độ trễ của đối thủ tăng tuyến tính theo số câu lệnh mỗi transaction (nhiều round-trip hơn để giữ trạng thái lock), trong khi độ trễ của DSQL gần như phẳng bất kể vùng nào.
+
+## Hai ngoại lệ với snapshot isolation "thuần túy" mà tôi thấy đáng khen vì họ nêu ra
+
+Snapshot isolation trong học thuật không bao phủ gọn gàng các thay đổi schema hay khóa tường minh, và paper thẳng thắn chỉ ra những chỗ họ phải gắn thêm đảm bảo mạnh hơn thay vì giả vờ model đã hoàn chỉnh: một `ALTER TABLE` chạy đồng thời với một `INSERT` có thể khiến insert đó commit dựa trên một schema đã thay đổi, nên các cập nhật catalog được kiểm tra xung đột đọc-ghi (tương đương serializable) thay vì chỉ kiểm tra ghi-ghi như mặc định của snapshot isolation. `FOR UPDATE` cũng được xử lý tương tự. Đây là một lời nhắc hay rằng các mức isolation trong sách vở chỉ là điểm khởi đầu, không phải một đặc tả có thể triển khai máy móc — ngữ nghĩa SQL thực tế có những trường hợp biên mà lý thuyết không phủ tới.
+
+## Những giới hạn được nói thẳng — điều khiến tôi tin paper hơn là một bài không nhắc gì
+
+Mục 8 đọc như những vết sẹo thật từ production hơn là marketing: transaction bị giới hạn ở 3.000 dòng / 10MiB (có chủ đích, để giới hạn tail latency theo định luật Little — càng nhiều concurrency đang chạy thì p99 càng tệ), ràng buộc khóa ngoại (foreign key) chưa được hỗ trợ (một đánh đổi để ra mắt nhanh hơn, mà giờ họ đang phải bù lại vì đã đánh giá thấp nhu cầu), và range partitioning — lựa chọn đúng đắn cho locality — lại khiến các sequence kiểu `AUTO_INCREMENT` và các index có cardinality thấp thực sự khó shard cho tốt. Tôi thích đọc một paper hệ thống dám thừa nhận cái gì chưa hoạt động tốt hơn là một bài không nói gì cả.
+
+## So sánh với những gì tôi kỳ vọng ở Spanner/CockroachDB
+
+Phần so sánh trong chính paper khá hữu ích: Spanner và CockroachDB dùng pessimistic, mỗi shard có một leader duy nhất kèm bảng lock, replicate qua các nhóm Paxos. DSQL dùng optimistic, không có leader theo nghĩa giữ lock cho từng shard (adjudicator chỉ là bộ kiểm tra xung đột không giữ state, không phải nơi giữ lock), và replicate qua một Journal tách rời thay vì Paxos-cho-từng-shard. Hệ thống có kiến trúc gần gũi nhất mà họ dẫn ra thực ra là FoundationDB, không phải Spanner — điều này hợp lý, vì FoundationDB là hệ tiên phong cho ý tưởng "tách hoàn toàn tầng transaction khỏi storage" mà DSQL đẩy đi xa hơn nữa.
+
+</div>

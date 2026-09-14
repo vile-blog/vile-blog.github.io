@@ -1,38 +1,44 @@
 # Edit this file to add/update the projects shown in the Projects section.
-# Each entry: name, description, tags (tech stack), github (url), demo (url, optional)
+# Each entry: name, description (+ description_vi), tags (tech stack), github (url), demo (url, optional)
 
 - name: "Hustly Space"
   description: "A platform where Vietnamese students discover hackathons, case competitions, and pitch contests — and find teammates to compete with."
+  description_vi: "Nền tảng giúp sinh viên Việt Nam khám phá các cuộc thi hackathon, case competition, pitch contest — và tìm đồng đội để cùng thi đấu."
   tags: ["React", "PostgreSQL", "Product"]
   github: ""
   demo: "https://www.hustlyspace.com/"
 
 - name: "OpsCopilot"
   description: "An AI agent for daily business operations, built during the AMD AI Developer Program."
+  description_vi: "AI agent hỗ trợ vận hành công việc kinh doanh hàng ngày, được xây dựng trong khuôn khổ AMD AI Developer Program."
   tags: ["Python", "AI Agents", "AMD"]
   github: "https://github.com/lcv-engineer/amd-developer-hackathon"
   demo: ""
 
 - name: "VIVA"
   description: "Top 3 out of 300 teams at FPT Automotive Hackathon 2026."
+  description_vi: "Lọt Top 3 trong số 300 đội tại FPT Automotive Hackathon 2026."
   tags: ["Kotlin"]
   github: "https://github.com/lcv-engineer/fpt-automotive-hackathon-2026"
   demo: ""
 
 - name: "Isymptom"
   description: "1st place capstone project at Grab Bootcamp 2025."
+  description_vi: "Dự án capstone đạt giải Nhất tại Grab Bootcamp 2025."
   tags: ["Python", "Machine Learning"]
   github: "https://github.com/lcv-engineer/grab-bootcamp-team13-2025"
   demo: ""
 
 - name: "ViSafeEval"
   description: "A Vietnamese-language AI safety benchmark and red-team toolkit for evaluating LLM safety in Vietnamese and regional slang."
+  description_vi: "Bộ benchmark và công cụ red-team đánh giá độ an toàn của AI bằng tiếng Việt, bao gồm cả tiếng lóng và phương ngữ vùng miền."
   tags: ["Python", "LLM Safety"]
   github: "https://github.com/lcv-engineer/AI-safety-hackathon"
   demo: ""
 
 - name: "cotuongX"
   description: "A backend and visualization layer connecting real-world Xiangqi board movement data to an online human-vs-AI viewing experience."
+  description_vi: "Lớp backend và trực quan hóa kết nối dữ liệu nước đi cờ tướng thực tế với trải nghiệm xem người đấu với AI trực tuyến."
   tags: ["Go"]
   github: "https://github.com/lcv-engineer/cotuongX"
   demo: ""

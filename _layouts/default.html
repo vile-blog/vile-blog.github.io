@@ -22,6 +22,25 @@
   })();
 </script>
 
+<!-- Language is applied here too, before first paint, for the same
+     flash-avoidance reason. Priority: stored preference -> browser
+     language -> English. -->
+<script>
+  (function () {
+    try {
+      var stored = localStorage.getItem("vile-lang");
+      var lang = stored
+        ? stored
+        : (navigator.language && navigator.language.toLowerCase().indexOf("vi") === 0
+            ? "vi"
+            : "en");
+      document.documentElement.setAttribute("data-lang", lang);
+    } catch (e) {
+      document.documentElement.setAttribute("data-lang", "en");
+    }
+  })();
+</script>
+
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
