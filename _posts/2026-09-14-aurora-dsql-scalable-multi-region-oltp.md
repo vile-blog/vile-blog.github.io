@@ -2,8 +2,8 @@
 title: "Paper Notes: Aurora DSQL — Scalable, Multi-Region OLTP"
 title_vi: "Ghi chú Paper: Aurora DSQL — Scalable, Multi-Region OLTP"
 date: 2026-09-14 10:15:00 +0700
-excerpt: "DSQL gets multi-region strong consistency down to one cross-region round trip per commit, not per statement, by disaggregating literally everything — including who decides if a transaction can commit."
-excerpt_vi: "DSQL đưa strong consistency đa vùng xuống còn một round-trip liên vùng mỗi lần commit, không phải mỗi câu lệnh, bằng cách tách rời gần như mọi thứ — kể cả việc ai là người quyết định một transaction có được commit hay không."
+excerpt: "How do you build a database that's spread across three continents, feels instant to every user, and never shows two people different answers to the same question? This paper's answer surprised me."
+excerpt_vi: "Làm sao xây một database trải trên ba châu lục, cảm giác tức thời với mọi người dùng, và không bao giờ cho hai người hai câu trả lời khác nhau cho cùng một câu hỏi? Câu trả lời trong paper này khiến tôi bất ngờ."
 categories: [papers]
 tags: ["Aurora DSQL", "Distributed SQL", "OLTP", "Multi-Region", "Concurrency Control"]
 paper_title: "Aurora DSQL: Scalable, Multi-Region OLTP"
@@ -13,83 +13,139 @@ paper_url: "https://arxiv.org/abs/2607.13276"
 
 <div data-lang-content="en" markdown="1">
 
-*Paper: ["Aurora DSQL: Scalable, Multi-Region OLTP"](https://arxiv.org/abs/2607.13276) — Brooker et al., AWS.*
+*Paper: ["Aurora DSQL: Scalable, Multi-Region OLTP"](https://arxiv.org/abs/2607.13276), by Brooker et al., AWS.*
 
-This is the paper in this batch that felt most like reading a distributed systems design from scratch rather than an evolution of something existing. The headline goal is blunt: strongly consistent, multi-region, active-active SQL, without making every statement pay a cross-region round trip. The mechanism they land on is to disaggregate the database into more independent pieces than I'd seen before, and to be extremely disciplined about *when* those pieces are allowed to talk to each other.
+This is a hard paper to explain casually, so let me build up to it slowly with an example, because I think the problem it's solving is actually really easy to picture even if the solution isn't.
 
-## Five services, each doing one thing
+## The problem, without any jargon
 
-DSQL splits into: **Query Processors** (stateless, one per active connection, running inside a Firecracker microVM with an embedded PostgreSQL engine for parsing/planning/wire protocol only), **Storage nodes** (sharded by key range, serving MVCC reads), **Adjudicators** (decide whether a transaction can commit — sharded by key, not tied to storage sharding), **Journal** (an ordered, durable, atomic commit log — the same primitive AWS reuses across S3, DynamoDB, and MemoryDB), and **Crossbar** (merges multiple Journals' streams into a per-shard order for storage to consume).
+Imagine you're running an online store with customers in the US, Europe, and Asia. You want the app to feel instant for everyone, so you'd like a copy of your database running near each group of customers instead of everyone talking to one server on the other side of the planet. But here's the catch: what if a customer in the US and a customer in Singapore try to buy the *last* item in stock at almost the exact same moment? Both copies of your database need to agree on who actually got it — you can't let both purchases succeed. That agreement has to travel between continents, and continents are far apart. Even at the speed of light, a message from the US to Singapore and back takes real, noticeable time. So now you've got a tension: you want things to feel fast and local, but correctness sometimes genuinely requires talking to the other side of the world.
 
-The detail I found most interesting: **adjudicator sharding and storage sharding are deliberately independent.** A database with heavy reads and light writes can run many storage shards behind a single adjudicator shard. That's a genuinely different lever than most sharded systems give you — it decouples "how do I scale reads" from "how do I scale conflict detection" instead of forcing one sharding scheme to serve both.
+That tension — "be fast and local most of the time, but never allow the world to disagree with itself" — is exactly what this paper is about. Before I can explain their answer, I need to define a handful of terms, because this paper leans on all of them.
 
-## OCC + MVCC instead of locks — and why that avoids a specific failure mode
+## A quick glossary, in plain language
 
-DSQL picks Optimistic Concurrency Control for writes and snapshot isolation as its (only) isolation level, explicitly to avoid the standard OCC complaint of high abort rates: MVCC means every read comes from a consistent snapshot, so a transaction is never aborted just because it read something that later changed. Snapshot isolation specifically means transactions only conflict — and abort — on **write-write** conflicts, not read-write conflicts, and since most OLTP writes (`UPDATE`, unique-key `INSERT`) are also reads, that's a real reduction in abort rate versus serializable isolation.
+- **Transaction**: a group of changes to a database that must all happen together, or not at all. Classic example: moving money between two bank accounts means subtracting from one and adding to the other — if only one half happens, someone's money just vanished.
+- **Sharding**: splitting a huge database into smaller pieces spread across many machines — like splitting one giant phone book into 26 separate books, one per letter of the alphabet, so no single bookshelf has to hold the entire country's contacts.
+- **Locking (the traditional way of handling multiple people at once)**: when someone starts changing a piece of data, the system "locks" it so nobody else can touch it until they're done — like checking a library book out so nobody else can borrow it until you return it. Safe, but if you go on vacation with the book, everyone else waits.
+- **Optimistic concurrency control (the alternative DSQL uses)**: instead of locking things upfront, everyone just goes ahead and works on their own copy, and only right at the very end does the system check "did anyone else change this same thing while I was working?" If nobody did, great, save it. If someone did, you redo your work. This avoids the "someone went on vacation with the book" problem entirely, at the cost of occasionally having to redo work.
+- **Snapshot / MVCC**: instead of keeping just one current version of each piece of data, the database keeps several recent versions around. That way, someone reading data can be handed a consistent "freeze frame" from a specific moment in time, even while other people are actively changing things — like a library keeping the previous edition of a book on the shelf while a new edition is being printed, so people already reading the old one aren't interrupted.
+- **Round trip**: sending a message and waiting for the reply. If the two computers are on different continents, this round trip is slow no matter how good your code is, because it's limited by the actual physical distance the signal has to travel.
 
-What stuck with me is *why* they avoid pessimistic locking at cloud scale, not just that they avoid it: with locks held across a network round trip, a client that pauses — a GC pause, a retry storm, or even an operator who's stepped away from their desk mid-transaction — blocks every other client waiting on that lock. OCC structurally can't do that: no client can ever block another client, because nothing is held across a wait.
+## What DSQL actually does
 
-## The commit protocol: one round of cross-region communication, not per-statement
+DSQL splits the job of "being a database" into five separate specialist pieces instead of one big program doing everything:
 
-This is the actual point of the paper. Reads are served locally against a snapshot timestamp with no coordination at all — the storage layer just waits until it's caught up to the requested timestamp. Writes buffer *locally inside the Query Processor* and touch nothing else until `COMMIT`. At commit time:
+1. **Query Processors** — the part that talks directly to your application, understands SQL, and figures out what to do with it. There's a fresh one of these for every connection, and it doesn't remember anything between requests.
+2. **Storage nodes** — hold the actual data, split ("sharded") by key range, and can hand out a snapshot version to readers without needing to check in with anyone else first.
+3. **Adjudicators** — the referees. Their only job is deciding "can this transaction go through, or does it conflict with something else that already happened?"
+4. **Journal** — a single, strictly ordered, permanent record of every transaction that has ever been approved. Think of it as the official diary that everything else is built from.
+5. **Crossbar** — takes the Journal's entries and routes them out to the right storage nodes.
 
-1. The adjudicator(s) owning the written keys check for write-write conflicts against everything committed between the transaction's start and commit timestamps.
-2. If clean, one adjudicator writes the transaction to its Journal — atomically, and only once, even across a multi-adjudicator transaction (their 2PC variant elects one adjudicator to actually do the write; the others just vote and hold a time-bounded promise not to commit conflicting transactions).
-3. In the multi-region case, that Journal write requires durability in two-of-three regions — one round of cross-region communication, period. Not one per statement.
+The detail that impressed me most: the referees (Adjudicators) and the data-holders (Storage nodes) are split up *independently* of each other. A shop that gets tons of browsing traffic but few actual purchases can run lots of storage copies for fast reading, while only needing a small number of referees, since checking out is rare. Most systems force you to use the same splitting scheme for both jobs; DSQL lets you tune them separately, which is a genuinely different and clever lever to have.
 
-The benchmark numbers make the payoff concrete: the RTT between `us-east-1` and `us-west-2` averages ~62ms, but because a 3-region Journal only needs 2-of-3 to commit, an `us-east-1`/`us-west-2`/`us-east-2` deployment's actual commit latency is bounded by the *closest* second region (~11.5ms p50 to `us-east-2`) rather than the full cross-continent hop. Against a pessimistic-locking competitor, their normalized-latency chart shows that competitor's latency growing linearly with statements-per-transaction (more round trips to hold lock state), while DSQL's stays flat regardless of region.
+## Why "checking at the end" instead of "locking upfront" matters at global scale
 
-## Two exceptions to "pure" snapshot isolation that I appreciated them naming
+Remember the library-book analogy — locking means someone can "walk off with the book." At a small scale that's a minor annoyance. At the scale DSQL operates at, with connections spread across continents, "walking off with the book" can mean: a server pauses briefly to do garbage collection, or a network hiccup causes a retry storm, or literally an engineer looking at a slow query steps away from their desk for coffee — mid-transaction. If that transaction is holding a lock, *every other request touching the same data anywhere in the world freezes* until it's released. DSQL's optimistic approach makes this structurally impossible: nobody ever waits on anybody else, because nobody reserves anything ahead of time. The worst case is just "redo your own work," never "block a stranger."
 
-Academic snapshot isolation doesn't cleanly cover schema changes or explicit locking, and the paper is upfront about where they had to bolt on stronger guarantees rather than pretend the model is complete: an `ALTER TABLE` concurrent with an `INSERT` could otherwise let the insert commit against a schema that's since changed, so catalog updates get read-write conflict detection (effectively serializable) instead of the default snapshot-isolation write-write-only check. Same treatment for `FOR UPDATE`. It's a good reminder that isolation levels from the literature are a starting point, not a spec you can implement mechanically — real SQL semantics have edge cases the theory doesn't cover.
+## The actual trick: only argue with the world once, at the very end
 
-## Honest limitations, which I trust more than a paper without any
+Here's the part that's genuinely clever. Reading data never needs to ask anyone else's permission — a Query Processor just reads a snapshot locally. Writing data is buffered locally too, entirely inside your own Query Processor, and doesn't touch the rest of the system *at all* until you say "I'm done, save this" (called `COMMIT`). Only at that single moment does the system have to:
 
-Section 8 reads like real production scar tissue rather than marketing: transactions are capped at 3,000 rows / 10MiB (deliberately, to bound tail latency via Little's Law — more concurrency in flight means worse p99s), foreign key constraints aren't supported yet (a time-to-market tradeoff they're now walking back after underestimating demand), and range partitioning — the right call for locality — makes `AUTO_INCREMENT`-style sequences and low-cardinality indexes genuinely hard to shard well. I'd rather read a systems paper that admits what doesn't work yet than one that doesn't.
+1. Ask the relevant Adjudicators "did anyone else change these exact same pieces of data since I started?"
+2. If nobody did, write the transaction into the Journal — permanently, atomically, exactly once.
+3. If your data is spread across multiple regions, make sure that Journal entry is safely stored in at least two of your three regions before saying "done."
 
-## How this compares to what I'd expect from Spanner/CockroachDB
+That third step is the only moment the system has to have an actual conversation across continents — and it only happens once per transaction, not once per individual change inside it. In their benchmark, a message between two AWS regions on opposite sides of the US takes around 62 milliseconds round-trip. But because you only need agreement from *two* out of *three* regions, DSQL can be clever about which two, and the real number ends up closer to 11 milliseconds in a well-chosen three-region setup — because it only has to wait for the *closer* of the two other regions, not the farthest one. Compared to an older-style competitor that locks data and needs a network round trip for every single line of a transaction, that competitor gets slower and slower the more work is in each transaction, while DSQL barely changes at all.
 
-The paper's own comparison section is useful: Spanner and CockroachDB are pessimistic, with a single leader per shard and a lock table, replicated via Paxos groups. DSQL is optimistic, has no per-shard leader in the locking sense (adjudicators are stateless conflict-checkers, not lock holders), and replicates via a disaggregated Journal instead of Paxos-per-shard. The closest architectural relative they cite is actually FoundationDB, not Spanner — which tracks, since FoundationDB pioneered the "separate the transaction layer from storage entirely" idea DSQL takes even further.
+## Where the theory gets messy, and they admit it
+
+Academic descriptions of "snapshot isolation" (the rule I described above, where everyone sees a consistent freeze-frame) don't perfectly cover every real situation. Two examples the authors call out honestly:
+
+- If someone is changing the actual *structure* of a table (like adding a column) at the same moment someone else is inserting a row, snapshot isolation alone isn't strict enough to prevent weirdness — so DSQL quietly makes structural changes stricter than normal data changes.
+- The SQL feature `FOR UPDATE`, which lets a program explicitly say "I plan to change this row soon, please don't let anyone sneak in first," needs similar special-casing.
+
+I liked that they said this out loud instead of pretending the textbook version of snapshot isolation just works everywhere unmodified. Real systems always have these edge cases; the honest ones name them.
+
+## The limitations section is the most trustworthy part of the paper
+
+A lot of company-published systems papers read like advertisements. This one has an entire section admitting real, current weaknesses: every transaction is capped at 3,000 rows or 10 megabytes (on purpose, to keep worst-case delays predictable — bigger transactions in flight make everyone's experience less predictable, not just the person running the big one). Foreign key constraints, a very standard SQL feature, aren't supported yet — they admit they underestimated how many people wanted it. And their choice to split data by ranges (good for keeping related rows physically close together) makes certain common patterns, like auto-incrementing ID numbers, genuinely awkward to spread across many machines efficiently. I trust a systems paper more, not less, when it tells me what doesn't work yet.
+
+## How it stacks up against the two names I already knew
+
+Two well-known systems I'd heard of before, Google's Spanner and CockroachDB, both use the "locking" approach — one designated leader machine per data shard, holding locks, agreeing via a voting protocol. DSQL deliberately avoids having any single "leader" holding locks at all. The system it actually resembles most, according to the authors themselves, isn't Spanner — it's an older, less famous system called FoundationDB, which was one of the first to seriously separate "deciding if a transaction is valid" from "storing the actual data." DSQL just takes that same idea and pushes it even further apart.
+
+## What this taught me, beyond the specific system
+
+The thing I keep coming back to is how much of this design is really about *minimizing the number of moments where distant computers have to talk to each other*, rather than making each individual conversation faster. That reframing — treat cross-region communication as a rare, expensive event you schedule deliberately, not something you can just optimize your way out of — feels like a genuinely transferable lesson for any system that has to work across long distances, not just databases.
 
 </div>
 <div data-lang-content="vi" markdown="1">
 
-*Paper: ["Aurora DSQL: Scalable, Multi-Region OLTP"](https://arxiv.org/abs/2607.13276) — Brooker et al., AWS.*
+*Paper: ["Aurora DSQL: Scalable, Multi-Region OLTP"](https://arxiv.org/abs/2607.13276), của Brooker và cộng sự, AWS.*
 
-Đây là paper trong đợt này khiến tôi có cảm giác đang đọc một thiết kế hệ phân tán làm từ đầu nhất, chứ không phải một bản tiến hóa của thứ gì đó đã có sẵn. Mục tiêu chính rất thẳng thắn: SQL strongly consistent, đa vùng, active-active, mà không bắt mỗi câu lệnh phải trả giá bằng một round-trip liên vùng. Cơ chế họ chọn là tách database thành nhiều mảnh độc lập hơn bất kỳ hệ thống nào tôi từng thấy, và cực kỳ kỷ luật về *thời điểm* các mảnh đó được phép nói chuyện với nhau.
+Đây là một paper khó giải thích ngắn gọn, nên để tôi xây dựng từ từ bằng một ví dụ, vì tôi nghĩ vấn đề nó giải quyết thực ra rất dễ hình dung, dù lời giải thì không.
 
-## Năm service, mỗi cái làm đúng một việc
+## Vấn đề, không cần thuật ngữ chuyên môn
 
-DSQL tách thành: **Query Processor** (không giữ state, mỗi kết nối active một cái, chạy trong Firecracker microVM với engine PostgreSQL nhúng chỉ để parse/plan/xử lý giao thức), **Storage node** (sharded theo dải key, phục vụ đọc theo MVCC), **Adjudicator** (quyết định một transaction có được commit hay không — sharded theo key, tách biệt với cách shard của storage), **Journal** (một commit log có thứ tự, bền vững, atomic — cùng một nguyên lý AWS tái sử dụng ở S3, DynamoDB, và MemoryDB), và **Crossbar** (gộp các luồng từ nhiều Journal thành một thứ tự theo từng shard để storage tiêu thụ).
+Tưởng tượng bạn đang vận hành một cửa hàng online với khách hàng ở Mỹ, châu Âu, và châu Á. Bạn muốn ứng dụng cảm giác nhanh tức thì với mọi người, nên bạn muốn có một bản sao database chạy gần từng nhóm khách hàng thay vì ai cũng phải nói chuyện với một server ở nửa vòng trái đất. Nhưng đây là cái bẫy: nếu một khách ở Mỹ và một khách ở Singapore cùng cố mua *món hàng cuối cùng* trong kho gần như cùng một thời điểm thì sao? Cả hai bản sao database phải thống nhất xem ai thực sự mua được — bạn không thể để cả hai giao dịch đều thành công. Sự thống nhất đó phải đi qua khoảng cách giữa các châu lục, mà các châu lục thì rất xa nhau. Ngay cả với tốc độ ánh sáng, một tin nhắn từ Mỹ đến Singapore rồi quay lại cũng mất một khoảng thời gian đáng kể. Vậy là bạn có một sự căng thẳng: bạn muốn mọi thứ nhanh và cục bộ, nhưng đôi khi tính đúng đắn lại thực sự đòi hỏi phải nói chuyện với phía bên kia thế giới.
 
-Chi tiết tôi thấy thú vị nhất: **việc shard adjudicator và shard storage được cố tình tách biệt hoàn toàn.** Một database có lượng đọc lớn, ghi ít có thể chạy nhiều storage shard đứng sau chỉ một adjudicator shard. Đây là một đòn bẩy thật sự khác so với hầu hết các hệ thống sharded khác — nó tách rời "làm sao scale đọc" khỏi "làm sao scale việc phát hiện xung đột" thay vì ép một lược đồ sharding phải phục vụ cả hai.
+Sự căng thẳng đó — "nhanh và cục bộ hầu hết thời gian, nhưng không bao giờ để thế giới tự mâu thuẫn với chính nó" — chính xác là điều bài paper này nói tới. Trước khi giải thích cách họ giải quyết, tôi cần định nghĩa vài thuật ngữ, vì cả paper dựa trên tất cả những khái niệm đó.
 
-## OCC + MVCC thay vì lock — và vì sao điều đó tránh được một failure mode cụ thể
+## Từ điển nhanh, bằng ngôn ngữ đơn giản
 
-DSQL chọn Optimistic Concurrency Control (OCC) cho ghi và snapshot isolation làm mức isolation duy nhất, với mục đích rõ ràng là tránh lời phàn nàn kinh điển về OCC là tỷ lệ abort cao: MVCC nghĩa là mọi lần đọc đều lấy từ một snapshot nhất quán, nên một transaction không bao giờ bị abort chỉ vì nó đã đọc phải thứ sau đó thay đổi. Snapshot isolation cụ thể nghĩa là transaction chỉ xung đột — và bị abort — khi có xung đột **ghi-ghi** (write-write), không phải xung đột đọc-ghi, và vì hầu hết các ghi trong OLTP (`UPDATE`, `INSERT` với unique key) cũng đồng thời là đọc, đây là một mức giảm tỷ lệ abort thật sự so với serializable isolation.
+- **Transaction**: một nhóm thay đổi lên database phải xảy ra cùng nhau, hoặc không xảy ra gì cả. Ví dụ kinh điển: chuyển tiền giữa hai tài khoản ngân hàng nghĩa là trừ tiền ở một bên và cộng vào bên kia — nếu chỉ một nửa xảy ra, tiền của ai đó vừa biến mất.
+- **Sharding**: chia một database khổng lồ thành nhiều mảnh nhỏ trải trên nhiều máy — giống như chia một cuốn danh bạ điện thoại khổng lồ thành 26 cuốn nhỏ, mỗi cuốn một chữ cái, để không cái kệ sách nào phải chứa toàn bộ danh bạ của cả nước.
+- **Locking (cách truyền thống xử lý nhiều người cùng lúc)**: khi ai đó bắt đầu thay đổi một dữ liệu, hệ thống "khóa" nó lại để không ai khác đụng vào được cho đến khi xong — giống như mượn một quyển sách thư viện để không ai khác mượn được cho đến khi bạn trả lại. An toàn, nhưng nếu bạn mang sách đi nghỉ mát thì mọi người khác phải chờ.
+- **Optimistic concurrency control (cách thay thế mà DSQL dùng)**: thay vì khóa trước, mọi người cứ làm việc trên bản của mình, và chỉ đến phút cuối cùng hệ thống mới kiểm tra "có ai khác đổi đúng thứ này trong lúc tôi đang làm không?" Nếu không ai đổi, tuyệt, lưu lại. Nếu có ai đổi, bạn làm lại. Cách này tránh hẳn vấn đề "ai đó mang sách đi nghỉ mát," đổi lại là thỉnh thoảng phải làm lại việc.
+- **Snapshot / MVCC**: thay vì chỉ giữ đúng một phiên bản hiện tại của mỗi dữ liệu, database giữ lại vài phiên bản gần đây. Nhờ vậy, người đọc dữ liệu có thể nhận được một "khung hình đóng băng" nhất quán tại một thời điểm cụ thể, ngay cả khi người khác đang thay đổi mọi thứ — giống như thư viện vẫn giữ ấn bản cũ của một cuốn sách trên kệ trong lúc ấn bản mới đang được in, để người đang đọc ấn bản cũ không bị gián đoạn.
+- **Round trip**: gửi một tin nhắn và chờ phản hồi. Nếu hai máy tính nằm ở hai châu lục khác nhau, round trip này chậm dù code bạn có giỏi cỡ nào, vì nó bị giới hạn bởi khoảng cách vật lý thật mà tín hiệu phải đi qua.
 
-Điều khiến tôi nhớ nhất là *lý do* họ tránh pessimistic locking ở quy mô cloud, chứ không chỉ là việc họ tránh nó: khi lock được giữ xuyên suốt một round-trip mạng, một client bị khựng lại — một lần GC pause, một cơn bão retry, hay thậm chí một người vận hành đứng dậy khỏi bàn giữa chừng transaction — sẽ chặn mọi client khác đang chờ lock đó. OCC về mặt cấu trúc không thể xảy ra chuyện này: không client nào có thể chặn client khác, vì không có gì bị giữ xuyên suốt một khoảng chờ.
+## DSQL thực sự làm gì
 
-## Giao thức commit: một vòng giao tiếp liên vùng, không phải mỗi câu lệnh một vòng
+DSQL chia công việc "làm một database" thành năm mảnh chuyên biệt riêng biệt thay vì một chương trình lớn làm hết mọi thứ:
 
-Đây mới là trọng tâm thật sự của paper. Đọc được phục vụ cục bộ dựa trên một timestamp snapshot mà không cần bất kỳ sự điều phối nào — tầng storage chỉ đơn giản chờ cho tới khi bắt kịp timestamp được yêu cầu. Ghi được buffer *cục bộ ngay trong Query Processor* và không đụng tới gì khác cho tới khi `COMMIT`. Tại thời điểm commit:
+1. **Query Processor** — phần nói chuyện trực tiếp với ứng dụng của bạn, hiểu SQL, và tìm ra phải làm gì với nó. Mỗi kết nối có một cái mới toanh, và nó không nhớ gì giữa các request.
+2. **Storage node** — giữ dữ liệu thật, chia ("shard") theo dải key, và có thể đưa cho người đọc một phiên bản snapshot mà không cần hỏi ý kiến ai khác trước.
+3. **Adjudicator** — các trọng tài. Việc duy nhất của họ là quyết định "transaction này có được đi qua không, hay nó xung đột với thứ gì đó đã xảy ra rồi?"
+4. **Journal** — một bản ghi duy nhất, có thứ tự nghiêm ngặt, vĩnh viễn của mọi transaction từng được chấp thuận. Hãy nghĩ nó như cuốn nhật ký chính thức mà mọi thứ khác được xây dựng từ đó.
+5. **Crossbar** — lấy các mục từ Journal và định tuyến chúng tới đúng storage node.
 
-1. (Các) adjudicator sở hữu những key được ghi kiểm tra xung đột ghi-ghi với mọi thứ đã commit trong khoảng giữa thời điểm bắt đầu và thời điểm commit của transaction.
-2. Nếu sạch, một adjudicator ghi transaction vào Journal của nó — atomic, và chỉ một lần, ngay cả khi transaction trải rộng qua nhiều adjudicator (biến thể 2PC của họ chọn ra một adjudicator để thực sự thực hiện ghi; các adjudicator còn lại chỉ vote và giữ một lời hứa có giới hạn thời gian là không commit các transaction xung đột).
-3. Trong trường hợp đa vùng, việc ghi Journal đó yêu cầu bền vững ở hai-trên-ba vùng — đúng một vòng giao tiếp liên vùng, chấm hết. Không phải một vòng cho mỗi câu lệnh.
+Chi tiết khiến tôi ấn tượng nhất: các trọng tài (Adjudicator) và nơi giữ dữ liệu (Storage node) được chia tách *độc lập* với nhau. Một cửa hàng có rất nhiều lượt xem nhưng ít lượt mua thực sự có thể chạy nhiều bản sao storage để đọc nhanh, trong khi chỉ cần một số ít trọng tài, vì việc mua hàng hiếm hơn. Hầu hết hệ thống bắt bạn dùng chung một cách chia cho cả hai việc; DSQL cho phép bạn tinh chỉnh riêng từng cái, và đó thực sự là một đòn bẩy khác biệt, thông minh.
 
-Các con số benchmark làm rõ lợi ích này: RTT trung bình giữa `us-east-1` và `us-west-2` khoảng 62ms, nhưng vì một Journal 3 vùng chỉ cần 2-trên-3 để commit, độ trễ commit thực tế của một triển khai `us-east-1`/`us-west-2`/`us-east-2` bị giới hạn bởi vùng thứ hai *gần nhất* (khoảng 11.5ms p50 tới `us-east-2`) thay vì cả chặng xuyên lục địa. So với một đối thủ dùng pessimistic locking, biểu đồ độ trễ chuẩn hóa của họ cho thấy độ trễ của đối thủ tăng tuyến tính theo số câu lệnh mỗi transaction (nhiều round-trip hơn để giữ trạng thái lock), trong khi độ trễ của DSQL gần như phẳng bất kể vùng nào.
+## Vì sao "kiểm tra ở cuối" thay vì "khóa trước" lại quan trọng ở quy mô toàn cầu
 
-## Hai ngoại lệ với snapshot isolation "thuần túy" mà tôi thấy đáng khen vì họ nêu ra
+Nhớ lại ví dụ quyển sách thư viện — locking nghĩa là ai đó có thể "mang sách đi mất." Ở quy mô nhỏ, đó chỉ là phiền toái nhỏ. Ở quy mô DSQL vận hành, với các kết nối trải khắp châu lục, "mang sách đi mất" có thể là: một server tạm dừng chút để dọn rác bộ nhớ, hoặc một trục trặc mạng gây ra một cơn bão retry, hoặc thậm chí một kỹ sư đang xem một truy vấn chậm đứng dậy đi lấy cà phê — ngay giữa transaction. Nếu transaction đó đang giữ một lock, *mọi request khác chạm vào cùng dữ liệu đó ở bất kỳ đâu trên thế giới đều bị đóng băng* cho đến khi nó được thả ra. Cách tiếp cận optimistic của DSQL khiến điều này về mặt cấu trúc không thể xảy ra: không ai phải chờ ai cả, vì không ai đặt trước cái gì. Trường hợp xấu nhất chỉ là "làm lại việc của chính mình," không bao giờ là "chặn đứng một người lạ."
 
-Snapshot isolation trong học thuật không bao phủ gọn gàng các thay đổi schema hay khóa tường minh, và paper thẳng thắn chỉ ra những chỗ họ phải gắn thêm đảm bảo mạnh hơn thay vì giả vờ model đã hoàn chỉnh: một `ALTER TABLE` chạy đồng thời với một `INSERT` có thể khiến insert đó commit dựa trên một schema đã thay đổi, nên các cập nhật catalog được kiểm tra xung đột đọc-ghi (tương đương serializable) thay vì chỉ kiểm tra ghi-ghi như mặc định của snapshot isolation. `FOR UPDATE` cũng được xử lý tương tự. Đây là một lời nhắc hay rằng các mức isolation trong sách vở chỉ là điểm khởi đầu, không phải một đặc tả có thể triển khai máy móc — ngữ nghĩa SQL thực tế có những trường hợp biên mà lý thuyết không phủ tới.
+## Mánh khóe thật sự: chỉ tranh cãi với cả thế giới đúng một lần, ở phút cuối
 
-## Những giới hạn được nói thẳng — điều khiến tôi tin paper hơn là một bài không nhắc gì
+Đây là phần tôi thấy thật sự thông minh. Đọc dữ liệu không bao giờ cần xin phép ai — một Query Processor chỉ đơn giản đọc một snapshot cục bộ. Ghi dữ liệu cũng được buffer cục bộ, hoàn toàn bên trong Query Processor của chính bạn, và không đụng đến phần còn lại của hệ thống *chút nào* cho đến khi bạn nói "tôi xong rồi, lưu lại đi" (gọi là `COMMIT`). Chỉ đúng khoảnh khắc đó hệ thống mới phải:
 
-Mục 8 đọc như những vết sẹo thật từ production hơn là marketing: transaction bị giới hạn ở 3.000 dòng / 10MiB (có chủ đích, để giới hạn tail latency theo định luật Little — càng nhiều concurrency đang chạy thì p99 càng tệ), ràng buộc khóa ngoại (foreign key) chưa được hỗ trợ (một đánh đổi để ra mắt nhanh hơn, mà giờ họ đang phải bù lại vì đã đánh giá thấp nhu cầu), và range partitioning — lựa chọn đúng đắn cho locality — lại khiến các sequence kiểu `AUTO_INCREMENT` và các index có cardinality thấp thực sự khó shard cho tốt. Tôi thích đọc một paper hệ thống dám thừa nhận cái gì chưa hoạt động tốt hơn là một bài không nói gì cả.
+1. Hỏi các Adjudicator liên quan "có ai khác đổi đúng những dữ liệu này kể từ lúc tôi bắt đầu không?"
+2. Nếu không ai đổi, ghi transaction vào Journal — vĩnh viễn, atomic, đúng một lần.
+3. Nếu dữ liệu của bạn trải trên nhiều vùng, đảm bảo mục Journal đó được lưu an toàn ở ít nhất hai trong ba vùng trước khi báo "xong."
 
-## So sánh với những gì tôi kỳ vọng ở Spanner/CockroachDB
+Bước thứ ba đó là khoảnh khắc duy nhất hệ thống phải thực sự "nói chuyện" xuyên châu lục — và nó chỉ xảy ra một lần cho mỗi transaction, không phải một lần cho từng thay đổi nhỏ bên trong nó. Trong benchmark của họ, một tin nhắn giữa hai vùng AWS ở hai đầu nước Mỹ mất khoảng 62 mili-giây cho một round-trip. Nhưng vì bạn chỉ cần sự đồng ý từ *hai trong ba* vùng, DSQL có thể khôn khéo chọn đúng hai vùng nào, và con số thực tế lại gần 11 mili-giây hơn trong một thiết lập ba vùng được chọn tốt — vì nó chỉ cần chờ vùng *gần hơn* trong hai vùng còn lại, không phải vùng xa nhất. So với một đối thủ kiểu cũ dùng khóa và cần một round-trip mạng cho mỗi dòng lệnh trong transaction, đối thủ đó càng chậm khi transaction càng dài, trong khi DSQL gần như không đổi.
 
-Phần so sánh trong chính paper khá hữu ích: Spanner và CockroachDB dùng pessimistic, mỗi shard có một leader duy nhất kèm bảng lock, replicate qua các nhóm Paxos. DSQL dùng optimistic, không có leader theo nghĩa giữ lock cho từng shard (adjudicator chỉ là bộ kiểm tra xung đột không giữ state, không phải nơi giữ lock), và replicate qua một Journal tách rời thay vì Paxos-cho-từng-shard. Hệ thống có kiến trúc gần gũi nhất mà họ dẫn ra thực ra là FoundationDB, không phải Spanner — điều này hợp lý, vì FoundationDB là hệ tiên phong cho ý tưởng "tách hoàn toàn tầng transaction khỏi storage" mà DSQL đẩy đi xa hơn nữa.
+## Chỗ lý thuyết trở nên lộn xộn, và họ thừa nhận điều đó
+
+Mô tả học thuật về "snapshot isolation" (luật tôi mô tả ở trên, nơi ai cũng thấy một khung hình đóng băng nhất quán) không phủ hoàn hảo mọi tình huống thực tế. Hai ví dụ tác giả thẳng thắn chỉ ra:
+
+- Nếu ai đó đang đổi *cấu trúc* thật sự của một bảng (như thêm một cột) đúng lúc người khác đang thêm một dòng, chỉ riêng snapshot isolation không đủ nghiêm ngặt để ngăn sự kỳ quặc — nên DSQL âm thầm làm cho các thay đổi cấu trúc nghiêm ngặt hơn thay đổi dữ liệu bình thường.
+- Tính năng SQL `FOR UPDATE`, cho phép chương trình nói rõ "tôi sắp đổi dòng này, đừng để ai chen ngang trước," cũng cần được xử lý đặc biệt tương tự.
+
+Tôi thích việc họ nói điều này ra thẳng thắn thay vì giả vờ phiên bản sách vở của snapshot isolation hoạt động ở mọi nơi mà không cần chỉnh sửa gì. Hệ thống thật luôn có những trường hợp biên như vậy; những bài viết trung thực là những bài dám nêu tên chúng.
+
+## Phần giới hạn là phần đáng tin nhất của paper
+
+Rất nhiều paper hệ thống do công ty xuất bản đọc như quảng cáo. Bài này có hẳn một mục thừa nhận những điểm yếu thật, hiện tại: mỗi transaction bị giới hạn ở 3.000 dòng hoặc 10 megabyte (có chủ đích, để giữ độ trễ trường hợp xấu nhất có thể dự đoán được — transaction lớn đang chạy khiến trải nghiệm của MỌI người kém dự đoán hơn, không chỉ người đang chạy transaction lớn đó). Ràng buộc khóa ngoại, một tính năng SQL rất chuẩn, chưa được hỗ trợ — họ thừa nhận đã đánh giá thấp số người muốn dùng nó. Và việc họ chọn chia dữ liệu theo dải (tốt cho việc giữ các dòng liên quan gần nhau về mặt vật lý) khiến một số kiểu dùng phổ biến, như số ID tự tăng dần, thực sự khó chia đều hiệu quả lên nhiều máy. Tôi tin một bài paper hệ thống hơn, không phải ít hơn, khi nó nói cho tôi biết cái gì chưa hoạt động tốt.
+
+## So với hai cái tên tôi đã từng biết
+
+Hai hệ thống nổi tiếng tôi từng nghe qua, Spanner của Google và CockroachDB, đều dùng cách tiếp cận "khóa" — một máy leader chỉ định cho mỗi mảnh dữ liệu, giữ lock, đồng thuận qua một giao thức bỏ phiếu. DSQL cố tình tránh hẳn việc có bất kỳ "leader" nào giữ lock. Hệ thống nó thực sự giống nhất, theo chính các tác giả, không phải Spanner — mà là một hệ thống cũ hơn, ít nổi tiếng hơn tên là FoundationDB, một trong những hệ đầu tiên nghiêm túc tách "quyết định một transaction có hợp lệ không" ra khỏi "lưu trữ dữ liệu thật." DSQL chỉ đơn giản lấy đúng ý tưởng đó và đẩy nó tách rời xa hơn nữa.
+
+## Điều bài này dạy tôi, ngoài hệ thống cụ thể
+
+Điều tôi cứ nghĩ lại là phần lớn thiết kế này thực chất là về việc *giảm thiểu số khoảnh khắc mà các máy tính ở xa nhau phải nói chuyện với nhau*, hơn là làm cho mỗi cuộc trò chuyện riêng lẻ nhanh hơn. Cách đóng khung lại vấn đề đó — coi giao tiếp liên vùng là một sự kiện hiếm, tốn kém mà bạn chủ động lên lịch, không phải thứ bạn có thể chỉ tối ưu hóa để thoát khỏi nó — có vẻ là một bài học thật sự có thể áp dụng cho bất kỳ hệ thống nào phải hoạt động qua khoảng cách xa, không chỉ riêng database.
 
 </div>
