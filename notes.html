@@ -21,8 +21,8 @@ permalink: /notes/
       <h2 class="notes-group-title">Book notes</h2>
       <div class="blog-list">
         {% assign book_posts = site.categories["book-notes"] %}
-        {% for post in book_posts %}
-          {% include blog-item.html post=post %}
+        {% for p in book_posts %}
+          {% include blog-item.html post=p %}
         {% else %}
           <p class="notes-empty">No book notes yet — check back soon.</p>
         {% endfor %}
@@ -34,8 +34,8 @@ permalink: /notes/
       <h2 class="notes-group-title">Paper notes</h2>
       <div class="blog-list">
         {% assign paper_posts = site.categories["papers"] %}
-        {% for post in paper_posts %}
-          {% include blog-item.html post=post %}
+        {% for p in paper_posts %}
+          {% include blog-item.html post=p %}
         {% else %}
           <p class="notes-empty">No paper notes yet — check back soon.</p>
         {% endfor %}

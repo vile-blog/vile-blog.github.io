@@ -11,8 +11,8 @@ permalink: /blog/
     </div>
 
     <div class="blog-list">
-      {% for post in site.posts %}
-        {% include blog-item.html post=post %}
+      {% for p in site.posts %}
+        {% include blog-item.html post=p %}
       {% endfor %}
     </div>
   </div>

@@ -9,8 +9,8 @@
     </div>
 
     <div class="blog-list">
-      {% for post in site.posts limit:3 %}
-        {% include blog-item.html post=post %}
+      {% for p in site.posts limit:3 %}
+        {% include blog-item.html post=p %}
       {% endfor %}
     </div>
 
