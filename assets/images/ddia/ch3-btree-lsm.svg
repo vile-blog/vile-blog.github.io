@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 340" font-family="'JetBrains Mono', 'SFMono-Regular', Consolas, monospace">
+  <rect width="760" height="340" rx="12" fill="#0d0f10"/>
+  <rect x="1" y="1" width="758" height="338" rx="11" fill="none" stroke="rgba(232,232,230,0.16)"/>
+  <text x="380" y="32" text-anchor="middle" font-size="14" font-weight="700" fill="#e8e8e6">Two ways a database writes to disk</text>
+  <line x1="380" y1="48" x2="380" y2="312" stroke="rgba(232,232,230,0.16)"/>
+
+  <!-- B-tree -->
+  <text x="190" y="70" text-anchor="middle" font-size="12.5" font-weight="700" fill="#3ee089">B-tree</text>
+  <text x="190" y="87" text-anchor="middle" font-size="10" fill="#868c92">PostgreSQL, MySQL, Oracle</text>
+
+  <rect x="150" y="102" width="80" height="26" rx="5" fill="#1a1d1f" stroke="#3ee089"/>
+  <text x="190" y="119" text-anchor="middle" font-size="9.5" fill="#e8e8e6">root page</text>
+  <line x1="170" y1="128" x2="130" y2="152" stroke="#3ee089" stroke-width="1.2"/>
+  <line x1="210" y1="128" x2="250" y2="152" stroke="#3ee089" stroke-width="1.2"/>
+  <rect x="95" y="152" width="70" height="24" rx="4" fill="#14171a" stroke="rgba(232,232,230,0.16)"/>
+  <text x="130" y="168" text-anchor="middle" font-size="8.5" fill="#e8e8e6">page A-M</text>
+  <rect x="215" y="152" width="70" height="24" rx="4" fill="#14171a" stroke="rgba(232,232,230,0.16)"/>
+  <text x="250" y="168" text-anchor="middle" font-size="8.5" fill="#e8e8e6">page N-Z</text>
+
+  <text x="190" y="205" text-anchor="middle" font-size="9.5" fill="#868c92">write = find the exact page,</text>
+  <text x="190" y="219" text-anchor="middle" font-size="9.5" fill="#868c92">update it in place</text>
+  <text x="190" y="250" text-anchor="middle" font-size="9.5" fill="#ffb454">fast, orderly reads —</text>
+  <text x="190" y="264" text-anchor="middle" font-size="9.5" fill="#ffb454">each write costs a disk seek</text>
+
+  <!-- LSM-tree -->
+  <text x="570" y="70" text-anchor="middle" font-size="12.5" font-weight="700" fill="#7fd4ff">LSM-tree</text>
+  <text x="570" y="87" text-anchor="middle" font-size="10" fill="#868c92">Cassandra, RocksDB, LevelDB</text>
+
+  <rect x="530" y="102" width="80" height="24" rx="4" fill="#1a1d1f" stroke="#7fd4ff"/>
+  <text x="570" y="118" text-anchor="middle" font-size="8.5" fill="#e8e8e6">memtable</text>
+  <text x="570" y="136" text-anchor="middle" font-size="8.5" fill="#868c92">↓ flush when full</text>
+
+  <rect x="500" y="146" width="55" height="20" rx="4" fill="#14171a" stroke="rgba(232,232,230,0.16)"/>
+  <text x="527" y="160" text-anchor="middle" font-size="7.5" fill="#e8e8e6">SSTable</text>
+  <rect x="562" y="146" width="55" height="20" rx="4" fill="#14171a" stroke="rgba(232,232,230,0.16)"/>
+  <text x="589" y="160" text-anchor="middle" font-size="7.5" fill="#e8e8e6">SSTable</text>
+  <rect x="531" y="172" width="55" height="20" rx="4" fill="#14171a" stroke="rgba(232,232,230,0.16)"/>
+  <text x="558" y="186" text-anchor="middle" font-size="7.5" fill="#e8e8e6">merged</text>
+
+  <text x="570" y="215" text-anchor="middle" font-size="9.5" fill="#868c92">write = append to an</text>
+  <text x="570" y="229" text-anchor="middle" font-size="9.5" fill="#868c92">in-memory log, merge later</text>
+  <text x="570" y="250" text-anchor="middle" font-size="9.5" fill="#ffb454">very fast writes —</text>
+  <text x="570" y="264" text-anchor="middle" font-size="9.5" fill="#ffb454">reads may check several files</text>
+
+  <text x="380" y="298" text-anchor="middle" font-size="10" fill="#868c92">same job — store and find data — opposite bet on what to optimize</text>
+</svg>

@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 380" font-family="'JetBrains Mono', 'SFMono-Regular', Consolas, monospace">
+  <rect width="760" height="380" rx="12" fill="#0d0f10"/>
+  <rect x="1" y="1" width="758" height="378" rx="11" fill="none" stroke="rgba(232,232,230,0.16)"/>
+
+  <!-- Title -->
+  <text x="380" y="34" text-anchor="middle" font-size="14" font-weight="700" fill="#e8e8e6">Twitter timeline: two ways to fan out one post</text>
+
+  <!-- Divider -->
+  <line x1="380" y1="52" x2="380" y2="352" stroke="rgba(232,232,230,0.16)"/>
+
+  <!-- LEFT: fan-out on write -->
+  <text x="190" y="72" text-anchor="middle" font-size="12.5" font-weight="700" fill="#3ee089">fan-out on write</text>
+  <text x="190" y="90" text-anchor="middle" font-size="10.5" fill="#868c92">(most users)</text>
+
+  <rect x="140" y="106" width="100" height="34" rx="7" fill="#1a1d1f" stroke="#3ee089"/>
+  <text x="190" y="127" text-anchor="middle" font-size="11" fill="#e8e8e6">user posts</text>
+
+  <line x1="190" y1="140" x2="60" y2="190" stroke="#3ee089" stroke-width="1.5"/>
+  <line x1="190" y1="140" x2="190" y2="190" stroke="#3ee089" stroke-width="1.5"/>
+  <line x1="190" y1="140" x2="320" y2="190" stroke="#3ee089" stroke-width="1.5"/>
+
+  <rect x="20" y="190" width="80" height="30" rx="6" fill="#14171a" stroke="rgba(232,232,230,0.16)"/>
+  <text x="60" y="209" text-anchor="middle" font-size="9.5" fill="#e8e8e6">follower A</text>
+  <rect x="150" y="190" width="80" height="30" rx="6" fill="#14171a" stroke="rgba(232,232,230,0.16)"/>
+  <text x="190" y="209" text-anchor="middle" font-size="9.5" fill="#e8e8e6">follower B</text>
+  <rect x="280" y="190" width="80" height="30" rx="6" fill="#14171a" stroke="rgba(232,232,230,0.16)"/>
+  <text x="320" y="209" text-anchor="middle" font-size="9.5" fill="#e8e8e6">follower C</text>
+
+  <text x="190" y="245" text-anchor="middle" font-size="10" fill="#868c92">write once per follower,</text>
+  <text x="190" y="260" text-anchor="middle" font-size="10" fill="#868c92">reading a timeline is instant</text>
+
+  <text x="190" y="292" text-anchor="middle" font-size="10" fill="#ffb454">breaks down when one account</text>
+  <text x="190" y="307" text-anchor="middle" font-size="10" fill="#ffb454">has 100M followers</text>
+
+  <!-- RIGHT: fan-out on read -->
+  <text x="570" y="72" text-anchor="middle" font-size="12.5" font-weight="700" fill="#7fd4ff">fan-out on read</text>
+  <text x="570" y="90" text-anchor="middle" font-size="10.5" fill="#868c92">(celebrity accounts)</text>
+
+  <rect x="520" y="106" width="100" height="34" rx="7" fill="#1a1d1f" stroke="#7fd4ff"/>
+  <text x="570" y="127" text-anchor="middle" font-size="11" fill="#e8e8e6">celeb posts</text>
+
+  <line x1="570" y1="140" x2="570" y2="175" stroke="#7fd4ff" stroke-width="1.5"/>
+  <rect x="520" y="175" width="100" height="30" rx="6" fill="#14171a" stroke="rgba(232,232,230,0.16)"/>
+  <text x="570" y="194" text-anchor="middle" font-size="9.5" fill="#e8e8e6">stored once</text>
+
+  <line x1="520" y1="228" x2="460" y2="250" stroke="#7fd4ff" stroke-width="1.2" stroke-dasharray="3 3"/>
+  <line x1="570" y1="228" x2="570" y2="250" stroke="#7fd4ff" stroke-width="1.2" stroke-dasharray="3 3"/>
+  <line x1="620" y1="228" x2="680" y2="250" stroke="#7fd4ff" stroke-width="1.2" stroke-dasharray="3 3"/>
+
+  <rect x="420" y="250" width="80" height="30" rx="6" fill="#14171a" stroke="rgba(232,232,230,0.16)"/>
+  <text x="460" y="269" text-anchor="middle" font-size="9.5" fill="#e8e8e6">follower reads</text>
+  <rect x="530" y="250" width="80" height="30" rx="6" fill="#14171a" stroke="rgba(232,232,230,0.16)"/>
+  <text x="570" y="269" text-anchor="middle" font-size="9.5" fill="#e8e8e6">follower reads</text>
+  <rect x="640" y="250" width="80" height="30" rx="6" fill="#14171a" stroke="rgba(232,232,230,0.16)"/>
+  <text x="680" y="269" text-anchor="middle" font-size="9.5" fill="#e8e8e6">follower reads</text>
+
+  <text x="570" y="305" text-anchor="middle" font-size="10" fill="#868c92">one write, no matter how</text>
+  <text x="570" y="320" text-anchor="middle" font-size="10" fill="#868c92">many followers — merged at read time</text>
+</svg>

@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 300" font-family="'JetBrains Mono', 'SFMono-Regular', Consolas, monospace">
+  <rect width="760" height="300" rx="12" fill="#0d0f10"/>
+  <rect x="1" y="1" width="758" height="298" rx="11" fill="none" stroke="rgba(232,232,230,0.16)"/>
+  <text x="380" y="32" text-anchor="middle" font-size="14" font-weight="700" fill="#e8e8e6">Key range vs. hash partitioning, e.g. Cassandra / DynamoDB</text>
+  <line x1="380" y1="48" x2="380" y2="270" stroke="rgba(232,232,230,0.16)"/>
+
+  <text x="190" y="70" text-anchor="middle" font-size="12" font-weight="700" fill="#3ee089">by key range</text>
+  <rect x="80" y="86" width="60" height="26" rx="5" fill="#1a1d1f" stroke="#3ee089"/>
+  <text x="110" y="103" text-anchor="middle" font-size="9" fill="#e8e8e6">A-F</text>
+  <rect x="160" y="86" width="60" height="26" rx="5" fill="#1a1d1f" stroke="#3ee089"/>
+  <text x="190" y="103" text-anchor="middle" font-size="9" fill="#e8e8e6">G-M</text>
+  <rect x="240" y="86" width="60" height="26" rx="5" fill="#1a1d1f" stroke="#ffb454"/>
+  <text x="270" y="103" text-anchor="middle" font-size="9" fill="#e8e8e6">N-S</text>
+  <text x="270" y="128" text-anchor="middle" font-size="8.5" fill="#ffb454">hot spot if traffic</text>
+  <text x="270" y="140" text-anchor="middle" font-size="8.5" fill="#ffb454">skews to one range</text>
+  <text x="190" y="170" text-anchor="middle" font-size="9.5" fill="#868c92">ordered — great for range scans</text>
+  <text x="190" y="184" text-anchor="middle" font-size="9.5" fill="#868c92">("everything from Mon-Fri")</text>
+
+  <text x="570" y="70" text-anchor="middle" font-size="12" font-weight="700" fill="#7fd4ff">by hash of key</text>
+  <rect x="470" y="86" width="55" height="26" rx="5" fill="#1a1d1f" stroke="#7fd4ff"/>
+  <text x="497" y="103" text-anchor="middle" font-size="9" fill="#e8e8e6">hash%3=0</text>
+  <rect x="540" y="86" width="55" height="26" rx="5" fill="#1a1d1f" stroke="#7fd4ff"/>
+  <text x="567" y="103" text-anchor="middle" font-size="9" fill="#e8e8e6">hash%3=1</text>
+  <rect x="610" y="86" width="55" height="26" rx="5" fill="#1a1d1f" stroke="#7fd4ff"/>
+  <text x="637" y="103" text-anchor="middle" font-size="9" fill="#e8e8e6">hash%3=2</text>
+  <text x="567" y="128" text-anchor="middle" font-size="8.5" fill="#7fd4ff">load spread evenly,</text>
+  <text x="567" y="140" text-anchor="middle" font-size="8.5" fill="#7fd4ff">no hot spot</text>
+  <text x="567" y="170" text-anchor="middle" font-size="9.5" fill="#868c92">scattered — range scans now</text>
+  <text x="567" y="184" text-anchor="middle" font-size="9.5" fill="#868c92">must ask every partition</text>
+
+  <text x="380" y="230" text-anchor="middle" font-size="10" fill="#868c92">same goal, opposite bet: keep keys sorted and risk hot spots,</text>
+  <text x="380" y="245" text-anchor="middle" font-size="10" fill="#868c92">or scatter them evenly and lose cheap range queries</text>
+</svg>

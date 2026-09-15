@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 320" font-family="'JetBrains Mono', 'SFMono-Regular', Consolas, monospace">
+  <rect width="760" height="320" rx="12" fill="#0d0f10"/>
+  <rect x="1" y="1" width="758" height="318" rx="11" fill="none" stroke="rgba(232,232,230,0.16)"/>
+  <text x="380" y="32" text-anchor="middle" font-size="14" font-weight="700" fill="#e8e8e6">One LinkedIn-style profile, three data models</text>
+
+  <!-- Relational -->
+  <text x="130" y="60" text-anchor="middle" font-size="12" font-weight="700" fill="#3ee089">relational</text>
+  <text x="130" y="75" text-anchor="middle" font-size="9.5" fill="#868c92">e.g. PostgreSQL</text>
+  <rect x="55" y="88" width="150" height="26" rx="5" fill="#1a1d1f" stroke="#3ee089"/>
+  <text x="130" y="105" text-anchor="middle" font-size="9.5" fill="#e8e8e6">users table</text>
+  <rect x="55" y="122" width="150" height="26" rx="5" fill="#14171a" stroke="rgba(232,232,230,0.16)"/>
+  <text x="130" y="139" text-anchor="middle" font-size="9.5" fill="#e8e8e6">jobs table (FK)</text>
+  <rect x="55" y="156" width="150" height="26" rx="5" fill="#14171a" stroke="rgba(232,232,230,0.16)"/>
+  <text x="130" y="173" text-anchor="middle" font-size="9.5" fill="#e8e8e6">education table (FK)</text>
+  <text x="130" y="205" text-anchor="middle" font-size="9.5" fill="#868c92">one profile = a join</text>
+  <text x="130" y="219" text-anchor="middle" font-size="9.5" fill="#868c92">across 3 tables</text>
+
+  <line x1="270" y1="60" x2="270" y2="270" stroke="rgba(232,232,230,0.16)"/>
+
+  <!-- Document -->
+  <text x="380" y="60" text-anchor="middle" font-size="12" font-weight="700" fill="#7fd4ff">document</text>
+  <text x="380" y="75" text-anchor="middle" font-size="9.5" fill="#868c92">e.g. MongoDB</text>
+  <rect x="305" y="88" width="150" height="94" rx="6" fill="#1a1d1f" stroke="#7fd4ff"/>
+  <text x="380" y="106" text-anchor="middle" font-size="9.5" fill="#e8e8e6">{ name, ...</text>
+  <text x="380" y="122" text-anchor="middle" font-size="9.5" fill="#e8e8e6">jobs: [ {...}, ... ],</text>
+  <text x="380" y="138" text-anchor="middle" font-size="9.5" fill="#e8e8e6">education: [ {...} ]</text>
+  <text x="380" y="154" text-anchor="middle" font-size="9.5" fill="#e8e8e6">}</text>
+  <text x="380" y="205" text-anchor="middle" font-size="9.5" fill="#868c92">one profile = one</text>
+  <text x="380" y="219" text-anchor="middle" font-size="9.5" fill="#868c92">self-contained record</text>
+
+  <line x1="520" y1="60" x2="520" y2="270" stroke="rgba(232,232,230,0.16)"/>
+
+  <!-- Graph -->
+  <text x="635" y="60" text-anchor="middle" font-size="12" font-weight="700" fill="#ffb454">graph</text>
+  <text x="635" y="75" text-anchor="middle" font-size="9.5" fill="#868c92">e.g. Neo4j</text>
+
+  <circle cx="635" cy="112" r="18" fill="#1a1d1f" stroke="#ffb454"/>
+  <text x="635" y="116" text-anchor="middle" font-size="8.5" fill="#e8e8e6">you</text>
+  <circle cx="580" cy="160" r="16" fill="#14171a" stroke="rgba(232,232,230,0.16)"/>
+  <text x="580" y="164" text-anchor="middle" font-size="8" fill="#e8e8e6">company</text>
+  <circle cx="690" cy="160" r="16" fill="#14171a" stroke="rgba(232,232,230,0.16)"/>
+  <text x="690" y="164" text-anchor="middle" font-size="8" fill="#e8e8e6">school</text>
+  <circle cx="635" cy="205" r="16" fill="#14171a" stroke="rgba(232,232,230,0.16)"/>
+  <text x="635" y="209" text-anchor="middle" font-size="8" fill="#e8e8e6">colleague</text>
+
+  <line x1="635" y1="130" x2="588" y2="148" stroke="#ffb454" stroke-width="1.2"/>
+  <line x1="635" y1="130" x2="682" y2="148" stroke="#ffb454" stroke-width="1.2"/>
+  <line x1="635" y1="130" x2="635" y2="189" stroke="#ffb454" stroke-width="1.2"/>
+  <line x1="580" y1="176" x2="635" y2="205" stroke="#ffb454" stroke-width="1" stroke-dasharray="2 2"/>
+
+  <text x="635" y="245" text-anchor="middle" font-size="9.5" fill="#868c92">one profile = a node with</text>
+  <text x="635" y="259" text-anchor="middle" font-size="9.5" fill="#868c92">relationships to other nodes</text>
+
+  <text x="380" y="298" text-anchor="middle" font-size="10" fill="#868c92">same real-world data — three very different shapes on disk</text>
+</svg>

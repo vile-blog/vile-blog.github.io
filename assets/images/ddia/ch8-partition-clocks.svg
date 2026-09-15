@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 320" font-family="'JetBrains Mono', 'SFMono-Regular', Consolas, monospace">
+  <rect width="760" height="320" rx="12" fill="#0d0f10"/>
+  <rect x="1" y="1" width="758" height="318" rx="11" fill="none" stroke="rgba(232,232,230,0.16)"/>
+  <text x="380" y="30" text-anchor="middle" font-size="14" font-weight="700" fill="#e8e8e6">Two things you can't fully trust in a distributed system</text>
+  <line x1="380" y1="46" x2="380" y2="290" stroke="rgba(232,232,230,0.16)"/>
+
+  <!-- Network partition -->
+  <text x="190" y="68" text-anchor="middle" font-size="12" font-weight="700" fill="#ffb454">the network</text>
+  <rect x="110" y="85" width="90" height="30" rx="6" fill="#1a1d1f" stroke="#3ee089"/>
+  <text x="155" y="104" text-anchor="middle" font-size="9" fill="#e8e8e6">us-east</text>
+  <rect x="230" y="85" width="90" height="30" rx="6" fill="#1a1d1f" stroke="#3ee089"/>
+  <text x="275" y="104" text-anchor="middle" font-size="9" fill="#e8e8e6">eu-west</text>
+  <line x1="200" y1="100" x2="230" y2="100" stroke="#ffb454" stroke-width="2"/>
+  <line x1="207" y1="93" x2="223" y2="107" stroke="#ffb454" stroke-width="2"/>
+  <line x1="207" y1="107" x2="223" y2="93" stroke="#ffb454" stroke-width="2"/>
+
+  <text x="190" y="148" text-anchor="middle" font-size="9" fill="#868c92">link drops — is the other</text>
+  <text x="190" y="161" text-anchor="middle" font-size="9" fill="#868c92">side dead, or just unreachable?</text>
+  <text x="190" y="184" text-anchor="middle" font-size="9" fill="#868c92">a timeout can't tell the difference,</text>
+  <text x="190" y="197" text-anchor="middle" font-size="9" fill="#868c92">it can only guess</text>
+
+  <!-- Clocks -->
+  <text x="570" y="68" text-anchor="middle" font-size="12" font-weight="700" fill="#7fd4ff">the clock</text>
+
+  <circle cx="530" cy="105" r="22" fill="#1a1d1f" stroke="#7fd4ff"/>
+  <line x1="530" y1="105" x2="530" y2="92" stroke="#7fd4ff" stroke-width="1.5"/>
+  <line x1="530" y1="105" x2="540" y2="105" stroke="#7fd4ff" stroke-width="1.5"/>
+  <text x="530" y="136" text-anchor="middle" font-size="8" fill="#868c92">machine A</text>
+
+  <circle cx="610" cy="105" r="22" fill="#1a1d1f" stroke="#7fd4ff"/>
+  <line x1="610" y1="105" x2="610" y2="95" stroke="#7fd4ff" stroke-width="1.5"/>
+  <line x1="610" y1="105" x2="616" y2="118" stroke="#7fd4ff" stroke-width="1.5"/>
+  <text x="610" y="136" text-anchor="middle" font-size="8" fill="#868c92">machine B</text>
+
+  <text x="570" y="160" text-anchor="middle" font-size="9" fill="#868c92">clocks quietly drift apart —</text>
+  <text x="570" y="173" text-anchor="middle" font-size="9" fill="#868c92">"who wrote last" isn't safe</text>
+  <text x="570" y="186" text-anchor="middle" font-size="9" fill="#868c92">to decide by timestamp alone</text>
+  <text x="570" y="209" text-anchor="middle" font-size="9" fill="#868c92">(Google Spanner's TrueTime exists</text>
+  <text x="570" y="222" text-anchor="middle" font-size="9" fill="#868c92">specifically to bound this uncertainty)</text>
+
+  <text x="380" y="260" text-anchor="middle" font-size="10" fill="#868c92">a real AWS or GCP region outage is usually one of these two,</text>
+  <text x="380" y="275" text-anchor="middle" font-size="10" fill="#868c92">not a server simply crashing cleanly</text>
+</svg>

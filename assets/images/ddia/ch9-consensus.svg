@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 300" font-family="'JetBrains Mono', 'SFMono-Regular', Consolas, monospace">
+  <rect width="760" height="300" rx="12" fill="#0d0f10"/>
+  <rect x="1" y="1" width="758" height="298" rx="11" fill="none" stroke="rgba(232,232,230,0.16)"/>
+  <text x="380" y="30" text-anchor="middle" font-size="14" font-weight="700" fill="#e8e8e6">Consensus: a 5-node cluster picks one leader</text>
+  <text x="380" y="47" text-anchor="middle" font-size="10" fill="#868c92">e.g. etcd (Kubernetes) using Raft, ZooKeeper using ZAB</text>
+
+  <circle cx="380" cy="130" r="30" fill="#1a1d1f" stroke="#3ee089" stroke-width="2"/>
+  <text x="380" y="135" text-anchor="middle" font-size="10" fill="#3ee089">leader</text>
+
+  <circle cx="200" cy="90" r="24" fill="#14171a" stroke="#7fd4ff"/>
+  <text x="200" y="94" text-anchor="middle" font-size="9" fill="#e8e8e6">node</text>
+  <circle cx="230" cy="200" r="24" fill="#14171a" stroke="#7fd4ff"/>
+  <text x="230" y="204" text-anchor="middle" font-size="9" fill="#e8e8e6">node</text>
+  <circle cx="530" cy="200" r="24" fill="#14171a" stroke="#7fd4ff"/>
+  <text x="530" y="204" text-anchor="middle" font-size="9" fill="#e8e8e6">node</text>
+  <circle cx="560" cy="90" r="24" fill="#14171a" stroke="rgba(232,232,230,0.3)" stroke-dasharray="3 2"/>
+  <text x="560" y="94" text-anchor="middle" font-size="9" fill="#868c92">node</text>
+  <text x="560" y="122" text-anchor="middle" font-size="8" fill="#ffb454">unreachable</text>
+
+  <line x1="220" y1="105" x2="355" y2="120" stroke="#3ee089" stroke-width="1.3"/>
+  <line x1="248" y1="185" x2="358" y2="150" stroke="#3ee089" stroke-width="1.3"/>
+  <line x1="505" y1="188" x2="405" y2="148" stroke="#3ee089" stroke-width="1.3"/>
+  <line x1="540" y1="108" x2="405" y2="122" stroke="rgba(232,232,230,0.25)" stroke-width="1" stroke-dasharray="2 2"/>
+
+  <text x="380" y="250" text-anchor="middle" font-size="10" fill="#868c92">3 of 5 nodes agree — a majority — so the leader is valid</text>
+  <text x="380" y="266" text-anchor="middle" font-size="10" fill="#868c92">even though one node can't currently be reached</text>
+</svg>

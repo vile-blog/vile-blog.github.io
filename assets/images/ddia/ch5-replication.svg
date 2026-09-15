@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 300" font-family="'JetBrains Mono', 'SFMono-Regular', Consolas, monospace">
+  <rect width="760" height="300" rx="12" fill="#0d0f10"/>
+  <rect x="1" y="1" width="758" height="298" rx="11" fill="none" stroke="rgba(232,232,230,0.16)"/>
+  <text x="380" y="32" text-anchor="middle" font-size="14" font-weight="700" fill="#e8e8e6">Single-leader replication, e.g. Postgres primary/replica</text>
+
+  <rect x="330" y="55" width="100" height="34" rx="7" fill="#1a1d1f" stroke="#3ee089"/>
+  <text x="380" y="76" text-anchor="middle" font-size="10.5" fill="#e8e8e6">leader</text>
+
+  <text x="450" y="72" font-size="9" fill="#868c92">all writes go here first</text>
+
+  <line x1="345" y1="89" x2="180" y2="150" stroke="#3ee089" stroke-width="1.3"/>
+  <line x1="380" y1="89" x2="380" y2="150" stroke="#3ee089" stroke-width="1.3"/>
+  <line x1="415" y1="89" x2="580" y2="150" stroke="#3ee089" stroke-width="1.3"/>
+  <text x="380" y="115" text-anchor="middle" font-size="9" fill="#868c92">replication log</text>
+
+  <rect x="130" y="150" width="100" height="30" rx="6" fill="#14171a" stroke="rgba(232,232,230,0.16)"/>
+  <text x="180" y="169" text-anchor="middle" font-size="9.5" fill="#e8e8e6">follower A</text>
+  <rect x="330" y="150" width="100" height="30" rx="6" fill="#14171a" stroke="rgba(232,232,230,0.16)"/>
+  <text x="380" y="169" text-anchor="middle" font-size="9.5" fill="#e8e8e6">follower B</text>
+  <rect x="530" y="150" width="100" height="30" rx="6" fill="#14171a" stroke="rgba(232,232,230,0.16)"/>
+  <text x="580" y="169" text-anchor="middle" font-size="9.5" fill="#e8e8e6">follower C</text>
+
+  <text x="180" y="198" text-anchor="middle" font-size="8.5" fill="#7fd4ff">serves reads</text>
+  <text x="380" y="198" text-anchor="middle" font-size="8.5" fill="#7fd4ff">serves reads</text>
+  <text x="580" y="198" text-anchor="middle" font-size="8.5" fill="#ffb454">leader dies →</text>
+  <text x="580" y="211" text-anchor="middle" font-size="8.5" fill="#ffb454">promoted to leader</text>
+
+  <text x="380" y="250" text-anchor="middle" font-size="10" fill="#868c92">one leader takes writes and streams them to every follower —</text>
+  <text x="380" y="266" text-anchor="middle" font-size="10" fill="#868c92">if the leader dies, a follower is promoted to take its place</text>
+</svg>
