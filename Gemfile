@@ -9,3 +9,9 @@ group :jekyll_plugins do
 end
 
 gem "webrick", "~> 1.8"
+
+# Windows has no system zoneinfo database, which makes `timezone:` in
+# _config.yml crash local builds with TZInfo::DataSourceNotFound. This
+# gem bundles the zoneinfo data so Windows builds work like GitHub
+# Pages' Linux build servers already do.
+gem "tzinfo-data", platforms: [:windows, :jruby]
