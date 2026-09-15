@@ -1,7 +1,7 @@
 ---
 title: "DDIA Chapter 6: Partitioning"
 title_vi: "DDIA Chương 6: Partitioning"
-date: 2026-09-15 16:00:00 +0700
+date: 2026-09-15 09:15:00 +0700
 excerpt: "Replication (Chapter 5) is about surviving a dead machine. This chapter is about a completely different problem: what happens when your data is just too big for one machine to hold in the first place."
 excerpt_vi: "Replication (Chương 5) là để sống sót khi một máy chết. Chương này là một vấn đề hoàn toàn khác: chuyện gì xảy ra khi dữ liệu của bạn đơn giản là quá lớn để một máy chứa nổi ngay từ đầu."
 categories: [book-notes]
@@ -11,6 +11,7 @@ book_author: "Martin Kleppmann"
 book_url: "https://www.oreilly.com/library/view/designing-data-intensive-applications/9781491903063/"
 book_chapter: "Chapter 6: Partitioning"
 book_chapter_vi: "Chương 6: Partitioning"
+book_chapter_num: 6
 ---
 
 <div data-lang-content="en" markdown="1">

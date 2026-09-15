@@ -1,7 +1,7 @@
 ---
 title: "DDIA Chapter 9: Consistency and Consensus"
 title_vi: "DDIA Chương 9: Consistency and Consensus"
-date: 2026-09-15 11:30:00 +0700
+date: 2026-09-15 10:00:00 +0700
 excerpt: "The chapter every earlier chapter kept pointing forward to. It finally answers: how does a group of unreliable machines agree on one thing, when the network lies and the clock can't be trusted?"
 excerpt_vi: "Chương mà mọi chương trước đó cứ liên tục chỉ về phía trước. Cuối cùng nó cũng trả lời: làm sao một nhóm máy không đáng tin cậy đồng thuận về một điều duy nhất, khi mạng nói dối và đồng hồ không thể tin được?"
 categories: [book-notes]
@@ -11,6 +11,7 @@ book_author: "Martin Kleppmann"
 book_url: "https://www.oreilly.com/library/view/designing-data-intensive-applications/9781491903063/"
 book_chapter: "Chapter 9: Consistency and Consensus"
 book_chapter_vi: "Chương 9: Consistency and Consensus"
+book_chapter_num: 9
 ---
 
 <div data-lang-content="en" markdown="1">

@@ -1,7 +1,7 @@
 ---
 title: "DDIA Chapter 3: Storage and Retrieval"
 title_vi: "DDIA Chương 3: Storage and Retrieval"
-date: 2026-09-15 09:30:00 +0700
+date: 2026-09-15 08:30:00 +0700
 excerpt: "Every database eventually has to answer the same boring-sounding question: how do you actually write bytes to a disk so you can find them again fast? The answer splits the entire database world in two."
 excerpt_vi: "Mọi database rồi cũng phải trả lời một câu hỏi nghe có vẻ nhàm chán: làm sao thực sự ghi byte xuống đĩa để sau này tìm lại được thật nhanh? Câu trả lời chia cả thế giới database ra làm hai phe."
 categories: [book-notes]
@@ -11,6 +11,7 @@ book_author: "Martin Kleppmann"
 book_url: "https://www.oreilly.com/library/view/designing-data-intensive-applications/9781491903063/"
 book_chapter: "Chapter 3: Storage and Retrieval"
 book_chapter_vi: "Chương 3: Storage and Retrieval"
+book_chapter_num: 3
 ---
 
 <div data-lang-content="en" markdown="1">

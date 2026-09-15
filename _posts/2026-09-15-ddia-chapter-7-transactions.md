@@ -1,7 +1,7 @@
 ---
 title: "DDIA Chapter 7: Transactions"
 title_vi: "DDIA Chương 7: Transactions"
-date: 2026-09-15 10:30:00 +0700
+date: 2026-09-15 09:30:00 +0700
 excerpt: "Two shoppers buy the last item in stock at the same instant. Whether your database lets that turn into a real bug depends entirely on the word 'transaction' actually meaning something."
 excerpt_vi: "Hai người mua cùng lúc chốt đơn món hàng cuối cùng còn trong kho. Việc đó có biến thành bug thật hay không phụ thuộc hoàn toàn vào việc từ 'transaction' có thực sự có ý nghĩa gì không."
 categories: [book-notes]
@@ -11,6 +11,7 @@ book_author: "Martin Kleppmann"
 book_url: "https://www.oreilly.com/library/view/designing-data-intensive-applications/9781491903063/"
 book_chapter: "Chapter 7: Transactions"
 book_chapter_vi: "Chương 7: Transactions"
+book_chapter_num: 7
 ---
 
 <div data-lang-content="en" markdown="1">

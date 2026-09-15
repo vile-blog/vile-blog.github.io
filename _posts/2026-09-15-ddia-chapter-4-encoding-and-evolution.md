@@ -1,7 +1,7 @@
 ---
 title: "DDIA Chapter 4: Encoding and Evolution"
 title_vi: "DDIA Chương 4: Encoding and Evolution"
-date: 2026-09-15 10:00:00 +0700
+date: 2026-09-15 08:45:00 +0700
 excerpt: "You can't deploy new code to a thousand servers all at once, and users won't update their app the instant you ship it. So old and new versions of your system are always talking to each other — this chapter is about making sure they can."
 excerpt_vi: "Bạn không thể deploy code mới lên một ngàn server cùng một lúc, và người dùng cũng không cập nhật app ngay khi bạn vừa ra bản mới. Vậy nên phiên bản cũ và mới luôn phải nói chuyện được với nhau — chương này nói về việc đảm bảo điều đó."
 categories: [book-notes]
@@ -11,6 +11,7 @@ book_author: "Martin Kleppmann"
 book_url: "https://www.oreilly.com/library/view/designing-data-intensive-applications/9781491903063/"
 book_chapter: "Chapter 4: Encoding and Evolution"
 book_chapter_vi: "Chương 4: Encoding and Evolution"
+book_chapter_num: 4
 ---
 
 <div data-lang-content="en" markdown="1">

@@ -1,7 +1,7 @@
 ---
 title: "DDIA Chapter 2: Data Models and Query Languages"
 title_vi: "DDIA Chương 2: Data Models and Query Languages"
-date: 2026-09-15 08:30:00 +0700
+date: 2026-09-15 08:15:00 +0700
 excerpt: "The same profile — a person with jobs and schools — looks completely different depending on whether you store it as tables, a document, or a graph. Chapter 2 is about why that choice matters more than it seems."
 excerpt_vi: "Cùng một profile — một người với công việc và trường học — trông hoàn toàn khác nhau tùy vào việc bạn lưu nó dưới dạng bảng, document, hay graph. Chương 2 nói về việc vì sao lựa chọn đó quan trọng hơn ta tưởng."
 categories: [book-notes]
@@ -11,6 +11,7 @@ book_author: "Martin Kleppmann"
 book_url: "https://www.oreilly.com/library/view/designing-data-intensive-applications/9781491903063/"
 book_chapter: "Chapter 2: Data Models and Query Languages"
 book_chapter_vi: "Chương 2: Data Models and Query Languages"
+book_chapter_num: 2
 ---
 
 <div data-lang-content="en" markdown="1">

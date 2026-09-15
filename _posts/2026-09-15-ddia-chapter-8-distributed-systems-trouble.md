@@ -1,7 +1,7 @@
 ---
 title: "DDIA Chapter 8: The Trouble with Distributed Systems"
 title_vi: "DDIA Chương 8: The Trouble with Distributed Systems"
-date: 2026-09-15 11:00:00 +0700
+date: 2026-09-15 09:45:00 +0700
 excerpt: "The chapter that explains why almost every scary outage story from a big tech company traces back to one of two things not behaving the way engineers assumed: the network, or the clock."
 excerpt_vi: "Chương giải thích vì sao hầu hết các câu chuyện sự cố đáng sợ từ các công ty công nghệ lớn đều bắt nguồn từ một trong hai thứ không hoạt động như kỹ sư từng giả định: mạng, hoặc đồng hồ."
 categories: [book-notes]
@@ -11,6 +11,7 @@ book_author: "Martin Kleppmann"
 book_url: "https://www.oreilly.com/library/view/designing-data-intensive-applications/9781491903063/"
 book_chapter: "Chapter 8: The Trouble with Distributed Systems"
 book_chapter_vi: "Chương 8: The Trouble with Distributed Systems"
+book_chapter_num: 8
 ---
 
 <div data-lang-content="en" markdown="1">

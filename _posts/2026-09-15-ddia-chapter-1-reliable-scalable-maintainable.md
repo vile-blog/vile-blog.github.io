@@ -11,6 +11,7 @@ book_author: "Martin Kleppmann"
 book_url: "https://www.oreilly.com/library/view/designing-data-intensive-applications/9781491903063/"
 book_chapter: "Chapter 1: Reliable, Scalable, and Maintainable Applications"
 book_chapter_vi: "Chương 1: Reliable, Scalable, and Maintainable Applications"
+book_chapter_num: 1
 ---
 
 <div data-lang-content="en" markdown="1">

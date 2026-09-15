@@ -2,6 +2,7 @@
 title: "DDIA Chapter 5: Replication"
 title_vi: "DDIA Chương 5: Replication"
 date: 2026-09-15 09:00:00 +0700
+book_chapter_num: 5
 excerpt: "The chapter that actually explains how a database keeps working when a machine dies — which is what most people really mean by 'high availability.'"
 excerpt_vi: "Chương thực sự giải thích cách một database vẫn hoạt động khi một máy chết — chính là điều hầu hết mọi người muốn nói khi nhắc tới 'high availability.'"
 categories: [book-notes]

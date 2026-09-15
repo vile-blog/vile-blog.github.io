@@ -22,7 +22,7 @@ permalink: /notes/
       <p class="eyebrow">~/notes/books</p>
       <h2 class="notes-group-title"><span data-lang-content="en">Book notes</span><span data-lang-content="vi">Ghi chú sách</span></h2>
       <div class="blog-list">
-        {% assign book_posts = site.categories["book-notes"] %}
+        {% assign book_posts = site.categories["book-notes"] | sort: "book_chapter_num" %}
         {% for p in book_posts %}
           {% include blog-item.html post=p %}
         {% else %}
