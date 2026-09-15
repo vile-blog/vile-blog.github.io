@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 320" font-family="'JetBrains Mono', 'SFMono-Regular', Consolas, monospace">
+  <rect width="760" height="320" rx="12" fill="#0d0f10"/>
+  <rect x="1" y="1" width="758" height="318" rx="11" fill="none" stroke="rgba(232,232,230,0.16)"/>
+  <text x="380" y="30" text-anchor="middle" font-size="14" font-weight="700" fill="#e8e8e6">One bundled database vs. small tools joined by an event log</text>
+  <line x1="380" y1="46" x2="380" y2="290" stroke="rgba(232,232,230,0.16)"/>
+
+  <!-- Bundled -->
+  <text x="190" y="68" text-anchor="middle" font-size="12" font-weight="700" fill="#ffb454">bundled (e.g. one Postgres)</text>
+  <rect x="90" y="85" width="200" height="130" rx="8" fill="#1a1d1f" stroke="#ffb454"/>
+  <rect x="105" y="98" width="80" height="24" rx="4" fill="#14171a" stroke="rgba(232,232,230,0.16)"/>
+  <text x="145" y="114" text-anchor="middle" font-size="8" fill="#e8e8e6">query engine</text>
+  <rect x="195" y="98" width="80" height="24" rx="4" fill="#14171a" stroke="rgba(232,232,230,0.16)"/>
+  <text x="235" y="114" text-anchor="middle" font-size="8" fill="#e8e8e6">index</text>
+  <rect x="105" y="130" width="80" height="24" rx="4" fill="#14171a" stroke="rgba(232,232,230,0.16)"/>
+  <text x="145" y="146" text-anchor="middle" font-size="8" fill="#e8e8e6">cache</text>
+  <rect x="195" y="130" width="80" height="24" rx="4" fill="#14171a" stroke="rgba(232,232,230,0.16)"/>
+  <text x="235" y="146" text-anchor="middle" font-size="8" fill="#e8e8e6">replication</text>
+  <text x="190" y="180" text-anchor="middle" font-size="8.5" fill="#868c92">one vendor's idea of the</text>
+  <text x="190" y="193" text-anchor="middle" font-size="8.5" fill="#868c92">right tradeoffs for every job</text>
+
+  <!-- Unbundled -->
+  <text x="570" y="68" text-anchor="middle" font-size="12" font-weight="700" fill="#7fd4ff">unbundled</text>
+  <rect x="530" y="85" width="80" height="28" rx="6" fill="#1a1d1f" stroke="#3ee089"/>
+  <text x="570" y="103" text-anchor="middle" font-size="8.5" fill="#e8e8e6">event log</text>
+
+  <line x1="545" y1="113" x2="490" y2="150" stroke="#3ee089" stroke-width="1.2"/>
+  <line x1="570" y1="113" x2="570" y2="150" stroke="#3ee089" stroke-width="1.2"/>
+  <line x1="595" y1="113" x2="650" y2="150" stroke="#3ee089" stroke-width="1.2"/>
+
+  <rect x="450" y="150" width="80" height="26" rx="5" fill="#14171a" stroke="rgba(232,232,230,0.16)"/>
+  <text x="490" y="167" text-anchor="middle" font-size="8" fill="#e8e8e6">Elasticsearch</text>
+  <rect x="530" y="150" width="80" height="26" rx="5" fill="#14171a" stroke="rgba(232,232,230,0.16)"/>
+  <text x="570" y="167" text-anchor="middle" font-size="8" fill="#e8e8e6">Redis</text>
+  <rect x="610" y="150" width="80" height="26" rx="5" fill="#14171a" stroke="rgba(232,232,230,0.16)"/>
+  <text x="650" y="167" text-anchor="middle" font-size="8" fill="#e8e8e6">analytics DB</text>
+
+  <text x="570" y="200" text-anchor="middle" font-size="8.5" fill="#868c92">each tool does one job well,</text>
+  <text x="570" y="213" text-anchor="middle" font-size="8.5" fill="#868c92">fed the same stream of events</text>
+
+  <text x="380" y="255" text-anchor="middle" font-size="10" fill="#868c92">the Unix-pipe idea from Chapter 10, applied one level up —</text>
+  <text x="380" y="270" text-anchor="middle" font-size="10" fill="#868c92">small specialized tools instead of one tool that does everything</text>
+</svg>
