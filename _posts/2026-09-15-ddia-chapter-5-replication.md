@@ -1,21 +1,23 @@
 ---
-title: "High Availability in Designing Data-Intensive Applications"
-title_vi: "High Availability trong Designing Data-Intensive Applications"
-date: 2026-09-14 10:00:00 +0700
-excerpt: "My notes on how DDIA frames high availability — replication, failover, and why 'available' and 'consistent' keep pulling in opposite directions."
-excerpt_vi: "Ghi chú của tôi về cách DDIA trình bày high availability — replication, failover, và vì sao 'available' với 'consistent' cứ kéo về hai hướng ngược nhau."
+title: "DDIA Chapter 5: Replication"
+title_vi: "DDIA Chương 5: Replication"
+date: 2026-09-15 09:00:00 +0700
+excerpt: "The chapter that actually explains how a database keeps working when a machine dies — which is what most people really mean by 'high availability.'"
+excerpt_vi: "Chương thực sự giải thích cách một database vẫn hoạt động khi một máy chết — chính là điều hầu hết mọi người muốn nói khi nhắc tới 'high availability.'"
 categories: [book-notes]
-tags: ["Designing Data-Intensive Applications", "Replication", "Fault Tolerance", "Distributed Systems"]
+tags: ["Designing Data-Intensive Applications", "Chapter 5", "Replication", "High Availability"]
 book_title: "Designing Data-Intensive Applications"
 book_author: "Martin Kleppmann"
 book_url: "https://www.oreilly.com/library/view/designing-data-intensive-applications/9781491903063/"
+book_chapter: "Chapter 5: Replication"
+book_chapter_vi: "Chương 5: Replication"
 ---
 
 <div data-lang-content="en" markdown="1">
 
-*Book: [Designing Data-Intensive Applications](https://www.oreilly.com/library/view/designing-data-intensive-applications/9781491903063/) by Martin Kleppmann — chapters on Replication, and Distributed System Troubles / Consistency & Consensus.*
+*Book: [Designing Data-Intensive Applications](https://www.oreilly.com/library/view/designing-data-intensive-applications/9781491903063/) by Martin Kleppmann — Chapter 5: Replication.*
 
-I've been going through DDIA slowly, and the chapters on replication and consensus finally connected a bunch of things I'd been treating as separate concerns: "why do we replicate data", "what happens when a node dies", and "why is consistency so hard to get for free". Here's how I'm holding it together in my head.
+I'm starting a chapter-by-chapter log as I work through DDIA, tagged so I can find any of them again later. First up is Chapter 5, which is the chapter that actually answers the question people usually mean when they say "high availability": how does a database keep working when one of its machines dies? The short answer is "keep more than one copy of the data" — replication — but the chapter spends its length on everything that's hard about making that actually safe, which turned out to connect a bunch of things I'd been treating as separate: "why do we replicate data", "what happens when a node dies", and "why is consistency so hard to get for free". Here's how I'm holding it together in my head.
 
 ## Availability starts with a boring question: what fails?
 
@@ -61,14 +63,14 @@ The thread that ties the whole thing together: safe leader election, safe failov
 
 The biggest shift in how I think about "HA" after this: it's not a checkbox you get from adding replicas. It's a set of very specific tradeoffs — timeout lengths, which consistency guarantees you promise the application, how you detect and resolve conflicting writes — that have to be chosen deliberately, because the failure-free case was never the hard part.
 
-Next up in my notes: probably Chapter 9's actual consensus algorithms, since I keep hand-waving at them here.
+Next chapter note, whenever I get there: Chapter 9, where the consensus algorithms this chapter kept pointing at and never actually solving finally get solved for real.
 
 </div>
 <div data-lang-content="vi" markdown="1">
 
-*Sách: [Designing Data-Intensive Applications](https://www.oreilly.com/library/view/designing-data-intensive-applications/9781491903063/) của Martin Kleppmann — chương về Replication, và Distributed System Troubles / Consistency & Consensus.*
+*Sách: [Designing Data-Intensive Applications](https://www.oreilly.com/library/view/designing-data-intensive-applications/9781491903063/) của Martin Kleppmann — Chương 5: Replication.*
 
-Tôi đang đọc DDIA khá chậm, và các chương về replication với consensus cuối cùng đã kết nối một loạt thứ tôi từng nghĩ là những vấn đề tách biệt: "tại sao phải replicate dữ liệu", "chuyện gì xảy ra khi một node chết", và "tại sao consistency lại khó có được miễn phí đến vậy". Đây là cách tôi đang ghép chúng lại trong đầu.
+Tôi bắt đầu một chuỗi ghi chú theo từng chương khi đọc DDIA, có gắn tag để sau này dễ tìm lại. Mở đầu là Chương 5, chương thực sự trả lời câu hỏi mà người ta thường muốn nói khi bảo "high availability": làm sao một database vẫn hoạt động khi một trong các máy của nó chết? Câu trả lời ngắn gọn là "giữ nhiều hơn một bản sao dữ liệu" — replication — nhưng cả chương dành phần lớn nội dung cho mọi thứ khó khăn để làm điều đó thực sự an toàn, và hóa ra nó kết nối một loạt thứ tôi từng nghĩ là tách biệt: "tại sao phải replicate dữ liệu", "chuyện gì xảy ra khi một node chết", và "tại sao consistency lại khó có được miễn phí đến vậy". Đây là cách tôi đang ghép chúng lại trong đầu.
 
 ## Availability bắt đầu từ một câu hỏi rất trần trụi: cái gì có thể hỏng?
 
@@ -114,6 +116,6 @@ Sợi chỉ xâu chuỗi tất cả lại: bầu leader an toàn, failover an to
 
 Thay đổi lớn nhất trong cách tôi nghĩ về "HA" sau chương này: nó không phải một ô cần tick được bằng cách thêm replica. Nó là một tập các đánh đổi rất cụ thể — độ dài timeout, những đảm bảo consistency nào bạn hứa với ứng dụng, cách bạn phát hiện và xử lý ghi xung đột — những thứ phải được chọn một cách có chủ đích, vì trường hợp không-có-failure chưa bao giờ là phần khó.
 
-Tiếp theo trong ghi chú của tôi: có lẽ là các thuật toán consensus thật sự ở Chương 9, vì tôi cứ nhắc tới chúng mà chưa đi sâu ở đây.
+Ghi chú chương tiếp theo, khi nào tôi đọc tới: Chương 9, nơi các thuật toán consensus mà chương này cứ nhắc tới mà chưa bao giờ thực sự giải quyết cuối cùng cũng được giải quyết.
 
 </div>
