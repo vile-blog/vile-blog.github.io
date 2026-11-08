@@ -1,0 +1,33 @@
+<!-- ================================================================
+     COMMAND PALETTE — Ctrl/Cmd+K (or "/") to search posts and run
+     commands. Behaviour lives in assets/js/extras.js.
+================================================================= -->
+<dialog class="pal" data-pal aria-label="Search and commands">
+  <div class="pal-box">
+    <div class="pal-input-row">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="m21 21-4.3-4.3"></path></svg>
+      <input
+        type="text"
+        class="pal-input"
+        data-pal-input
+        role="combobox"
+        aria-expanded="true"
+        aria-controls="pal-list"
+        aria-autocomplete="list"
+        autocomplete="off"
+        autocapitalize="off"
+        spellcheck="false"
+        placeholder="Search posts, jump to a section, run a command…"
+        data-ph-en="Search posts, jump to a section, run a command…"
+        data-ph-vi="Tìm bài viết, nhảy tới mục, chạy lệnh…"
+      />
+      <kbd class="pal-kbd">esc</kbd>
+    </div>
+    <ul class="pal-list" id="pal-list" role="listbox" data-pal-list></ul>
+    <p class="pal-foot" aria-hidden="true">
+      <span><kbd>↑</kbd><kbd>↓</kbd> {% include t.html en="navigate" vi="di chuyển" %}</span>
+      <span><kbd>↵</kbd> {% include t.html en="open" vi="mở" %}</span>
+      <span><kbd>esc</kbd> {% include t.html en="close" vi="đóng" %}</span>
+    </p>
+  </div>
+</dialog>

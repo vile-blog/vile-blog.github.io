@@ -26,12 +26,13 @@
     </div>
 
     <div class="hero-graphic">
-      <div class="terminal" role="img" aria-label="Stylized code editor window showing a Go struct describing the engineer's stack">
+      <div class="terminal" data-term>
         <div class="terminal-bar">
           <span class="terminal-dot red" aria-hidden="true"></span>
           <span class="terminal-dot yellow" aria-hidden="true"></span>
           <span class="terminal-dot green" aria-hidden="true"></span>
           <span class="terminal-title">about-me.go</span>
+          <span class="terminal-hint" aria-hidden="true">{% include t.html en="try: help" vi="thử: help" %}</span>
         </div>
         <div class="terminal-body">
 <code aria-hidden="true"><span class="line-num">1</span><span class="tok-com">// currently building for the web</span>
@@ -46,8 +47,25 @@
 <span class="line-num">10</span> <span class="tok-prop">Status</span><span class="tok-punc">:</span> <span class="tok-str">"shipping"</span><span class="tok-punc">,</span>
 <span class="line-num">11</span> <span class="tok-prop">OpenTo</span><span class="tok-punc">:</span> <span class="tok-str">"good conversations"</span><span class="tok-punc">,</span>
 <span class="line-num">12</span><span class="tok-punc">}</span></code>
+          <div class="term-log" data-term-log role="log" aria-live="polite"></div>
+          <form class="term-prompt" data-term-form autocomplete="off">
+            <label for="term-input" class="term-ps1" aria-label="Terminal command">$</label>
+            <input id="term-input" class="term-input" data-term-input type="text" spellcheck="false" autocapitalize="off" autocomplete="off" placeholder="help" />
+          </form>
         </div>
       </div>
     </div>
   </div>
 </section>
+
+<script type="application/json" id="term-data">
+{
+  "author": {{ site.author | jsonify }},
+  "projects": {{ site.data.projects | jsonify }},
+  "roadmap": [
+    {%- for m in site.data.roadmap.milestones -%}
+    { "status": {{ m.status | jsonify }}, "label": {{ m.label | jsonify }}, "title": {{ m.title | jsonify }}, "title_vi": {{ m.title_vi | jsonify }} }{% unless forloop.last %},{% endunless %}
+    {%- endfor -%}
+  ]
+}
+</script>

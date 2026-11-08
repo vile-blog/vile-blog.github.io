@@ -10,6 +10,19 @@ permalink: /blog/
       <h1 class="section-title">{% include t.html en="All writing" vi="Tất cả bài viết" %}</h1>
     </div>
 
+    <div class="graph-block reveal" id="graph" data-graph>
+      <p class="eyebrow">~/graph</p>
+      <p class="graph-sub">{% include t.html en="Every post, connected by the tags they share. Hover to trace links, drag to rearrange, click a dot to read." vi="Mọi bài viết, nối với nhau qua các thẻ chung. Rê chuột để lần theo liên kết, kéo để sắp xếp lại, bấm vào chấm để đọc." %}</p>
+      <div class="graph-stage" data-graph-stage>
+        <div class="graph-tip" data-graph-tip hidden></div>
+      </div>
+      <ul class="graph-legend" aria-hidden="true">
+        <li class="gl-book">{% include t.html en="Book note" vi="Ghi chú sách" %}</li>
+        <li class="gl-post">{% include t.html en="Post" vi="Bài viết" %}</li>
+        <li class="gl-tag">{% include t.html en="Shared tag" vi="Thẻ chung" %}</li>
+      </ul>
+    </div>
+
     <div class="blog-list">
       {% for p in site.posts %}
         {% include blog-item.html post=p %}

@@ -1,0 +1,25 @@
+---
+layout: null
+sitemap: false
+---
+{%- comment -%}
+  Search / graph index. Fetched lazily by assets/js/extras.js the first time the
+  command palette, the hero terminal or the knowledge graph needs it.
+  Keys are short on purpose: t/tv title (en/vi), u url, d date, c category,
+  g tags, e excerpt (en), ev excerpt (vi), x full text.
+{%- endcomment -%}
+[
+{%- for p in site.posts -%}
+  {
+    "t": {{ p.title | jsonify }},
+    "tv": {{ p.title_vi | default: p.title | jsonify }},
+    "u": {{ p.url | relative_url | jsonify }},
+    "d": {{ p.date | date: "%Y-%m-%d" | jsonify }},
+    "c": {{ p.categories | first | default: "blog" | jsonify }},
+    "g": {{ p.tags | jsonify }},
+    "e": {{ p.excerpt | strip_html | strip_newlines | normalize_whitespace | jsonify }},
+    "ev": {{ p.excerpt_vi | default: p.excerpt | strip_html | strip_newlines | normalize_whitespace | jsonify }},
+    "x": {{ p.content | strip_html | strip_newlines | normalize_whitespace | jsonify }}
+  }{% unless forloop.last %},{% endunless %}
+{%- endfor -%}
+]

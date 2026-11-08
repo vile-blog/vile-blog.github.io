@@ -22,9 +22,12 @@ This chapter answers a question I'd always taken for granted without really thin
 
 ## Failure isn't just "on or off"
 
-The first thing that reframed this chapter for me: I used to picture "a machine failing" as a light switch — it's either fine or it's dead. Real failures are messier than that. A machine can be *slow* instead of dead. A network cable can be flaky, dropping some messages but not all. A machine can be perfectly healthy but unreachable from certain other machines due to a network hiccup, while still being reachable from others — this is called a **partial failure**, and it's genuinely confusing because from any single other machine's point of view, "that server is slow to respond" and "that server is dead" look *identical* until you wait long enough to be sure.
+The first thing that reframed this chapter for me: I used to picture "a machine failing" as a light switch — it's either fine or it's dead. Real failures are messier than that. A machine can be *slow* instead of dead. A network cable can be flaky, dropping some messages but not all. A machine can be perfectly healthy but unreachable from certain other machines due to a network hiccup, while still being reachable from others — this is called a **partial failure**, and it's genuinely confusing because from any single other machine's point of view, "that server is slow to respond" and "that server is dead" look *identical* until you wait long enough to be sure. <span class="sn">In practice, "waiting long enough" means a timeout: set it too short and you declare healthy machines dead, too long and users sit through the outage.</span>
 
 This matters because a system that only knows how to handle the clean, easy case — "the machine crashed and restarted" — falls apart the first time it hits one of these messier, more ambiguous situations. So the real goal of "high availability" isn't "prevent every possible failure" (you can't — hardware breaks, that's just physics), it's "design the system so that when something breaks, the rest of it can keep going anyway." Which immediately implies two rules: no single machine should be the *only* copy of any piece of data, and no single machine should be the *only one allowed* to accept new writes forever.
+
+> **No single point of anything.** Two rules fall out of this: no machine should hold the only copy of any data, and no machine should be the only one allowed to accept writes forever.
+{: .callout .callout-key}
 
 ## Three ways to organize your copies
 
@@ -52,6 +55,9 @@ The genuinely scary failure mode here is called **split brain**: the old leader 
 
 Here's a subtler problem that has nothing to do with anything actually breaking. Followers usually replicate *asynchronously* — meaning the leader doesn't wait around for every follower to confirm before telling the original writer "done, saved" — because waiting for every single copy on every single write would make everything painfully slow. But this means followers are always at least a little bit behind the leader, and that small lag can cause genuinely confusing bugs. Picture posting a comment on a website, having it save successfully, and then immediately refreshing the page — only to see the comment has vanished, because your refresh happened to read from a follower that hadn't caught up yet. Nothing broke. The comment is safe on the leader. But from the user's point of view, it looks exactly like data loss.
 
+> **Stale read, not data loss.** The comment is safe on the leader; the follower you happened to read from just has not caught up. Treat it as a read-consistency problem, not a durability one.
+{: .callout .callout-warn}
+
 The book names a few specific promises a system can choose to make, to prevent exactly this kind of confusion:
 
 - **Read-your-writes** — you should always be able to see your *own* recent changes immediately, even if other people's reads are still served from a slightly-behind copy.
@@ -77,9 +83,12 @@ Chương này trả lời một câu hỏi mà trước giờ tôi cứ mặc nh
 
 ## Failure không chỉ đơn giản là "bật hoặc tắt"
 
-Điều đầu tiên khiến tôi nhìn lại cả chương: trước đây tôi hình dung "một máy bị lỗi" giống như một công tắc điện — hoặc là ổn, hoặc là chết hẳn. Failure thật thì lộn xộn hơn nhiều. Một máy có thể *chậm* thay vì chết hẳn. Một đường mạng có thể chập chờn, làm rớt vài message nhưng không phải tất cả. Một máy có thể hoàn toàn khỏe mạnh nhưng không tới được từ một số máy khác do trục trặc mạng, trong khi vẫn tới được từ những máy khác — gọi là **partial failure** (lỗi cục bộ), và nó thực sự gây rối vì từ góc nhìn của bất kỳ máy nào khác, "server đó phản hồi chậm" và "server đó đã chết" trông *giống hệt nhau* cho đến khi bạn chờ đủ lâu để chắc chắn.
+Điều đầu tiên khiến tôi nhìn lại cả chương: trước đây tôi hình dung "một máy bị lỗi" giống như một công tắc điện — hoặc là ổn, hoặc là chết hẳn. Failure thật thì lộn xộn hơn nhiều. Một máy có thể *chậm* thay vì chết hẳn. Một đường mạng có thể chập chờn, làm rớt vài message nhưng không phải tất cả. Một máy có thể hoàn toàn khỏe mạnh nhưng không tới được từ một số máy khác do trục trặc mạng, trong khi vẫn tới được từ những máy khác — gọi là **partial failure** (lỗi cục bộ), và nó thực sự gây rối vì từ góc nhìn của bất kỳ máy nào khác, "server đó phản hồi chậm" và "server đó đã chết" trông *giống hệt nhau* cho đến khi bạn chờ đủ lâu để chắc chắn. <span class="sn">Trong thực tế, "chờ đủ lâu" nghĩa là một timeout: đặt quá ngắn thì máy khỏe cũng bị coi là chết, đặt quá dài thì người dùng phải ngồi chờ suốt lúc sự cố.</span>
 
 Điều này quan trọng vì một hệ thống chỉ biết xử lý kịch bản sạch sẽ, dễ dàng — "máy crash rồi restart lại" — sẽ sụp đổ ngay lần đầu gặp phải một trong những tình huống lộn xộn, mơ hồ hơn này. Vậy nên mục tiêu thực sự của "high availability" không phải là "ngăn chặn mọi failure có thể xảy ra" (bạn không thể — phần cứng sẽ hỏng, đó là vật lý), mà là "thiết kế hệ thống sao cho khi có gì đó hỏng, phần còn lại vẫn tiếp tục hoạt động được." Điều này kéo theo ngay hai quy tắc: không một máy nào nên là bản sao *duy nhất* của bất kỳ mẩu dữ liệu nào, và không một máy nào nên là nơi *duy nhất được phép* nhận ghi mãi mãi.
+
+> **Không có "điểm duy nhất" nào.** Từ đây suy ra hai quy tắc: không máy nào được giữ bản sao duy nhất của bất kỳ dữ liệu nào, và không máy nào là máy duy nhất được phép nhận ghi mãi mãi.
+{: .callout .callout-key}
 
 ## Ba cách tổ chức các bản sao
 
@@ -106,6 +115,9 @@ Failure mode thực sự đáng sợ ở đây gọi là **split brain**: leader
 ## Ngay cả khi không có gì "hỏng," các bản sao vẫn có thể bị trễ
 
 Đây là một vấn đề tinh vi hơn, chẳng liên quan gì tới việc có thứ gì thực sự bị hỏng. Follower thường replicate theo kiểu *bất đồng bộ* — nghĩa là leader không ngồi chờ mọi follower xác nhận trước khi báo cho người ghi ban đầu là "xong, đã lưu" — vì chờ mọi bản sao xác nhận ở mỗi lượt ghi sẽ khiến mọi thứ chậm đến khó chịu. Nhưng điều này nghĩa là follower luôn trễ hơn leader ít nhất một chút, và độ trễ nhỏ đó có thể gây ra những con bug thực sự gây bối rối. Hãy tưởng tượng bạn đăng một bình luận trên một website, nó lưu thành công, rồi bạn lập tức tải lại trang — chỉ để thấy bình luận đó biến mất, vì lần tải lại đó tình cờ đọc từ một follower chưa kịp bắt kịp. Không có gì hỏng cả. Bình luận vẫn an toàn trên leader. Nhưng từ góc nhìn của người dùng, nó trông y hệt như mất dữ liệu.
+
+> **Đọc dữ liệu cũ, không phải mất dữ liệu.** Bình luận vẫn an toàn trên leader; follower mà bạn tình cờ đọc chỉ là chưa bắt kịp. Hãy coi đây là vấn đề nhất quán khi đọc, không phải vấn đề độ bền dữ liệu.
+{: .callout .callout-warn}
 
 Cuốn sách gọi tên vài cam kết cụ thể một hệ thống có thể chọn để đưa ra, nhằm ngăn đúng loại bối rối này:
 
