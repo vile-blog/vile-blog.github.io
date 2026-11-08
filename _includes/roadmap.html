@@ -1,0 +1,68 @@
+<!-- ================================================================
+     ROADMAP — sourced from _data/roadmap.yml
+     Desktop: horizontal track, cards alternate above/below.
+     Tablet/mobile (<=1000px): vertical timeline.
+================================================================= -->
+{% assign steps = site.data.roadmap.milestones %}
+{% assign dest = site.data.roadmap.destination %}
+{% assign cols = steps.size | plus: 1 %}
+{% assign now_index = 1 %}
+{% for m in steps %}{% if m.status == "now" %}{% assign now_index = forloop.index %}{% endif %}{% endfor %}
+
+<section id="roadmap" aria-labelledby="roadmap-heading">
+  <div class="container">
+    <div class="section-head reveal">
+      <p class="eyebrow">~/roadmap</p>
+      <h2 id="roadmap-heading" class="section-title">{% include t.html en="From intern to <span class='accent-text'>founding engineer</span>" vi="Từ thực tập sinh đến <span class='accent-text'>founding engineer</span>" %}</h2>
+      <p class="roadmap-sub">{% include t.html en="Where I have been, what I am building right now, and where I am heading." vi="Tôi đã đi qua những đâu, đang xây dựng gì, và đang hướng tới điều gì." %}</p>
+    </div>
+
+    <div class="roadmap reveal">
+      <ol class="rm-grid" style="--cols: {{ cols }}; --now: {{ now_index }};">
+        <li class="rm-bar" aria-hidden="true"><span class="rm-fill"></span></li>
+
+        {% for m in steps %}
+        {% assign side = "bottom" %}
+        {% assign rem = forloop.index | modulo: 2 %}
+        {% if rem == 1 %}{% assign side = "top" %}{% endif %}
+        <li class="rm-step rm-{{ m.status }} rm-{{ side }}" style="--i: {{ forloop.index }};">
+          <div class="rm-cell">
+            <article class="rm-card">
+              <p class="rm-status">
+                {% if m.status == "achieved" %}{% include t.html en="Achieved" vi="Đã đạt" %}{% elsif m.status == "now" %}{% include t.html en="Now" vi="Hiện tại" %}{% else %}{% include t.html en="Target" vi="Mục tiêu" %}{% endif %}
+                <span aria-hidden="true">·</span>
+                {% if m.label_vi %}{% include t.html en=m.label vi=m.label_vi %}{% else %}{{ m.label }}{% endif %}
+              </p>
+              <h3 class="rm-title">{% include t.html en=m.title vi=m.title_vi %}</h3>
+              <p class="rm-text">{% include t.html en=m.text vi=m.text_vi %}</p>
+            </article>
+          </div>
+          <div class="rm-node" {% if m.status == "now" %}aria-current="step"{% endif %}>
+            <span class="rm-num">{% if forloop.index < 10 %}0{% endif %}{{ forloop.index }}</span>
+            {% if m.status == "now" %}<span class="rm-here">{% include t.html en="I'm here" vi="Tôi ở đây" %}</span>{% endif %}
+          </div>
+        </li>
+        {% endfor %}
+
+        <li class="rm-step rm-destination rm-top" style="--i: {{ cols }};">
+          <div class="rm-cell">
+            <article class="rm-card">
+              <p class="rm-status">{% include t.html en="Destination" vi="Đích đến" %}</p>
+              <h3 class="rm-title">{% include t.html en=dest.title vi=dest.title_vi %}</h3>
+              <p class="rm-text">{% include t.html en=dest.text vi=dest.text_vi %}</p>
+            </article>
+          </div>
+          <div class="rm-node">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 21V4"></path><path d="M5 4h11l-2 4 2 4H5"></path></svg>
+          </div>
+        </li>
+      </ol>
+
+      <ul class="rm-legend" aria-label="Legend">
+        <li class="rm-key-achieved">{% include t.html en="Achieved" vi="Đã đạt" %}</li>
+        <li class="rm-key-now">{% include t.html en="In progress" vi="Đang thực hiện" %}</li>
+        <li class="rm-key-target">{% include t.html en="Target" vi="Mục tiêu" %}</li>
+      </ul>
+    </div>
+  </div>
+</section>

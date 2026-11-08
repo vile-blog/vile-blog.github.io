@@ -1,0 +1,59 @@
+# Roadmap section — rendered by _includes/roadmap.html
+#
+# `milestones` run left to right along the track. Cards alternate above and
+# below the line automatically. `status` is one of:
+#   achieved | now | target
+# Exactly one milestone should be `now`; the green progress fill stops there.
+# The `destination` card is drawn at the end of the track with a flag.
+#
+# Every user-facing string has an _vi twin (the site switches EN/VI together).
+
+milestones:
+  - status: achieved
+    label: "2020 – 2025"
+    title: "Computer Science foundation"
+    title_vi: "Nền tảng Khoa học máy tính"
+    text: "B.S. in Computer Science at IUH (GPA 3.83/4.0), professional English, and a National First Prize at the Eureka Student Scientific Research Award."
+    text_vi: "Cử nhân Khoa học máy tính tại IUH (GPA 3.83/4.0), tiếng Anh thành thạo trong công việc, và Giải Nhất Quốc gia Giải thưởng Sinh viên Nghiên cứu Khoa học Eureka."
+
+  - status: achieved
+    label: "2024 – 2025"
+    title: "Full-stack builder"
+    title_vi: "Lập trình full-stack"
+    text: "Full-stack consultant for global clients via micro1 and Upwork (Badminton Match Finder, DDT-Algo), plus a real-time stock monitoring UI at Phu Hung Securities."
+    text_vi: "Tư vấn full-stack cho khách hàng quốc tế qua micro1 và Upwork (Badminton Match Finder, DDT-Algo), cùng giao diện theo dõi chứng khoán thời gian thực tại Chứng khoán Phú Hưng."
+
+  - status: achieved
+    label: "2025 – 2026"
+    title: "Backend at scale"
+    title_vi: "Backend quy mô lớn"
+    text: "At Grab, on a platform handling 1.1B messages/day: eliminated 60–70M silently dropped messages/day and cut failure detection from 25 hours to minutes. Top 1/20 at the Grab Engineering Bootcamp."
+    text_vi: "Tại Grab, trên nền tảng xử lý 1,1 tỷ tin nhắn/ngày: loại bỏ 60–70 triệu tin nhắn bị mất âm thầm mỗi ngày và rút thời gian phát hiện lỗi từ 25 giờ xuống còn vài phút. Top 1/20 Grab Engineering Bootcamp."
+
+  - status: achieved
+    label: "2025 – 2026"
+    title: "Senior engineer & research"
+    title_vi: "Senior engineer & nghiên cứu"
+    text: "Scaled multi-shuttle path planning from 700 to 1000+ agents at Vinatech, then joined FPT Automotive as Senior Engineer. IEEE-accepted A* paper; Top 6/300 at the FPT Automotive Hackathon; Top 10 in the AMD AI Developer Program."
+    text_vi: "Mở rộng hệ thống lập lộ trình đa shuttle từ 700 lên 1000+ agent tại Vinatech, sau đó gia nhập FPT Automotive với vai trò Senior Engineer. Bài báo về A* được IEEE chấp nhận; Top 6/300 FPT Automotive Hackathon; Top 10 AMD AI Developer Program."
+
+  - status: now
+    label: "2026"
+    title: "Founding engineer & AI agents"
+    title_vi: "Founding engineer & AI agent"
+    text: "Designing Hustly Space end to end — now serving 1,000+ users — while building AI agents that automate operations: on-call triage, MR reviews and deployments through MCP tools."
+    text_vi: "Thiết kế Hustly Space từ đầu đến cuối — hiện phục vụ 1,000+ người dùng — đồng thời xây dựng các AI agent tự động hóa vận hành: trực on-call, review MR và triển khai thông qua MCP tools."
+
+  - status: target
+    label: "Next"
+    label_vi: "Tiếp theo"
+    title: "Technical lead"
+    title_vi: "Technical lead"
+    text: "Own larger distributed systems and AI-agent platforms: lead design reviews, set reliability standards and mentor other engineers."
+    text_vi: "Làm chủ các hệ thống phân tán và nền tảng AI agent lớn hơn: dẫn dắt design review, đặt tiêu chuẩn về độ tin cậy và kèm cặp các kỹ sư khác."
+
+destination:
+  title: "Staff-Level Backend & AI Engineer"
+  title_vi: "Kỹ sư Backend & AI cấp Staff"
+  text: "Design reliable, large-scale platforms and AI-agent systems end to end, and lead the teams that run them."
+  text_vi: "Thiết kế các nền tảng và hệ thống AI agent quy mô lớn, đáng tin cậy từ đầu đến cuối, và dẫn dắt những đội ngũ vận hành chúng."

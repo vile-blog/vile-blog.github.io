@@ -1112,6 +1112,409 @@ section {
 }
 
 /* ==========================================================================
+   Roadmap
+   Desktop: one horizontal track; cards alternate above / below it and are
+   two columns wide, so neighbours on the same side never touch. The grid is
+   narrowed by exactly the cards' overhang so nothing spills past .container.
+   <=1000px: collapses into a vertical timeline.
+   ========================================================================== */
+#roadmap .section-title .accent-text {
+  color: var(--accent);
+}
+
+.roadmap-sub {
+  margin-top: 12px;
+  color: var(--text-secondary);
+}
+
+.rm-grid {
+  --rm-gap: 10px;     /* breathing room between neighbouring cards */
+  --rm-link: 28px;    /* length of the connector between card and node */
+  --rm-track: 44px;   /* height of the track row */
+  --rm-node: 34px;
+
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(var(--cols), 1fr);
+  grid-template-rows: auto var(--rm-track) auto;
+  /* card width = 2 columns - gap, so the first/last card overhang by
+     (column - gap); shrinking the grid by that keeps them inside .container */
+  width: calc((100% + 2 * var(--rm-gap)) * var(--cols) / (var(--cols) + 2));
+  margin: 0 auto;
+}
+
+.rm-step {
+  display: contents;
+}
+
+/* --- Track --- */
+.rm-bar {
+  grid-row: 2;
+  grid-column: 1 / -1;
+  align-self: center;
+  position: relative;
+  height: var(--rm-track);
+  /* extend the track past the first/last node by the cards' overhang */
+  margin-inline: calc(var(--rm-gap) - 100% / var(--cols));
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--text-primary) 8%, var(--surface));
+  border: 1px solid var(--border);
+  overflow: hidden;
+}
+
+.rm-bar::after {
+  /* dashed centre line */
+  content: "";
+  position: absolute;
+  inset: calc(50% - 1px) 18px auto 18px;
+  height: 2px;
+  background-image: linear-gradient(90deg, color-mix(in srgb, var(--text-primary) 38%, transparent) 55%, transparent 55%);
+  background-size: 16px 2px;
+}
+
+.rm-fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  /* ends at the centre of the "now" node */
+  width: calc((var(--now) + 0.5) / (var(--cols) + 2) * (100% + 2 * var(--rm-gap)) - var(--rm-gap));
+  background: linear-gradient(90deg, color-mix(in srgb, var(--accent) 35%, transparent), var(--accent));
+  border-radius: 999px 0 0 999px;
+}
+
+/* --- Nodes --- */
+.rm-node {
+  grid-row: 2;
+  grid-column: var(--i);
+  justify-self: center;
+  align-self: center;
+  position: relative;
+  z-index: 1;
+  width: var(--rm-node);
+  height: var(--rm-node);
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--surface);
+  border: 2px solid var(--accent);
+  color: var(--accent);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.rm-node svg {
+  width: 16px;
+  height: 16px;
+}
+
+.rm-achieved .rm-node {
+  box-shadow: 0 0 0 3px var(--surface);
+}
+
+.rm-now .rm-node {
+  width: 40px;
+  height: 40px;
+  background: var(--amber);
+  border-color: var(--amber);
+  color: #1a1204;
+  box-shadow: 0 0 0 4px var(--bg), 0 0 0 6px var(--amber-dim);
+  animation: rm-pulse 2.4s ease-in-out infinite;
+}
+
+.rm-target .rm-node {
+  background: var(--surface);
+  border-color: var(--border-strong);
+  color: var(--text-tertiary);
+  box-shadow: 0 0 0 3px var(--bg);
+}
+
+.rm-destination .rm-node {
+  background: var(--surface);
+  border-color: var(--amber);
+  color: var(--amber);
+  box-shadow: 0 0 0 3px var(--bg);
+}
+
+.rm-here {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  line-height: 1.4;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: var(--amber);
+  color: #1a1204;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+@keyframes rm-pulse {
+  0%, 100% { box-shadow: 0 0 0 4px var(--bg), 0 0 0 6px var(--amber-dim); }
+  50%      { box-shadow: 0 0 0 4px var(--bg), 0 0 0 12px transparent; }
+}
+
+/* --- Cards --- */
+.rm-cell {
+  grid-column: var(--i);
+  position: relative;
+}
+
+.rm-top .rm-cell {
+  grid-row: 1;
+  align-self: end;
+  padding-bottom: var(--rm-link);
+}
+
+.rm-bottom .rm-cell {
+  grid-row: 3;
+  align-self: start;
+  padding-top: var(--rm-link);
+}
+
+/* connector between card and node */
+.rm-cell::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  height: var(--rm-link);
+  border-left: 1px dashed var(--border-strong);
+}
+
+.rm-top .rm-cell::after {
+  bottom: 0;
+}
+
+.rm-bottom .rm-cell::after {
+  top: 0;
+}
+
+.rm-card {
+  /* two columns wide, centred on the node's column */
+  width: calc(200% - 2 * var(--rm-gap));
+  margin-left: calc(-50% + var(--rm-gap));
+  padding: 14px 16px 16px;
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-md);
+  transition: transform 0.2s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+:root[data-theme="light"] .rm-card {
+  box-shadow: 0 1px 2px rgba(20, 23, 26, 0.04), 0 10px 24px -16px rgba(20, 23, 26, 0.18);
+}
+
+.rm-card:hover {
+  transform: translateY(-3px);
+  border-color: var(--accent);
+}
+
+.rm-status {
+  margin-bottom: 8px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.rm-title {
+  margin-bottom: 8px;
+  font-size: 0.98rem;
+  line-height: 1.3;
+  color: var(--text-primary);
+}
+
+.rm-text {
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: var(--text-secondary);
+}
+
+/* status variants */
+.rm-now .rm-status {
+  color: var(--amber);
+}
+
+.rm-now .rm-card {
+  border-color: var(--amber);
+  box-shadow: 0 0 0 1px var(--amber-dim), var(--shadow-lift);
+}
+
+.rm-now .rm-cell::after {
+  border-left-color: var(--amber);
+}
+
+.rm-target .rm-card {
+  border-style: dashed;
+}
+
+.rm-target .rm-status {
+  color: var(--text-tertiary);
+}
+
+.rm-destination .rm-card {
+  border: 1px dashed var(--amber);
+  background: color-mix(in srgb, var(--accent) 9%, var(--surface));
+}
+
+.rm-destination .rm-status {
+  color: var(--amber);
+}
+
+.rm-destination .rm-cell::after {
+  border-left-color: var(--amber);
+}
+
+/* --- Legend --- */
+.rm-legend {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px 28px;
+  margin-top: 40px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.rm-legend li {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.rm-legend li::before {
+  content: "";
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+
+.rm-legend .rm-key-now::before {
+  background: var(--amber);
+}
+
+.rm-legend .rm-key-target::before {
+  background: transparent;
+  border: 1.5px solid var(--text-tertiary);
+}
+
+/* --- Vertical timeline (tablet + mobile) ---
+   Breakpoint is 1100px, not the site-wide 1000px: a 7-column track needs
+   ~1000px of content width before two-column-wide cards get cramped. */
+@media (max-width: 1100px) {
+  .rm-grid {
+    display: block;
+    width: auto;
+    margin: 0;
+    padding-left: 56px;
+  }
+
+  .rm-bar {
+    display: none;
+  }
+
+  .rm-step {
+    display: block;
+    position: relative;
+    padding-bottom: 28px;
+  }
+
+  .rm-step:last-child {
+    padding-bottom: 0;
+  }
+
+  /* line segment from this node down to the next one */
+  .rm-step:not(:last-child)::before {
+    content: "";
+    position: absolute;
+    left: -40.5px;
+    top: 17px;
+    bottom: -17px;
+    width: 3px;
+    border-radius: 2px;
+    background: var(--border-strong);
+  }
+
+  .rm-achieved:not(:last-child)::before {
+    background: var(--accent);
+  }
+
+  .rm-now:not(:last-child)::before {
+    background: linear-gradient(var(--amber), var(--border-strong));
+  }
+
+  .rm-node {
+    position: absolute;
+    left: -56px;
+    top: 0;
+    z-index: 1;
+  }
+
+  .rm-now .rm-node {
+    left: -59px;
+    top: -3px;
+  }
+
+  /* the amber node + "Now" label already say it; the pill would clip
+     against the left edge of narrow screens */
+  .rm-here {
+    display: none;
+  }
+
+  .rm-top .rm-cell,
+  .rm-bottom .rm-cell {
+    padding: 0;
+  }
+
+  .rm-cell::after {
+    display: none;
+  }
+
+  .rm-card {
+    width: auto;
+    margin-left: 0;
+    max-width: 640px;
+  }
+
+  .rm-text {
+    font-size: 13.5px;
+  }
+}
+
+@media (max-width: 480px) {
+  .rm-grid {
+    padding-left: 48px;
+  }
+  .rm-node {
+    left: -48px;
+  }
+  .rm-now .rm-node {
+    left: -51px;
+  }
+  .rm-step:not(:last-child)::before {
+    left: -32.5px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rm-now .rm-node {
+    animation: none;
+  }
+  .rm-card {
+    transition: border-color 0.25s ease;
+  }
+  .rm-card:hover {
+    transform: none;
+  }
+}
+
+/* ==========================================================================
    Blog
    ========================================================================== */
 .blog-list {

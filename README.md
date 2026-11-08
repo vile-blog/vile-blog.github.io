@@ -5,6 +5,7 @@ Personal landing page + blog, built with [Jekyll](https://jekyllrb.com/) and hos
 ## Editing content
 
 - **Personal info / hero / about text** — edit `_config.yml` (name, tagline, bio, social links) and `_includes/about.html`.
+- **Roadmap** — edit `_data/roadmap.yml`. Each milestone has a `status` (`achieved`, `now`, or `target`), a `label`, and EN/VI `title`/`text`. Cards alternate above/below the track automatically, and the green progress fill stops at the milestone marked `now`. The `destination` entry is the flag at the end.
 - **Projects** — edit `_data/projects.yml`. Add/remove entries; each needs `name`, `description`, `tags`, `github`, and optional `demo`.
 - **Blog posts** — add a new file to `_posts/` named `YYYY-MM-DD-title.md` with front matter:
   ```yaml
