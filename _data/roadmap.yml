@@ -16,7 +16,7 @@
 milestones:
   - status: achieved
     label: "2021 – 2024"
-    title: "Computer Science foundation"
+    title: "Computer Science Foundation"
     title_vi: "Nền tảng Khoa học máy tính"
     text: "Bachelor's in Computer Science at IUH, and a research paper on the A* algorithm accepted by IEEE."
     text_vi: "Cử nhân Khoa học máy tính tại IUH, và một bài báo khoa học về thuật toán A* được IEEE chấp nhận."
@@ -28,14 +28,14 @@ milestones:
             vi: "Cử nhân Khoa học máy tính, Đại học Công nghiệp TP.HCM (IUH) — GPA 3.83/4.0."
           - en: "English: professional working proficiency."
             vi: "Tiếng Anh: thành thạo trong công việc."
-      - heading: "Research — accepted by IEEE"
+      - heading: "Research — Accepted by IEEE"
         heading_vi: "Nghiên cứu — được IEEE chấp nhận"
         points:
           - en: "Optimizing the A* Algorithm: Enhancing Efficiency and Performance in Pathfinding."
             vi: "Optimizing the A* Algorithm: Enhancing Efficiency and Performance in Pathfinding."
           - en: "Disproved textbook pathfinding claims: BFS peak memory is 43× smaller than DFS on 2D grids, and A* needs about 25% obstacle density to overcome its heap overhead."
             vi: "Bác bỏ một số nhận định kinh điển về tìm đường: bộ nhớ đỉnh của BFS nhỏ hơn DFS tới 43 lần trên lưới 2D, và A* cần mật độ chướng ngại vật khoảng 25% mới bù được chi phí heap."
-      - heading: "Awards & optimization work"
+      - heading: "Awards & Optimization Work"
         heading_vi: "Giải thưởng & bài toán tối ưu"
         points:
           - en: "National First Prize — Eureka Student Scientific Research Award."
@@ -45,8 +45,8 @@ milestones:
 
   - status: achieved
     label: "2024 – 2025"
-    title: "Consultant & full-stack engineer"
-    title_vi: "Consultant & full-stack engineer"
+    title: "Consultant & Full-Stack Engineer"
+    title_vi: "Consultant & Full-Stack Engineer"
     text: "Full-stack consulting and engineering — a real-time trading UI at Phu Hung Securities and client projects through micro1 and Upwork."
     text_vi: "Tư vấn và phát triển full-stack — giao diện giao dịch thời gian thực tại Chứng khoán Phú Hưng và các dự án khách hàng qua micro1 và Upwork."
     details:
@@ -57,8 +57,8 @@ milestones:
             vi: "Xây dựng giao diện web thời gian thực để theo dõi giá cổ phiếu và biểu đồ bằng ReactJS và TypeScript."
           - en: "Integrated WebSocket for live market streaming."
             vi: "Tích hợp WebSocket để nhận dữ liệu thị trường trực tiếp."
-      - heading: "micro1 & Upwork — Full-stack consultant"
-        heading_vi: "micro1 & Upwork — Full-stack consultant"
+      - heading: "micro1 & Upwork — Full-Stack Consultant"
+        heading_vi: "micro1 & Upwork — Full-Stack Consultant"
         points:
           - en: "Delivered consulting for global clients end to end: requirements analysis, system design and delivery."
             vi: "Tư vấn cho khách hàng quốc tế từ đầu đến cuối: phân tích yêu cầu, thiết kế hệ thống và bàn giao."
@@ -69,8 +69,8 @@ milestones:
 
   - status: achieved
     label: "2025 – 2026"
-    title: "Grab: experimentation & notifications"
-    title_vi: "Grab: experimentation & notification"
+    title: "Grab: Experimentation & Notifications"
+    title_vi: "Grab: Experimentation & Notification"
     text: "Champion of the Grab Engineering Bootcamp 2025, then Software Engineer on Grab's experimentation platform and notification system."
     text_vi: "Quán quân Grab Engineering Bootcamp 2025, sau đó là Software Engineer của experimentation platform và hệ thống notification tại Grab."
     details:
@@ -79,7 +79,7 @@ milestones:
         points:
           - en: "Disease Diagnosis App: a high-throughput backend using Bloom filters and Redis caching, RabbitMQ for async processing, and Prometheus/Grafana for monitoring."
             vi: "Disease Diagnosis App: backend throughput cao dùng Bloom filter và Redis cache, RabbitMQ xử lý bất đồng bộ, giám sát bằng Prometheus/Grafana."
-      - heading: "Platform reliability"
+      - heading: "Platform Reliability"
         heading_vi: "Độ tin cậy của nền tảng"
         points:
           - en: "Led reliability work (Datadog dashboards, runbooks): cut silent-failure detection time from 25 hours to minutes and MTTR by 30–50%, saving 40+ engineering hours a year."
@@ -90,8 +90,8 @@ milestones:
             vi: "Củng cố đồng bộ cấu hình bằng ghi ba pha và khóa DB, tránh được 18,7 nghìn USD chi phí sự cố mỗi năm."
           - en: "Adopted Temporal to enforce a 5-minute DB-to-storage SLA at 99.9% uptime, cutting triage time to 2 minutes."
             vi: "Áp dụng Temporal để đảm bảo SLA 5 phút từ DB sang storage với uptime 99.9%, rút thời gian xử lý sự cố xuống 2 phút."
-      - heading: "Multi-agent AI across microservices"
-        heading_vi: "AI multi-agent xuyên suốt hệ thống microservices"
+      - heading: "Multi-Agent AI Across Microservices"
+        heading_vi: "AI Multi-Agent xuyên suốt hệ thống Microservices"
         points:
           - en: "Built an AI operations agent with autonomous sub-agents that work across the microservices system — on-call triage, MR reviews and deployments through MCP tools."
             vi: "Xây dựng AI operations agent với các sub-agent tự chủ hoạt động xuyên suốt hệ thống microservices — trực on-call, review MR và triển khai thông qua MCP tools."
@@ -105,8 +105,8 @@ milestones:
 
   - status: achieved
     label: "06/2026 – 09/2026"
-    title: "Multi-agent systems & voice AI"
-    title_vi: "Hệ thống multi-agent & voice AI"
+    title: "Multi-Agent Systems & Voice AI"
+    title_vi: "Hệ thống Multi-Agent & Voice AI"
     text: "Senior Software Engineer at Vinatech, scaling multi-agent path planning past 1000 agents. Top 6/300 at the FPT Automotive Hackathon."
     text_vi: "Senior Software Engineer tại Vinatech, mở rộng hệ thống lập lộ trình multi-agent vượt 1000 agent. Top 6/300 tại FPT Automotive Hackathon."
     details:
@@ -134,8 +134,8 @@ milestones:
 
   - status: now
     label: "2026"
-    title: "Founding engineer & senior engineer"
-    title_vi: "Founding engineer & senior engineer"
+    title: "Founding Engineer & Senior Engineer"
+    title_vi: "Founding Engineer & Senior Engineer"
     text: "Founding Engineer & Member of Staff at Hustly Space, and Senior Software Engineer at FPT Automotive."
     text_vi: "Founding Engineer & Member of Staff tại Hustly Space, đồng thời là Senior Software Engineer tại FPT Automotive."
     details:
@@ -151,8 +151,8 @@ milestones:
       - heading: "FPT Automotive — Senior Software Engineer, Backend"
         heading_vi: "FPT Automotive — Senior Software Engineer, Backend"
         points:
-          - en: "Senior backend engineer (Senior Software Engineer I)."
-            vi: "Kỹ sư backend cấp senior (Senior Software Engineer I)."
+          - en: "Senior Backend Engineer (Senior Software Engineer I)."
+            vi: "Kỹ sư Backend cấp Senior (Senior Software Engineer I)."
       - heading: "AMD AI Developer Program 2026 — Top 10 (OpsCopilot)"
         heading_vi: "AMD AI Developer Program 2026 — Top 10 (OpsCopilot)"
         points:
@@ -168,21 +168,21 @@ milestones:
 
   - status: target
     label: "2028"
-    title: "Lead engineer & my own business"
-    title_vi: "Lead engineer & doanh nghiệp riêng"
-    text: "Lead software engineer — and build a business of my own."
-    text_vi: "Lead software engineer — và xây dựng một doanh nghiệp của riêng mình."
+    title: "Lead Engineer & My Own Business"
+    title_vi: "Lead Engineer & Doanh nghiệp riêng"
+    text: "Lead Software Engineer — and build a business of my own."
+    text_vi: "Lead Software Engineer — và xây dựng một doanh nghiệp của riêng mình."
     details:
-      - heading: "The plan for 2028"
+      - heading: "The Plan for 2028"
         heading_vi: "Kế hoạch cho năm 2028"
         points:
-          - en: "Step up from individual contributor to lead software engineer: own architecture, set reliability standards and grow other engineers."
-            vi: "Chuyển từ vai trò cá nhân đóng góp sang lead software engineer: làm chủ kiến trúc, đặt tiêu chuẩn độ tin cậy và giúp các kỹ sư khác trưởng thành."
+          - en: "Step up from individual contributor to Lead Software Engineer: own architecture, set reliability standards and grow other engineers."
+            vi: "Chuyển từ vai trò cá nhân đóng góp sang Lead Software Engineer: làm chủ kiến trúc, đặt tiêu chuẩn độ tin cậy và giúp các kỹ sư khác trưởng thành."
           - en: "Run a business of my own, building on what I have learned founding Hustly Space."
             vi: "Vận hành doanh nghiệp riêng, dựa trên những gì đã học được khi sáng lập Hustly Space."
 
 destination:
-  title: "To be discovered :))"
+  title: "To Be Discovered :))"
   title_vi: "Chưa biết :))"
   text: "Not written yet — and that is the fun part."
   text_vi: "Chưa viết xong — và đó mới là phần thú vị."

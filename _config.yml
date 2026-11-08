@@ -1,7 +1,7 @@
 title: Vi Le
 tagline: "Software Engineer — building backend systems & AI agents"
 description: >-
-  Personal site and blog of Vi Le — software engineer, ex-Grab, founder of
+  Personal site and blog of Vi Le — Software Engineer, ex-Grab, founder of
   Hustly Space. Projects, writing, and notes on building software.
 url: "https://vile-blog.github.io"
 # Default share image (OpenGraph / Twitter card) used by jekyll-seo-tag.
@@ -24,7 +24,7 @@ author:
   linkedin: "https://linkedin.com/in/vilecong"
   x: ""
   bio: >-
-    I'm a software engineer with 3 years of experience building backend
+    I'm a Software Engineer with 3 years of experience building backend
     systems — including the messaging platform and experimentation platform
     teams at Grab. I'm also the founder of Hustly Space, a platform helping
     students discover competitions and build teams. This site is where I
