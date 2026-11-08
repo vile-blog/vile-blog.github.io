@@ -378,6 +378,11 @@ body.pal-lock {
   cursor: grab;
 }
 
+.g-tag.is-cat circle {
+  fill: var(--accent-dim);
+  stroke: var(--accent);
+}
+
 .g-label {
   font-family: var(--font-mono);
   font-size: 10px;
@@ -813,6 +818,13 @@ mark.hl.is-flash {
   border-color: var(--accent);
 }
 
+/* blocks that are now commentable in their own right */
+.post-content pre,
+.post-content blockquote,
+.post-content figure {
+  position: relative;
+}
+
 @media (max-width: 860px) {
   .pc-float {
     display: none;
@@ -992,5 +1004,294 @@ mark.hl.is-flash {
   }
   .read-progress {
     transition: none;
+  }
+}
+
+/* ---------- Roadmap dialog: copy deep link ---------- */
+.rm-copy-link {
+  margin-top: 26px;
+  padding: 6px 12px;
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  color: var(--text-secondary);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  transition: color 0.2s ease, border-color 0.2s ease;
+}
+
+.rm-copy-link:hover,
+.rm-copy-link.is-done {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+.rm-copy-link.is-done::after {
+  content: " ✓";
+}
+
+/* ==========================================================================
+   Post navigation + related posts
+   ========================================================================== */
+.post-nav {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-top: 64px;
+}
+
+.post-nav-link {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 16px 18px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  transition: border-color 0.2s ease, transform 0.2s ease;
+}
+
+.post-nav-link.is-next {
+  grid-column: 2;
+  text-align: right;
+}
+
+.post-nav-link:hover {
+  border-color: var(--accent);
+  transform: translateY(-2px);
+}
+
+.post-nav-dir {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--accent);
+}
+
+.post-nav-title {
+  font-family: var(--font-mono);
+  font-size: 0.95rem;
+  font-weight: 700;
+  line-height: 1.35;
+  color: var(--text-primary);
+}
+
+.post-related {
+  margin-top: 56px;
+}
+
+.related-title {
+  margin-bottom: 18px;
+  font-size: 1.2rem;
+  color: var(--text-primary);
+}
+
+.related-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.related-link {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  transition: border-color 0.2s ease;
+}
+
+.related-link:hover {
+  border-color: var(--accent);
+}
+
+.related-name {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+}
+
+.related-why {
+  flex: none;
+  max-width: 45%;
+  text-align: right;
+  font-size: 12px;
+  color: var(--text-tertiary);
+}
+
+@media (max-width: 600px) {
+  .post-nav {
+    grid-template-columns: 1fr;
+  }
+  .post-nav-link.is-next {
+    grid-column: 1;
+  }
+  .related-link {
+    flex-direction: column;
+    gap: 4px;
+  }
+  .related-why {
+    max-width: none;
+    text-align: left;
+  }
+}
+
+/* ==========================================================================
+   Focus mode
+   ========================================================================== */
+.focus-toggle {
+  font: inherit;
+  color: var(--text-tertiary);
+  text-decoration: underline;
+  text-decoration-style: dotted;
+  text-underline-offset: 3px;
+}
+
+.focus-toggle:hover {
+  color: var(--accent);
+}
+
+.focus-exit {
+  display: none;
+  position: fixed;
+  top: 14px;
+  right: 16px;
+  z-index: 210;
+  padding: 6px 12px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-secondary);
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  border-radius: 999px;
+  opacity: 0.55;
+  transition: opacity 0.2s ease;
+}
+
+.focus-exit:hover,
+.focus-exit:focus-visible {
+  opacity: 1;
+}
+
+html.focus-mode .focus-exit {
+  display: block;
+}
+
+html.focus-mode .site-nav,
+html.focus-mode .chat-widget,
+html.focus-mode .back-to-top,
+html.focus-mode .post-toc,
+html.focus-mode .bg-glow,
+html.focus-mode .bg-texture,
+html.focus-mode .back-link,
+html.focus-mode .view-badge,
+html.focus-mode .post-related,
+html.focus-mode footer,
+html.focus-mode .site-footer {
+  display: none !important;
+}
+
+html.focus-mode .post {
+  padding-top: 56px;
+}
+
+html.focus-mode .post-container {
+  max-width: 720px;
+}
+
+html.focus-mode .post-content {
+  font-size: 1.16rem;
+  line-height: 1.95;
+}
+
+/* ---------- keyboard help ---------- */
+.key-list {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 12px 24px;
+  margin: 18px 0 0;
+}
+
+.key-list dt {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.key-list dd {
+  margin: 0;
+  color: var(--text-secondary);
+}
+
+.key-list kbd {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  padding: 2px 8px;
+  color: var(--text-primary);
+  background: var(--bg-alt);
+  border: 1px solid var(--border-strong);
+  border-bottom-width: 2px;
+  border-radius: 5px;
+}
+
+/* ==========================================================================
+   Hacker mode  (Konami code / `matrix`)
+   ========================================================================== */
+html.hacker,
+html.hacker[data-theme="light"],
+html.hacker[data-theme="dark"] {
+  --bg: #000000;
+  --bg-alt: #02080a;
+  --surface: #04100a;
+  --surface-hover: #071a10;
+  --border: rgba(0, 255, 102, 0.18);
+  --border-strong: rgba(0, 255, 102, 0.34);
+  --text-primary: #c4ffd9;
+  --text-secondary: #5fd68a;
+  --text-tertiary: #3fa766;
+  --accent: #00ff66;
+  --accent-strong: #8dffb8;
+  --accent-dim: rgba(0, 255, 102, 0.12);
+  --accent-glow: rgba(0, 255, 102, 0.34);
+  --accent-contrast: #001a09;
+  --amber: #ffd400;
+  --amber-dim: rgba(255, 212, 0, 0.14);
+  --font-sans: var(--font-mono);
+  color-scheme: dark;
+}
+
+html.hacker body::after {
+  /* faint CRT scanlines */
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 9998;
+  pointer-events: none;
+  background: repeating-linear-gradient(0deg, rgba(0, 255, 102, 0.035) 0 1px, transparent 1px 3px);
+}
+
+html.hacker ::selection {
+  background: #00ff66;
+  color: #000;
+}
+
+.matrix-rain {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;
+  opacity: 0.9;
+  transition: opacity 0.9s ease;
+}
+
+.matrix-rain.is-out {
+  opacity: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html.hacker body::after {
+    display: none;
   }
 }

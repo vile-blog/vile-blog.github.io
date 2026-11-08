@@ -64,7 +64,98 @@
     return indexPromise;
   }
 
-  window.ViSite = { base: base, lang: lang, tr: tr, fold: fold, loadIndex: loadIndex };
+  /* ------------------------------------------------------------------
+     Hidden "hacker" mode: Konami code (↑↑↓↓←→←→ B A) or `matrix` in the
+     hero terminal. Persisted; the class is set before first paint by an
+     inline snippet in the layout.
+  ------------------------------------------------------------------ */
+  var reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var rainCanvas = null;
+
+  function flash(msg) {
+    var t = document.createElement("div");
+    t.className = "rd-toast is-on";
+    t.setAttribute("role", "status");
+    t.textContent = msg;
+    document.body.appendChild(t);
+    setTimeout(function () { t.classList.remove("is-on"); }, 2200);
+    setTimeout(function () { if (t.parentNode) t.parentNode.removeChild(t); }, 2600);
+  }
+
+  function matrixRain(ms) {
+    if (reduceMotion || rainCanvas) return;
+    var c = document.createElement("canvas");
+    c.className = "matrix-rain";
+    c.setAttribute("aria-hidden", "true");
+    document.body.appendChild(c);
+    rainCanvas = c;
+    var ctx = c.getContext("2d");
+    var w = (c.width = window.innerWidth);
+    var h = (c.height = window.innerHeight);
+    var size = 16;
+    var cols = Math.ceil(w / size);
+    var drops = [];
+    for (var i = 0; i < cols; i++) drops.push(Math.random() * -40);
+    var glyphs = "アイウエオカキクケコサシスセソタチツテトナニヌネノ0123456789<>{}/*+=".split("");
+    var start = performance.now();
+
+    function frame(now) {
+      var elapsed = now - start;
+      ctx.fillStyle = "rgba(0, 0, 0, 0.08)";
+      ctx.fillRect(0, 0, w, h);
+      ctx.font = size + "px monospace";
+      for (var k = 0; k < cols; k++) {
+        var g = glyphs[(Math.random() * glyphs.length) | 0];
+        ctx.fillStyle = Math.random() > 0.97 ? "#d6ffe3" : "#00ff66";
+        ctx.fillText(g, k * size, drops[k] * size);
+        if (drops[k] * size > h && Math.random() > 0.975) drops[k] = 0;
+        drops[k]++;
+      }
+      if (elapsed < ms) {
+        requestAnimationFrame(frame);
+      } else {
+        c.classList.add("is-out");
+        setTimeout(function () {
+          if (c.parentNode) c.parentNode.removeChild(c);
+          rainCanvas = null;
+        }, 900);
+      }
+    }
+    requestAnimationFrame(frame);
+  }
+
+  function setHacker(on) {
+    root.classList.toggle("hacker", on);
+    try { localStorage.setItem("vile-hacker", on ? "1" : "0"); } catch (e) { /* private mode */ }
+    if (on) {
+      matrixRain(5000);
+      flash(tr("Wake up, Neo… (type `matrix` to leave)", "Thức dậy đi, Neo… (gõ `matrix` để thoát)"));
+    } else {
+      flash(tr("Back to the real world.", "Trở về thế giới thật."));
+    }
+    return on;
+  }
+
+  function toggleHacker() {
+    return setHacker(!root.classList.contains("hacker"));
+  }
+
+  (function konami() {
+    var seq = ["ArrowUp", "ArrowUp", "ArrowDown", "ArrowDown", "ArrowLeft", "ArrowRight", "ArrowLeft", "ArrowRight", "b", "a"];
+    var at = 0;
+    document.addEventListener("keydown", function (e) {
+      if (isTyping(e.target)) { at = 0; return; }
+      var key = e.key.length === 1 ? e.key.toLowerCase() : e.key;
+      if (key === seq[at]) {
+        at++;
+        if (at === seq.length) { at = 0; toggleHacker(); }
+      } else {
+        at = key === seq[0] ? 1 : 0;
+      }
+    });
+  })();
+
+  window.ViSite = { base: base, lang: lang, tr: tr, fold: fold, loadIndex: loadIndex, toggleHacker: toggleHacker };
 
   function postTitle(p) {
     return lang() === "vi" ? p.tv || p.t : p.t;
@@ -534,6 +625,11 @@
         log.textContent = "";
       },
 
+      matrix: function () {
+        var on = toggleHacker();
+        print(on ? tr("Follow the white rabbit…", "Hãy theo con thỏ trắng…") : tr("Red pill declined.", "Từ chối viên thuốc đỏ."), "hl");
+      },
+
       sudo: function (args) {
         if (fold(args.join(" ")).replace(/\s+/g, " ") === "hire me") {
           print("[sudo] password for recruiter: ********", "dim");
@@ -620,8 +716,24 @@
         tagNode[t] = { type: "tag", label: t, deg: 0 };
         nodes.push(tagNode[t]);
       });
+      // every post also hangs off a hub for its category, so papers / plain
+      // posts that share no tags still end up connected to something
+      var CATS = {
+        "book-notes": ["Book notes", "Ghi chú sách"],
+        papers: ["Paper notes", "Ghi chú bài báo"],
+        blog: ["Writing", "Bài viết"]
+      };
+      var catCount = {};
+      posts.forEach(function (p) { catCount[p.c] = (catCount[p.c] || 0) + 1; });
+      Object.keys(catCount).forEach(function (c) {
+        if (catCount[c] < 2) return;
+        var name = CATS[c] || [c, c];
+        tagNode["@" + c] = { type: "tag", cat: true, label: tr(name[0], name[1]), deg: 0 };
+        nodes.push(tagNode["@" + c]);
+      });
+
       posts.forEach(function (p) {
-        (p.g || []).forEach(function (t) {
+        (p.g || []).concat(["@" + p.c]).forEach(function (t) {
           if (!tagNode[t]) return;
           links.push({ a: p._node, b: tagNode[t] });
           p._node.deg++;
@@ -670,7 +782,7 @@
           el.setAttribute("class", "g-node g-post" + (n.post.c === "book-notes" ? " is-book" : ""));
         } else {
           el = document.createElementNS(SVG, "g");
-          el.setAttribute("class", "g-node g-tag");
+          el.setAttribute("class", "g-node g-tag" + (n.cat ? " is-cat" : ""));
         }
         var c = document.createElementNS(SVG, "circle");
         c.setAttribute("r", n.r);
@@ -709,7 +821,7 @@
           if (l.a === n || l.b === n) l.el.classList.add("is-near");
         });
         tip.hidden = false;
-        tip.textContent = n.type === "post" ? postTitle(n.post) : "#" + n.label + " · " + (n.deg) + " " + tr("posts", "bài");
+        tip.textContent = n.type === "post" ? postTitle(n.post) : (n.cat ? "" : "#") + n.label + " · " + (n.deg) + " " + tr("posts", "bài");
         placeTip(n);
       }
 

@@ -23,10 +23,17 @@ Everything below is plain HTML/CSS/JS — no build step beyond Jekyll itself.
 
 - **Command palette** — `Ctrl/Cmd+K` (or `/`, or the search button in the nav) searches every post and runs commands (jump to a section, toggle theme/language). It reads `/search.json`, which Jekyll generates from `search.json` at the repo root.
 - **Hero terminal** — the box on the home page takes commands (`help`, `ls posts`, `cat roadmap`, `search <words>`, `lang vi`, `sudo hire me`…). Commands live in `assets/js/extras.js`.
-- **Knowledge graph** — `/blog/#graph` links posts through the tags they share. Tags used by only one post are left out, so give related posts a common tag to connect them.
+- **Knowledge graph** — `/blog/#graph` links posts through the tags they share. Tags used by only one post are left out, but every post also hangs off a hub for its category (book notes / paper notes / writing); give related posts a common tag to link them more tightly.
 - **Highlights & private notes** (posts only) — readers select text to highlight in 4 colours, attach a note, copy a quote, or copy a link to the passage. Stored in the reader's own browser (`localStorage`), never uploaded.
-- **Per-paragraph comments** (posts only) — the 💬 button beside a paragraph (or in the selection toolbar) opens a public thread for just that paragraph. Each thread is a GitHub Discussion created by giscus on the first comment, titled `<post path>#<paragraph id>`. The id is a hash of the paragraph's opening text, so editing a paragraph's first ~160 characters starts a fresh thread for it.
+- **Per-block comments** (posts only) — the 💬 button in the left margin (or in the selection toolbar) opens a public thread for whatever you point at: paragraphs, headings, list items, code blocks, table cells, callouts, images/diagrams. Each thread is a GitHub Discussion created by giscus on the first comment, titled `<post path>#<paragraph id>`. The id is a hash of the block's opening text (the image path for image-only paragraphs), so editing a block's first ~160 characters starts a fresh thread for it. To keep a thread through any edit, pin the block with kramdown: put `{: data-cid="why-quorums"}` on the line right after it (letters, digits and dashes only; the id is then `<lang>-why-quorums`).
 - **Reading progress bar + table of contents** — built automatically from the post's `##` headings.
+
+- **Focus mode** (posts only) — the "Focus mode" link next to the reading time (or the `F` key) hides the nav, chat and TOC and enlarges the text. The choice is remembered.
+- **Keyboard shortcuts** (posts only) — `j` / `k` next / previous section, `g g` top, `G` bottom, `f` focus, `?` shows the list.
+- **Prev / next + related posts** — book chapters link to the previous / next *chapter* (by `book_chapter_num`); other posts link by date. "If you liked this" ranks other posts by shared tags, weighting rare tags higher (the DDIA tag every chapter carries is ignored).
+- **Roadmap deep links** — `/#roadmap-3` opens milestone 3's details directly; the dialog has a "Copy link" button.
+- **Share image** — `assets/og-default.png` (1200×630) is the default OpenGraph / Twitter card (`image:` in `_config.yml`). Give a post its own with `image:` in its front matter.
+- **Hidden extras** — the Konami code (↑ ↑ ↓ ↓ ← → ← → B A) or `matrix` in the hero terminal toggles a green-on-black "hacker" theme.
 
 ### Writing callouts and sidenotes
 

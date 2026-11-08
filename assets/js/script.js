@@ -161,8 +161,16 @@
     if (rmDialog && typeof rmDialog.showModal === "function") {
       var rmBody = rmDialog.querySelector("[data-rm-body]");
 
+      var rmOpeners = {}; // "3" -> function that opens milestone 3
+
+      function setHash(h) {
+        // replaceState: deep links without piling up history entries
+        try { history.replaceState(null, "", h || location.pathname + location.search); } catch (e) { /* file:// etc. */ }
+      }
+
       document.querySelectorAll("[data-rm-open]").forEach(function (btn) {
         var card = btn.closest(".rm-card");
+        var num = (btn.getAttribute("data-rm-open").match(/(\d+)$/) || [])[1];
 
         function open() {
           var src = document.getElementById(btn.getAttribute("data-rm-open"));
@@ -170,10 +178,29 @@
           rmBody.innerHTML = src.innerHTML;
           var title = rmBody.querySelector(".rm-dialog-title");
           if (title) title.id = "rm-dialog-heading";
+
+          // "Copy link" — a deep link straight to this milestone
+          var link = document.createElement("button");
+          link.type = "button";
+          link.className = "rm-copy-link";
+          link.innerHTML = '<span data-lang-content="en">Copy link</span><span data-lang-content="vi">Sao chép link</span>';
+          link.addEventListener("click", function () {
+            var url = location.origin + location.pathname + "#roadmap-" + num;
+            var done = function () {
+              link.classList.add("is-done");
+              setTimeout(function () { link.classList.remove("is-done"); }, 1400);
+            };
+            if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(url).then(done, function () {});
+          });
+          rmBody.appendChild(link);
+
           rmDialog.scrollTop = 0;
-          rmDialog.showModal();
+          if (!rmDialog.open) rmDialog.showModal();
           document.body.classList.add("rm-lock");
+          if (num) setHash("#roadmap-" + num);
         }
+
+        if (num) rmOpeners[num] = open;
 
         // the whole card is clickable (the button's ::after covers it too,
         // this also catches clicks that land on the card's padding)
@@ -195,7 +222,19 @@
       rmDialog.addEventListener("close", function () {
         document.body.classList.remove("rm-lock");
         rmBody.innerHTML = "";
+        if (/^#roadmap-\d+$/.test(location.hash)) setHash("#roadmap");
       });
+
+      // #roadmap-3 opens milestone 3 (on load, and when the hash changes)
+      function openFromHash() {
+        var m = location.hash.match(/^#roadmap-(\d+)$/);
+        if (!m || !rmOpeners[m[1]]) return;
+        var sec = document.getElementById("roadmap");
+        if (sec) sec.scrollIntoView();
+        rmOpeners[m[1]]();
+      }
+      window.addEventListener("hashchange", openFromHash);
+      openFromHash();
     }
 
     /* ------------------------------------------------------------------

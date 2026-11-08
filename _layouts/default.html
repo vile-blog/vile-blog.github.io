@@ -41,6 +41,11 @@
   })();
 </script>
 
+<!-- Hidden "hacker" mode (Konami code / `matrix` in the hero terminal). -->
+<script>
+  try { if (localStorage.getItem("vile-hacker") === "1") document.documentElement.classList.add("hacker"); } catch (e) {}
+</script>
+
 <link rel="icon" type="image/svg+xml" href="{{ '/assets/favicon.svg' | relative_url }}" />
 
 <link rel="preconnect" href="https://fonts.googleapis.com" />

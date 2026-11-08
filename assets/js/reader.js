@@ -17,7 +17,10 @@
 
   var root = document.documentElement;
   var Site = window.ViSite || {};
-  var BLOCK_SEL = "p, li, h2, h3, h4, h5, td, th";
+  // Everything a reader can comment on. closest() picks the innermost match, so a
+  // <p> inside a callout (<blockquote>) is its own thread and only the callout's
+  // padding/label belongs to the callout itself.
+  var BLOCK_SEL = "p, li, h2, h3, h4, h5, td, th, pre, blockquote, figure";
   var COLORS = ["yellow", "green", "blue", "pink"];
   var STORE_KEY = "vile-hl:" + location.pathname;
 
@@ -139,15 +142,26 @@
   }
 
   var blocks = Array.prototype.slice.call(content.querySelectorAll(BLOCK_SEL)).filter(function (b) {
-    return !b.closest("pre") && !b.closest(".sn");
+    return !b.closest(".sn");
   });
   (function assignIds() {
     var seen = {};
     blocks.forEach(function (b) {
       var holder = b.closest("[data-lang-content]");
       var l = holder ? holder.getAttribute("data-lang-content") : "x";
-      var norm = b.textContent.replace(/\s+/g, " ").trim().slice(0, 160);
-      var id = l + "-" + hash36(norm);
+      var id;
+      var pinned = b.getAttribute("data-cid"); // author-chosen, survives any edit
+      if (pinned) {
+        id = l + "-" + pinned.replace(/[^\w-]+/g, "-");
+      } else {
+        var norm = b.textContent.replace(/\s+/g, " ").trim().slice(0, 160);
+        if (!norm) {
+          // image-only blocks have no text: key them on the picture instead
+          var img = b.querySelector("img");
+          norm = img ? (img.getAttribute("src") || "") + "|" + (img.getAttribute("alt") || "").slice(0, 60) : "";
+        }
+        id = l + "-" + hash36(norm);
+      }
       seen[id] = (seen[id] || 0) + 1;
       if (seen[id] > 1) id += "-" + seen[id];
       b.setAttribute("data-bid", id);
@@ -157,7 +171,7 @@
   function blockOf(node) {
     var n = node.nodeType === 3 ? node.parentNode : node;
     var b = n && n.closest ? n.closest(BLOCK_SEL) : null;
-    if (!b || !content.contains(b) || b.closest("pre") || b.closest(".sn")) return null;
+    if (!b || !content.contains(b) || b.closest(".sn")) return null;
     return b;
   }
 
@@ -795,7 +809,7 @@
     content.addEventListener("mousemove", function (e) {
       if (e.target.closest && e.target.closest(".pc-float")) return;
       var b = blockOf(e.target);
-      if (!b || !visible(b) || b.matches("h2, h3, h4, h5")) {
+      if (!b || !visible(b)) {
         if (!b) floatBtn.hidden = true;
         return;
       }
@@ -815,6 +829,181 @@
   }
 
   /* ------------------------------------------------------------------
+     Related posts — ranked by the tags two posts share, rarer tags count
+     for more (so "Designing Data-Intensive Applications", which every
+     chapter carries, doesn't drown out "Replication").
+  ------------------------------------------------------------------ */
+  var relatedBox = document.querySelector("[data-related]");
+  var relatedList = document.querySelector("[data-related-list]");
+  var relatedPicks = null;
+
+  function renderRelated() {
+    if (!relatedBox || !relatedPicks) return;
+    relatedList.textContent = "";
+    relatedPicks.forEach(function (r) {
+      var li = el("li", "related-item");
+      var a = el("a", "related-link");
+      a.href = r.p.u;
+      a.appendChild(el("span", "related-name", lang() === "vi" ? (r.p.tv || r.p.t) : r.p.t));
+      a.appendChild(el("span", "related-why", r.shared.slice(0, 3).join(" · ")));
+      li.appendChild(a);
+      relatedList.appendChild(li);
+    });
+  }
+
+  if (relatedBox && Site.loadIndex) {
+    Site.loadIndex().then(function (posts) {
+      var here = location.pathname.replace(/index\.html$/, "");
+      var df = {};
+      posts.forEach(function (p) { (p.g || []).forEach(function (t) { df[t] = (df[t] || 0) + 1; }); });
+      var me = posts.filter(function (p) { return p.u === here; })[0];
+      if (!me) return;
+      var mine = {};
+      (me.g || []).forEach(function (t) { mine[t] = true; });
+
+      var scored = posts
+        .filter(function (p) { return p !== me; })
+        .map(function (p) {
+          var score = 0;
+          var shared = [];
+          (p.g || []).forEach(function (t) {
+            if (!mine[t]) return;
+            var w = Math.log(posts.length / df[t]);
+            if (w < 0.5) return; // near-universal tags carry no signal
+            score += w;
+            shared.push(t);
+          });
+          if (p.c === me.c) score += 0.15; // tie-breaker: same kind of post
+          return { p: p, score: score, shared: shared };
+        })
+        .filter(function (r) { return r.shared.length > 0; })
+        .sort(function (a, b) { return b.score - a.score; })
+        .slice(0, 3);
+
+      if (!scored.length) return;
+      relatedPicks = scored;
+      renderRelated();
+      relatedBox.hidden = false;
+    });
+  }
+
+  /* ------------------------------------------------------------------
+     Focus mode — hides the chrome, enlarges the text. Toggle with the
+     button next to the reading time, or press F.
+  ------------------------------------------------------------------ */
+  var FOCUS_KEY = "vile-focus";
+  var focusBtn = el("button", "focus-toggle");
+  focusBtn.type = "button";
+  var focusExit = el("button", "focus-exit");
+  focusExit.type = "button";
+  document.body.appendChild(focusExit);
+
+  function syncFocusLabels() {
+    var on = root.classList.contains("focus-mode");
+    focusBtn.textContent = on ? T("Exit focus", "Thoát tập trung") : T("Focus mode", "Chế độ tập trung");
+    focusBtn.setAttribute("aria-pressed", on ? "true" : "false");
+    focusExit.textContent = T("Exit focus · F", "Thoát tập trung · F");
+  }
+
+  function setFocus(on) {
+    root.classList.toggle("focus-mode", on);
+    try { localStorage.setItem(FOCUS_KEY, on ? "1" : "0"); } catch (e) { /* private mode */ }
+    syncFocusLabels();
+    layoutSidenotesSoon();
+  }
+
+  focusBtn.addEventListener("click", function () { setFocus(!root.classList.contains("focus-mode")); });
+  focusExit.addEventListener("click", function () { setFocus(false); });
+
+  var metaRow = document.querySelector(".post-meta");
+  if (metaRow) {
+    var sep = el("span", "", "·");
+    sep.setAttribute("aria-hidden", "true");
+    metaRow.appendChild(sep);
+    metaRow.appendChild(focusBtn);
+  }
+  try {
+    if (localStorage.getItem(FOCUS_KEY) === "1") root.classList.add("focus-mode");
+  } catch (e) { /* ignore */ }
+  syncFocusLabels();
+
+  /* ------------------------------------------------------------------
+     Keyboard shortcuts:  j / k  next / previous section
+                          g g / G  top / bottom      f  focus      ?  help
+  ------------------------------------------------------------------ */
+  var keyHelp = el("dialog", "rd-dialog key-dialog");
+  keyHelp.setAttribute("aria-labelledby", "key-title");
+  var keyInner = el("div", "rd-dialog-inner");
+  keyHelp.appendChild(keyInner);
+  document.body.appendChild(keyHelp);
+  keyHelp.addEventListener("click", function (e) { if (e.target === keyHelp) keyHelp.close(); });
+
+  function openKeyHelp() {
+    keyInner.textContent = "";
+    var close = el("button", "rd-close", "×");
+    close.type = "button";
+    close.setAttribute("aria-label", "Close");
+    close.addEventListener("click", function () { keyHelp.close(); });
+    keyInner.appendChild(close);
+    var h = el("h3", "rd-title", T("Keyboard shortcuts", "Phím tắt"));
+    h.id = "key-title";
+    keyInner.appendChild(h);
+    var rows = [
+      [["j", "k"], T("next / previous section", "mục sau / mục trước")],
+      [["g", "g"], T("jump to the top", "về đầu bài")],
+      [["G"], T("jump to the bottom", "xuống cuối bài")],
+      [["f"], T("focus mode", "chế độ tập trung")],
+      [["Ctrl K", "/"], T("search everything", "tìm kiếm tất cả")],
+      [["?"], T("this help", "bảng này")]
+    ];
+    var dl = el("dl", "key-list");
+    rows.forEach(function (r) {
+      var dt = el("dt");
+      r[0].forEach(function (part, i) {
+        if (i) dt.appendChild(document.createTextNode(" "));
+        dt.appendChild(el("kbd", "", part));
+      });
+      dl.appendChild(dt);
+      dl.appendChild(el("dd", "", r[1]));
+    });
+    keyInner.appendChild(dl);
+    keyHelp.showModal();
+  }
+
+  function jumpSection(dir) {
+    var heads = Array.prototype.slice.call(content.querySelectorAll("h2")).filter(visible);
+    if (!heads.length) return;
+    var target = null;
+    if (dir > 0) {
+      target = heads.filter(function (h) { return h.getBoundingClientRect().top > 100; })[0];
+    } else {
+      var above = heads.filter(function (h) { return h.getBoundingClientRect().top < -10; });
+      target = above[above.length - 1];
+      if (!target) { window.scrollTo({ top: 0, behavior: "smooth" }); return; }
+    }
+    if (target) window.scrollTo({ top: target.getBoundingClientRect().top + window.scrollY - 90, behavior: "smooth" });
+  }
+
+  var lastG = 0;
+  document.addEventListener("keydown", function (e) {
+    if (e.ctrlKey || e.metaKey || e.altKey) return;
+    var t = e.target;
+    if (t && (t.tagName === "INPUT" || t.tagName === "TEXTAREA" || t.tagName === "SELECT" || t.isContentEditable)) return;
+    if (document.querySelector("dialog[open]")) return;
+
+    if (e.key === "j") { jumpSection(1); }
+    else if (e.key === "k") { jumpSection(-1); }
+    else if (e.key === "G") { window.scrollTo({ top: document.documentElement.scrollHeight, behavior: "smooth" }); }
+    else if (e.key === "g") {
+      var now = Date.now();
+      if (now - lastG < 600) { window.scrollTo({ top: 0, behavior: "smooth" }); lastG = 0; }
+      else lastG = now;
+    }
+    else if (e.key === "f") { setFocus(!root.classList.contains("focus-mode")); }
+    else if (e.key === "?") { e.preventDefault(); openKeyHelp(); }
+  });
+
+  /* ------------------------------------------------------------------
      Wire-up
   ------------------------------------------------------------------ */
   function onLangChange() {
@@ -824,6 +1013,8 @@
     refreshLabels();
     updateFab();
     layoutSidenotesSoon();
+    syncFocusLabels();
+    renderRelated();
     if (list.open) renderList();
   }
 

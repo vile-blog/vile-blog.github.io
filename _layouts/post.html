@@ -30,6 +30,47 @@ layout: default
       {{ content }}
     </div>
 
+    {%- comment -%}
+      Prev / next: book chapters follow chapter order; everything else follows date.
+    {%- endcomment -%}
+    {% assign prev_post = page.previous %}
+    {% assign next_post = page.next %}
+    {% if page.book_chapter_num %}
+      {% assign chapters = site.categories["book-notes"] | sort: "book_chapter_num" %}
+      {% assign prev_post = nil %}
+      {% assign next_post = nil %}
+      {% assign here = 0 %}
+      {% for c in chapters %}{% if c.url == page.url %}{% assign here = forloop.index0 %}{% endif %}{% endfor %}
+      {% assign pi = here | minus: 1 %}
+      {% assign ni = here | plus: 1 %}
+      {% if pi >= 0 %}{% assign prev_post = chapters[pi] %}{% endif %}
+      {% if ni < chapters.size %}{% assign next_post = chapters[ni] %}{% endif %}
+    {% endif %}
+    {% if prev_post or next_post %}
+    <nav class="post-nav" aria-label="{{ 'More posts' }}">
+      {% if prev_post %}
+      {% assign pv = prev_post.title_vi | default: prev_post.title %}
+      <a class="post-nav-link is-prev" href="{{ prev_post.url | relative_url }}" rel="prev">
+        <span class="post-nav-dir">&larr; {% if page.book_chapter_num %}{% include t.html en="Previous chapter" vi="Chương trước" %}{% else %}{% include t.html en="Older" vi="Cũ hơn" %}{% endif %}</span>
+        <span class="post-nav-title">{% include t.html en=prev_post.title vi=pv %}</span>
+      </a>
+      {% else %}<span></span>{% endif %}
+      {% if next_post %}
+      {% assign nv = next_post.title_vi | default: next_post.title %}
+      <a class="post-nav-link is-next" href="{{ next_post.url | relative_url }}" rel="next">
+        <span class="post-nav-dir">{% if page.book_chapter_num %}{% include t.html en="Next chapter" vi="Chương sau" %}{% else %}{% include t.html en="Newer" vi="Mới hơn" %}{% endif %} &rarr;</span>
+        <span class="post-nav-title">{% include t.html en=next_post.title vi=nv %}</span>
+      </a>
+      {% endif %}
+    </nav>
+    {% endif %}
+
+    <aside class="post-related" data-related hidden>
+      <p class="eyebrow">~/related</p>
+      <h2 class="related-title">{% include t.html en="If you liked this" vi="Có thể bạn sẽ thích" %}</h2>
+      <ul class="related-list" data-related-list></ul>
+    </aside>
+
     <div class="post-comments">
       <p class="eyebrow">~/comments</p>
       <p class="comments-hint">

@@ -4,6 +4,11 @@ description: >-
   Personal site and blog of Vi Le — software engineer, ex-Grab, founder of
   Hustly Space. Projects, writing, and notes on building software.
 url: "https://vile-blog.github.io"
+# Default share image (OpenGraph / Twitter card) used by jekyll-seo-tag.
+# A post can override it with `image:` in its front matter.
+image: /assets/og-default.png
+twitter:
+  card: summary_large_image
 baseurl: ""
 title_separator: "—"
 
