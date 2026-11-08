@@ -153,6 +153,52 @@
     }
 
     /* ------------------------------------------------------------------
+       Roadmap: open a card's details in a modal <dialog>.
+       The details live (hidden) next to each card; we copy them into the
+       dialog on open, so EN/VI switching keeps working while it is open.
+    ------------------------------------------------------------------ */
+    var rmDialog = document.querySelector("[data-rm-dialog]");
+    if (rmDialog && typeof rmDialog.showModal === "function") {
+      var rmBody = rmDialog.querySelector("[data-rm-body]");
+
+      document.querySelectorAll("[data-rm-open]").forEach(function (btn) {
+        var card = btn.closest(".rm-card");
+
+        function open() {
+          var src = document.getElementById(btn.getAttribute("data-rm-open"));
+          if (!src) return;
+          rmBody.innerHTML = src.innerHTML;
+          var title = rmBody.querySelector(".rm-dialog-title");
+          if (title) title.id = "rm-dialog-heading";
+          rmDialog.scrollTop = 0;
+          rmDialog.showModal();
+          document.body.classList.add("rm-lock");
+        }
+
+        // the whole card is clickable (the button's ::after covers it too,
+        // this also catches clicks that land on the card's padding)
+        btn.addEventListener("click", open);
+        if (card) {
+          card.addEventListener("click", function (e) {
+            if (e.target !== btn && !btn.contains(e.target)) open();
+          });
+        }
+      });
+
+      rmDialog.addEventListener("click", function (e) {
+        // click on the backdrop (the <dialog> itself) or the close button
+        if (e.target === rmDialog || e.target.closest("[data-rm-close]")) {
+          rmDialog.close();
+        }
+      });
+
+      rmDialog.addEventListener("close", function () {
+        document.body.classList.remove("rm-lock");
+        rmBody.innerHTML = "";
+      });
+    }
+
+    /* ------------------------------------------------------------------
        Footer year
     ------------------------------------------------------------------ */
     var yearEl = document.querySelector("[data-year]");

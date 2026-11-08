@@ -1135,7 +1135,7 @@ section {
 
   position: relative;
   display: grid;
-  grid-template-columns: repeat(var(--cols), 1fr);
+  grid-template-columns: repeat(var(--cols), minmax(0, 1fr));
   grid-template-rows: auto var(--rm-track) auto;
   /* card width = 2 columns - gap, so the first/last card overhang by
      (column - gap); shrinking the grid by that keeps them inside .container */
@@ -1367,6 +1367,204 @@ section {
 
 .rm-destination .rm-cell::after {
   border-left-color: var(--amber);
+}
+
+/* --- Clickable cards + details dialog --- */
+.rm-card {
+  position: relative;
+}
+
+.rm-card.is-clickable {
+  cursor: pointer;
+}
+
+.rm-more {
+  margin-top: 12px;
+  padding: 0;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--accent);
+  transition: gap 0.2s ease;
+}
+
+.rm-more span {
+  display: inline-block;
+  transition: transform 0.2s ease;
+}
+
+.rm-card:hover .rm-more span,
+.rm-more:focus-visible span {
+  transform: translateX(3px);
+}
+
+/* stretched hit area: the whole card activates the button */
+.rm-more::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+}
+
+.rm-now .rm-more {
+  color: var(--amber);
+}
+
+body.rm-lock {
+  overflow: hidden;
+}
+
+.rm-dialog {
+  width: min(680px, calc(100vw - 32px));
+  max-height: min(82vh, 760px);
+  padding: 0;
+  color: var(--text-primary);
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 30px 80px -20px rgba(0, 0, 0, 0.6);
+  overflow: auto;
+}
+
+.rm-dialog::backdrop {
+  background: rgba(8, 10, 11, 0.62);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+}
+
+.rm-dialog[open] {
+  animation: rm-dialog-in 0.22s ease;
+}
+
+@keyframes rm-dialog-in {
+  from { opacity: 0; transform: translateY(12px) scale(0.985); }
+  to   { opacity: 1; transform: none; }
+}
+
+.rm-dialog-inner {
+  position: relative;
+  padding: 32px 34px 34px;
+}
+
+.rm-dialog-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  transition: color 0.2s ease, border-color 0.2s ease;
+}
+
+.rm-dialog-close:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+.rm-dialog-close svg {
+  width: 16px;
+  height: 16px;
+}
+
+.rm-dialog .rm-status {
+  margin-bottom: 10px;
+  font-size: 11px;
+}
+
+.rm-dialog .rm-st-now {
+  color: var(--amber);
+}
+
+.rm-dialog .rm-st-target {
+  color: var(--text-tertiary);
+}
+
+.rm-dialog-title {
+  padding-right: 40px;
+  font-size: clamp(1.25rem, 2.6vw, 1.6rem);
+  line-height: 1.25;
+}
+
+.rm-dialog-lead {
+  margin-top: 10px;
+  color: var(--text-secondary);
+}
+
+.rm-group {
+  margin-top: 26px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
+}
+
+.rm-group-title {
+  margin-bottom: 12px;
+  font-size: 0.92rem;
+  color: var(--accent);
+}
+
+.rm-points li {
+  position: relative;
+  padding-left: 18px;
+  margin-top: 9px;
+  font-size: 0.94rem;
+  line-height: 1.6;
+  color: var(--text-secondary);
+}
+
+.rm-points li:first-child {
+  margin-top: 0;
+}
+
+.rm-points li::before {
+  content: "";
+  position: absolute;
+  left: 2px;
+  top: 0.7em;
+  width: 6px;
+  height: 6px;
+  border-radius: 1px;
+  background: var(--accent);
+  opacity: 0.8;
+}
+
+.rm-ext-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 26px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
+}
+
+.rm-ext-links a {
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  color: var(--text-secondary);
+  padding: 6px 12px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-strong);
+  transition: color 0.2s ease, border-color 0.2s ease;
+}
+
+.rm-ext-links a:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+@media (max-width: 480px) {
+  .rm-dialog-inner {
+    padding: 26px 20px 28px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rm-dialog[open] {
+    animation: none;
+  }
 }
 
 /* --- Legend --- */

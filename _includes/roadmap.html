@@ -1,7 +1,8 @@
 <!-- ================================================================
      ROADMAP — sourced from _data/roadmap.yml
      Desktop: horizontal track, cards alternate above/below.
-     Tablet/mobile (<=1000px): vertical timeline.
+     Tablet/mobile (<=1100px): vertical timeline.
+     Clicking a card opens its details in the dialog at the bottom.
 ================================================================= -->
 {% assign steps = site.data.roadmap.milestones %}
 {% assign dest = site.data.roadmap.destination %}
@@ -14,7 +15,7 @@
     <div class="section-head reveal">
       <p class="eyebrow">~/roadmap</p>
       <h2 id="roadmap-heading" class="section-title">{% include t.html en="From intern to <span class='accent-text'>founding engineer</span>" vi="Từ thực tập sinh đến <span class='accent-text'>founding engineer</span>" %}</h2>
-      <p class="roadmap-sub">{% include t.html en="Where I have been, what I am building right now, and where I am heading." vi="Tôi đã đi qua những đâu, đang xây dựng gì, và đang hướng tới điều gì." %}</p>
+      <p class="roadmap-sub">{% include t.html en="Where I have been, what I am building right now, and where I am heading. Click any card for the details." vi="Tôi đã đi qua những đâu, đang xây dựng gì, và đang hướng tới điều gì. Bấm vào từng thẻ để xem chi tiết." %}</p>
     </div>
 
     <div class="roadmap reveal">
@@ -25,9 +26,11 @@
         {% assign side = "bottom" %}
         {% assign rem = forloop.index | modulo: 2 %}
         {% if rem == 1 %}{% assign side = "top" %}{% endif %}
+        {% assign clickable = false %}
+        {% if m.details or m.links %}{% assign clickable = true %}{% endif %}
         <li class="rm-step rm-{{ m.status }} rm-{{ side }}" style="--i: {{ forloop.index }};">
           <div class="rm-cell">
-            <article class="rm-card">
+            <article class="rm-card{% if clickable %} is-clickable{% endif %}">
               <p class="rm-status">
                 {% if m.status == "achieved" %}{% include t.html en="Achieved" vi="Đã đạt" %}{% elsif m.status == "now" %}{% include t.html en="Now" vi="Hiện tại" %}{% else %}{% include t.html en="Target" vi="Mục tiêu" %}{% endif %}
                 <span aria-hidden="true">·</span>
@@ -35,12 +38,43 @@
               </p>
               <h3 class="rm-title">{% include t.html en=m.title vi=m.title_vi %}</h3>
               <p class="rm-text">{% include t.html en=m.text vi=m.text_vi %}</p>
+              {% if clickable %}
+              <button type="button" class="rm-more" data-rm-open="rm-detail-{{ forloop.index }}" aria-haspopup="dialog">
+                {% include t.html en="Details" vi="Chi tiết" %} <span aria-hidden="true">→</span>
+              </button>
+              {% endif %}
             </article>
           </div>
           <div class="rm-node" {% if m.status == "now" %}aria-current="step"{% endif %}>
             <span class="rm-num">{% if forloop.index < 10 %}0{% endif %}{{ forloop.index }}</span>
             {% if m.status == "now" %}<span class="rm-here">{% include t.html en="I'm here" vi="Tôi ở đây" %}</span>{% endif %}
           </div>
+
+          {% if clickable %}
+          <!-- Copied into the dialog on click; hidden here so it isn't read twice. -->
+          <div class="rm-detail" id="rm-detail-{{ forloop.index }}" hidden>
+            <p class="rm-status rm-st-{{ m.status }}">
+              {% if m.status == "achieved" %}{% include t.html en="Achieved" vi="Đã đạt" %}{% elsif m.status == "now" %}{% include t.html en="Now" vi="Hiện tại" %}{% else %}{% include t.html en="Target" vi="Mục tiêu" %}{% endif %}
+              <span aria-hidden="true">·</span>
+              {% if m.label_vi %}{% include t.html en=m.label vi=m.label_vi %}{% else %}{{ m.label }}{% endif %}
+            </p>
+            <h3 class="rm-dialog-title">{% include t.html en=m.title vi=m.title_vi %}</h3>
+            <p class="rm-dialog-lead">{% include t.html en=m.text vi=m.text_vi %}</p>
+            {% for g in m.details %}
+            <div class="rm-group">
+              <h4 class="rm-group-title">{% include t.html en=g.heading vi=g.heading_vi %}</h4>
+              <ul class="rm-points">
+                {% for p in g.points %}<li>{% include t.html en=p.en vi=p.vi %}</li>{% endfor %}
+              </ul>
+            </div>
+            {% endfor %}
+            {% if m.links %}
+            <div class="rm-ext-links">
+              {% for l in m.links %}<a href="{{ l.url }}" target="_blank" rel="noopener noreferrer">{{ l.label }} <span aria-hidden="true">↗</span></a>{% endfor %}
+            </div>
+            {% endif %}
+          </div>
+          {% endif %}
         </li>
         {% endfor %}
 
@@ -65,4 +99,13 @@
       </ul>
     </div>
   </div>
+
+  <dialog class="rm-dialog" data-rm-dialog aria-labelledby="rm-dialog-heading">
+    <div class="rm-dialog-inner">
+      <button type="button" class="rm-dialog-close" data-rm-close aria-label="Close">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg>
+      </button>
+      <div data-rm-body></div>
+    </div>
+  </dialog>
 </section>

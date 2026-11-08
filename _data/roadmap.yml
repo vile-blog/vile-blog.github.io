@@ -6,54 +6,183 @@
 # Exactly one milestone should be `now`; the green progress fill stops there.
 # The `destination` card is drawn at the end of the track with a flag.
 #
+# Clicking a card opens a dialog with the optional `details`:
+#   details:  list of groups -> { heading, heading_vi, points: [{ en, vi }] }
+#   links:    list of { label, url }
+# A card without `details` / `links` is not clickable.
+#
 # Every user-facing string has an _vi twin (the site switches EN/VI together).
 
 milestones:
   - status: achieved
-    label: "2020 – 2025"
+    label: "2021 – 2024"
     title: "Computer Science foundation"
     title_vi: "Nền tảng Khoa học máy tính"
-    text: "B.S. in Computer Science at IUH (GPA 3.83/4.0), professional English, and a National First Prize at the Eureka Student Scientific Research Award."
-    text_vi: "Cử nhân Khoa học máy tính tại IUH (GPA 3.83/4.0), tiếng Anh thành thạo trong công việc, và Giải Nhất Quốc gia Giải thưởng Sinh viên Nghiên cứu Khoa học Eureka."
+    text: "Bachelor's in Computer Science at IUH, and a research paper on the A* algorithm accepted by IEEE."
+    text_vi: "Cử nhân Khoa học máy tính tại IUH, và một bài báo khoa học về thuật toán A* được IEEE chấp nhận."
+    details:
+      - heading: "Education"
+        heading_vi: "Học vấn"
+        points:
+          - en: "B.S. in Computer Science, Industrial University of Ho Chi Minh City (IUH) — GPA 3.83/4.0."
+            vi: "Cử nhân Khoa học máy tính, Đại học Công nghiệp TP.HCM (IUH) — GPA 3.83/4.0."
+          - en: "English: professional working proficiency."
+            vi: "Tiếng Anh: thành thạo trong công việc."
+      - heading: "Research — accepted by IEEE"
+        heading_vi: "Nghiên cứu — được IEEE chấp nhận"
+        points:
+          - en: "Optimizing the A* Algorithm: Enhancing Efficiency and Performance in Pathfinding."
+            vi: "Optimizing the A* Algorithm: Enhancing Efficiency and Performance in Pathfinding."
+          - en: "Disproved textbook pathfinding claims: BFS peak memory is 43× smaller than DFS on 2D grids, and A* needs about 25% obstacle density to overcome its heap overhead."
+            vi: "Bác bỏ một số nhận định kinh điển về tìm đường: bộ nhớ đỉnh của BFS nhỏ hơn DFS tới 43 lần trên lưới 2D, và A* cần mật độ chướng ngại vật khoảng 25% mới bù được chi phí heap."
+      - heading: "Awards & optimization work"
+        heading_vi: "Giải thưởng & bài toán tối ưu"
+        points:
+          - en: "National First Prize — Eureka Student Scientific Research Award."
+            vi: "Giải Nhất Quốc gia — Giải thưởng Sinh viên Nghiên cứu Khoa học Eureka."
+          - en: "Vehicle Routing Problem solver for Vissan: 63 customers under capacity (2,000 units) and time (48h) constraints with Ant Colony Optimization, cutting travel distance and fuel costs."
+            vi: "Bộ giải bài toán định tuyến phương tiện cho Vissan: 63 khách hàng với ràng buộc tải trọng (2.000 đơn vị) và thời gian (48 giờ) bằng thuật toán đàn kiến, giảm quãng đường và chi phí nhiên liệu."
 
   - status: achieved
     label: "2024 – 2025"
-    title: "Full-stack builder"
-    title_vi: "Lập trình full-stack"
-    text: "Full-stack consultant for global clients via micro1 and Upwork (Badminton Match Finder, DDT-Algo), plus a real-time stock monitoring UI at Phu Hung Securities."
-    text_vi: "Tư vấn full-stack cho khách hàng quốc tế qua micro1 và Upwork (Badminton Match Finder, DDT-Algo), cùng giao diện theo dõi chứng khoán thời gian thực tại Chứng khoán Phú Hưng."
+    title: "Consultant & full-stack engineer"
+    title_vi: "Consultant & full-stack engineer"
+    text: "Full-stack consulting and engineering — a real-time trading UI at Phu Hung Securities and client projects through micro1 and Upwork."
+    text_vi: "Tư vấn và phát triển full-stack — giao diện giao dịch thời gian thực tại Chứng khoán Phú Hưng và các dự án khách hàng qua micro1 và Upwork."
+    details:
+      - heading: "Phu Hung Securities (phs.vn)"
+        heading_vi: "Chứng khoán Phú Hưng (phs.vn)"
+        points:
+          - en: "Built a real-time web UI for monitoring stock prices and charts with ReactJS and TypeScript."
+            vi: "Xây dựng giao diện web thời gian thực để theo dõi giá cổ phiếu và biểu đồ bằng ReactJS và TypeScript."
+          - en: "Integrated WebSocket for live market streaming."
+            vi: "Tích hợp WebSocket để nhận dữ liệu thị trường trực tiếp."
+      - heading: "micro1 & Upwork — Full-stack consultant"
+        heading_vi: "micro1 & Upwork — Full-stack consultant"
+        points:
+          - en: "Delivered consulting for global clients end to end: requirements analysis, system design and delivery."
+            vi: "Tư vấn cho khách hàng quốc tế từ đầu đến cuối: phân tích yêu cầu, thiết kế hệ thống và bàn giao."
+          - en: "Badminton Match Finder — matchmaking, player profiles, slot reservations and a responsive UI."
+            vi: "Badminton Match Finder — ghép trận, hồ sơ người chơi, đặt sân/khung giờ và giao diện responsive."
+          - en: "DDT-Algo — an AI-assisted algorithm learning platform for students, with sandboxed code execution and auto-grading."
+            vi: "DDT-Algo — nền tảng học thuật toán có AI hỗ trợ cho sinh viên, với môi trường chạy code cô lập (sandbox) và chấm điểm tự động."
 
   - status: achieved
     label: "2025 – 2026"
-    title: "Backend at scale"
-    title_vi: "Backend quy mô lớn"
-    text: "At Grab, on a platform handling 1.1B messages/day: eliminated 60–70M silently dropped messages/day and cut failure detection from 25 hours to minutes. Top 1/20 at the Grab Engineering Bootcamp."
-    text_vi: "Tại Grab, trên nền tảng xử lý 1,1 tỷ tin nhắn/ngày: loại bỏ 60–70 triệu tin nhắn bị mất âm thầm mỗi ngày và rút thời gian phát hiện lỗi từ 25 giờ xuống còn vài phút. Top 1/20 Grab Engineering Bootcamp."
+    title: "Grab: experimentation & notifications"
+    title_vi: "Grab: experimentation & notification"
+    text: "Champion of the Grab Engineering Bootcamp 2025, then Software Engineer on Grab's experimentation platform and notification system."
+    text_vi: "Quán quân Grab Engineering Bootcamp 2025, sau đó là Software Engineer của experimentation platform và hệ thống notification tại Grab."
+    details:
+      - heading: "Grab Engineering Bootcamp 2025 — Top 1/20"
+        heading_vi: "Grab Engineering Bootcamp 2025 — Top 1/20"
+        points:
+          - en: "Disease Diagnosis App: a high-throughput backend using Bloom filters and Redis caching, RabbitMQ for async processing, and Prometheus/Grafana for monitoring."
+            vi: "Disease Diagnosis App: backend throughput cao dùng Bloom filter và Redis cache, RabbitMQ xử lý bất đồng bộ, giám sát bằng Prometheus/Grafana."
+      - heading: "Platform reliability"
+        heading_vi: "Độ tin cậy của nền tảng"
+        points:
+          - en: "Led reliability work (Datadog dashboards, runbooks): cut silent-failure detection time from 25 hours to minutes and MTTR by 30–50%, saving 40+ engineering hours a year."
+            vi: "Dẫn dắt việc nâng độ tin cậy (dashboard Datadog, runbook): rút thời gian phát hiện lỗi âm thầm từ 25 giờ xuống còn vài phút, giảm MTTR 30–50%, tiết kiệm hơn 40 giờ kỹ sư mỗi năm."
+          - en: "Eliminated 60–70M silently dropped messages per day on a platform handling 1.1B messages per day."
+            vi: "Loại bỏ 60–70 triệu tin nhắn bị mất âm thầm mỗi ngày trên nền tảng xử lý 1,1 tỷ tin nhắn mỗi ngày."
+          - en: "Hardened config sync with three-phase writes and DB locking, avoiding USD 18.7K a year in incident costs."
+            vi: "Củng cố đồng bộ cấu hình bằng ghi ba pha và khóa DB, tránh được 18,7 nghìn USD chi phí sự cố mỗi năm."
+          - en: "Adopted Temporal to enforce a 5-minute DB-to-storage SLA at 99.9% uptime, cutting triage time to 2 minutes."
+            vi: "Áp dụng Temporal để đảm bảo SLA 5 phút từ DB sang storage với uptime 99.9%, rút thời gian xử lý sự cố xuống 2 phút."
+      - heading: "Multi-agent AI across microservices"
+        heading_vi: "AI multi-agent xuyên suốt hệ thống microservices"
+        points:
+          - en: "Built an AI operations agent with autonomous sub-agents that work across the microservices system — on-call triage, MR reviews and deployments through MCP tools."
+            vi: "Xây dựng AI operations agent với các sub-agent tự chủ hoạt động xuyên suốt hệ thống microservices — trực on-call, review MR và triển khai thông qua MCP tools."
+          - en: "Observability through Datadog, Hubble and OpenSearch."
+            vi: "Quan sát hệ thống qua Datadog, Hubble và OpenSearch."
+          - en: "Co-authored the AIX observability strategy: standardized monitor/alert conventions, critical business-flow metrics, and an AI agent that suggests root causes across dashboards, alerts and runbooks."
+            vi: "Đồng tác giả chiến lược observability AIX: chuẩn hóa quy ước monitor/alert, metric cho các luồng nghiệp vụ trọng yếu, và AI agent gợi ý nguyên nhân gốc qua dashboard, alert và runbook."
+    links:
+      - label: "Isymptom — Disease Diagnosis App (GitHub)"
+        url: "https://github.com/lcv-engineer/grab-bootcamp-team13-2025"
 
   - status: achieved
-    label: "2025 – 2026"
-    title: "Senior engineer & research"
-    title_vi: "Senior engineer & nghiên cứu"
-    text: "Scaled multi-shuttle path planning from 700 to 1000+ agents at Vinatech, then joined FPT Automotive as Senior Engineer. IEEE-accepted A* paper; Top 6/300 at the FPT Automotive Hackathon; Top 10 in the AMD AI Developer Program."
-    text_vi: "Mở rộng hệ thống lập lộ trình đa shuttle từ 700 lên 1000+ agent tại Vinatech, sau đó gia nhập FPT Automotive với vai trò Senior Engineer. Bài báo về A* được IEEE chấp nhận; Top 6/300 FPT Automotive Hackathon; Top 10 AMD AI Developer Program."
+    label: "06/2026 – 09/2026"
+    title: "Multi-agent systems & voice AI"
+    title_vi: "Hệ thống multi-agent & voice AI"
+    text: "Senior Software Engineer at Vinatech, scaling multi-agent path planning past 1000 agents. Top 6/300 at the FPT Automotive Hackathon."
+    text_vi: "Senior Software Engineer tại Vinatech, mở rộng hệ thống lập lộ trình multi-agent vượt 1000 agent. Top 6/300 tại FPT Automotive Hackathon."
+    details:
+      - heading: "Vinatech Group Solution — Senior Software Engineer"
+        heading_vi: "Vinatech Group Solution — Senior Software Engineer"
+        points:
+          - en: "Redesigned multi-shuttle path planning from full-horizon, event-driven replanning to windowed rolling-horizon lifelong planning (RHCR-style, ECBS as the primary solver)."
+            vi: "Thiết kế lại việc lập lộ trình đa shuttle: từ replanning toàn horizon theo sự kiện sang lifelong planning theo cửa sổ trượt (kiểu RHCR, dùng ECBS làm solver chính)."
+          - en: "Cut replanning cost by 3× and scaled the system from 700 to 1000+ concurrent agents, keeping throughput loss under 2%."
+            vi: "Giảm chi phí replanning 3 lần và mở rộng hệ thống từ 700 lên hơn 1000 agent chạy đồng thời, giữ mức hao hụt throughput dưới 2%."
+          - en: "Strengthened microservices resilience with circuit-breaker and fault-tolerance strategies, and upgraded the 2D/3D map visualization."
+            vi: "Tăng khả năng chịu lỗi của microservices bằng circuit breaker và các chiến lược fault-tolerance, đồng thời nâng cấp trực quan hóa bản đồ 2D/3D."
+      - heading: "FPT Automotive Hackathon 2026 — Top 6/300 (VIVA)"
+        heading_vi: "FPT Automotive Hackathon 2026 — Top 6/300 (VIVA)"
+        points:
+          - en: "VIVA, the Vietnamese In-Vehicle Assistant: an offline voice assistant that recognizes Vietnamese speech inside the car and automates in-car tasks in 1–2 seconds."
+            vi: "VIVA — Vietnamese In-Vehicle Assistant: trợ lý giọng nói offline nhận diện tiếng Việt ngay trong xe và tự động hóa các tác vụ trên xe trong 1–2 giây."
+          - en: "Pipeline: Mic → VAD → ASR → Intent Router → SafetyGuard → TTS."
+            vi: "Pipeline: Mic → VAD → ASR → Intent Router → SafetyGuard → TTS."
+          - en: "A safety model where AI proposes and code executes, validated on FPT CarSky (Android Automotive, CAN bus)."
+            vi: "Mô hình an toàn “AI đề xuất, code thực thi”, được kiểm chứng trên FPT CarSky (Android Automotive, CAN bus)."
+    links:
+      - label: "VIVA (GitHub)"
+        url: "https://github.com/lcv-engineer/fpt-automotive-hackathon-2026"
 
   - status: now
     label: "2026"
-    title: "Founding engineer & AI agents"
-    title_vi: "Founding engineer & AI agent"
-    text: "Designing Hustly Space end to end — now serving 1,000+ users — while building AI agents that automate operations: on-call triage, MR reviews and deployments through MCP tools."
-    text_vi: "Thiết kế Hustly Space từ đầu đến cuối — hiện phục vụ 1,000+ người dùng — đồng thời xây dựng các AI agent tự động hóa vận hành: trực on-call, review MR và triển khai thông qua MCP tools."
+    title: "Founding engineer & senior engineer"
+    title_vi: "Founding engineer & senior engineer"
+    text: "Founding Engineer & Member of Staff at Hustly Space, and Senior Software Engineer at FPT Automotive."
+    text_vi: "Founding Engineer & Member of Staff tại Hustly Space, đồng thời là Senior Software Engineer tại FPT Automotive."
+    details:
+      - heading: "Hustly Space — Founding Engineer & Member of Staff"
+        heading_vi: "Hustly Space — Founding Engineer & Member of Staff"
+        points:
+          - en: "A platform where Vietnamese students discover hackathons, case competitions and pitch contests, and find teammates to compete with."
+            vi: "Nền tảng giúp sinh viên Việt Nam khám phá hackathon, case competition, pitch contest và tìm đồng đội để cùng thi đấu."
+          - en: "Designed the end-to-end architecture — domain model, service boundaries, API contracts and deployment topology — from roadmap to production launch. Now serving 1,000+ users."
+            vi: "Thiết kế kiến trúc từ đầu đến cuối — domain model, ranh giới service, API contract và mô hình triển khai — từ roadmap đến khi ra mắt production. Hiện phục vụ hơn 1,000 người dùng."
+          - en: "Made the key technology and trade-off calls (scalability vs. cost, consistency vs. availability) so the system stays maintainable as usage grows."
+            vi: "Đưa ra các quyết định công nghệ và đánh đổi then chốt (khả năng mở rộng so với chi phí, nhất quán so với sẵn sàng) để hệ thống vẫn dễ bảo trì khi lượng người dùng tăng."
+      - heading: "FPT Automotive — Senior Software Engineer, Backend"
+        heading_vi: "FPT Automotive — Senior Software Engineer, Backend"
+        points:
+          - en: "Senior backend engineer (Senior Software Engineer I)."
+            vi: "Kỹ sư backend cấp senior (Senior Software Engineer I)."
+      - heading: "AMD AI Developer Program 2026 — Top 10 (OpsCopilot)"
+        heading_vi: "AMD AI Developer Program 2026 — Top 10 (OpsCopilot)"
+        points:
+          - en: "Built 8 multi-step chain-of-thought AI agents that automate AP/AR invoices (from 12 minutes to seconds) and contracts."
+            vi: "Xây dựng 8 AI agent chain-of-thought nhiều bước tự động hóa hóa đơn AP/AR (từ 12 phút xuống còn vài giây) và hợp đồng."
+          - en: "Served Mistral 7B on AMD Instinct MI300X through vLLM (223 tok/s) behind an OpenAI-compatible API."
+            vi: "Triển khai Mistral 7B trên AMD Instinct MI300X qua vLLM (223 tok/s) sau một API tương thích OpenAI."
+    links:
+      - label: "Hustly Space"
+        url: "https://www.hustlyspace.com/"
+      - label: "OpsCopilot (GitHub)"
+        url: "https://github.com/lcv-engineer/amd-developer-hackathon"
 
   - status: target
-    label: "Next"
-    label_vi: "Tiếp theo"
-    title: "Technical lead"
-    title_vi: "Technical lead"
-    text: "Own larger distributed systems and AI-agent platforms: lead design reviews, set reliability standards and mentor other engineers."
-    text_vi: "Làm chủ các hệ thống phân tán và nền tảng AI agent lớn hơn: dẫn dắt design review, đặt tiêu chuẩn về độ tin cậy và kèm cặp các kỹ sư khác."
+    label: "2028"
+    title: "Lead engineer & my own business"
+    title_vi: "Lead engineer & doanh nghiệp riêng"
+    text: "Lead software engineer — and build a business of my own."
+    text_vi: "Lead software engineer — và xây dựng một doanh nghiệp của riêng mình."
+    details:
+      - heading: "The plan for 2028"
+        heading_vi: "Kế hoạch cho năm 2028"
+        points:
+          - en: "Step up from individual contributor to lead software engineer: own architecture, set reliability standards and grow other engineers."
+            vi: "Chuyển từ vai trò cá nhân đóng góp sang lead software engineer: làm chủ kiến trúc, đặt tiêu chuẩn độ tin cậy và giúp các kỹ sư khác trưởng thành."
+          - en: "Run a business of my own, building on what I have learned founding Hustly Space."
+            vi: "Vận hành doanh nghiệp riêng, dựa trên những gì đã học được khi sáng lập Hustly Space."
 
 destination:
-  title: "Staff-Level Backend & AI Engineer"
-  title_vi: "Kỹ sư Backend & AI cấp Staff"
-  text: "Design reliable, large-scale platforms and AI-agent systems end to end, and lead the teams that run them."
-  text_vi: "Thiết kế các nền tảng và hệ thống AI agent quy mô lớn, đáng tin cậy từ đầu đến cuối, và dẫn dắt những đội ngũ vận hành chúng."
+  title: "To be discovered :))"
+  title_vi: "Chưa biết :))"
+  text: "Not written yet — and that is the fun part."
+  text_vi: "Chưa viết xong — và đó mới là phần thú vị."
