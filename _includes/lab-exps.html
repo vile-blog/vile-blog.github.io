@@ -1,0 +1,6 @@
+{%- comment -%} One-click experiments for a lab card. Usage: {% include lab-exps.html key="raft" %} {%- endcomment -%}
+{% assign d = site.data.lab[include.key] %}
+<div class="lab-exps" data-exps>
+  <span class="lab-exps-l">{% include t.html en="Try it:" vi="Thử ngay:" %}</span>
+  {% for e in d.experiments %}<button type="button" class="lab-chip" data-exp="{{ e.id }}">{% include t.html en=e.en vi=e.vi %}</button>{% endfor %}
+</div>

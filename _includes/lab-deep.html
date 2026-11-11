@@ -1,0 +1,78 @@
+{%- comment -%}
+  Deep-dive panels for one lab card. Usage: {% include lab-deep.html key="raft" %}
+  Content comes from _data/lab.yml. Every panel is plain HTML (readable without JS);
+  lab.js turns the panels into tabs.
+{%- endcomment -%}
+{% assign d = site.data.lab[include.key] %}
+<section class="lab-deep" data-deep>
+  <p class="eyebrow lab-deep-l">{% include t.html en="deep dive" vi="đào sâu" %}</p>
+  <div class="lab-panel" data-panel="overview">
+    <h3 class="lab-ph">{% include t.html en="Overview" vi="Tổng quan" %}</h3>
+    <p class="lab-prose">{% include t.html en=d.overview vi=d.overview_vi %}</p>
+    <p class="lab-prose lab-muted">{% include t.html en=d.simplified.en vi=d.simplified.vi %}</p>
+    <p class="lab-notice">{% include t.html en=d.notice.en vi=d.notice.vi %}</p>
+  </div>
+
+  <div class="lab-panel" data-panel="how">
+    <h3 class="lab-ph">{% include t.html en="How it works" vi="Cách hoạt động" %}</h3>
+    <ol class="lab-steps">
+      {% for s in d.how %}<li>{% include t.html en=s.en vi=s.vi %}</li>{% endfor %}
+    </ol>
+  </div>
+
+  <div class="lab-panel" data-panel="usecases">
+    <h3 class="lab-ph">{% include t.html en="Real-world use cases" vi="Ứng dụng thực tế" %} <span class="lab-count">{{ d.usecases.size }}</span></h3>
+    <ul class="lab-uc-grid">
+      {% for u in d.usecases %}
+      <li>
+        <a class="lab-uc" href="{{ u.url }}" target="_blank" rel="noopener noreferrer">
+          <b>{{ u.name }}<span aria-hidden="true"> ↗</span></b>
+          <span>{% include t.html en=u.en vi=u.vi %}</span>
+        </a>
+      </li>
+      {% endfor %}
+    </ul>
+  </div>
+
+  <div class="lab-panel" data-panel="papers">
+    <h3 class="lab-ph">{% include t.html en="Papers" vi="Bài báo khoa học" %} <span class="lab-count">{{ d.papers.size }}</span></h3>
+    <ul class="lab-refs">
+      {% for p in d.papers %}
+      <li>
+        <a class="lab-ref-title" href="{{ p.url }}" target="_blank" rel="noopener noreferrer">{{ p.title }}<span aria-hidden="true"> ↗</span></a>
+        <span class="lab-ref-meta">{{ p.authors }} · {{ p.venue }}</span>
+        <span class="lab-ref-why">{% include t.html en=p.en vi=p.vi %}</span>
+      </li>
+      {% endfor %}
+    </ul>
+  </div>
+
+  <div class="lab-panel" data-panel="reading">
+    <h3 class="lab-ph">{% include t.html en="Blogs &amp; further reading" vi="Blog &amp; tài liệu đọc thêm" %} <span class="lab-count">{{ d.reading.size }}</span></h3>
+    <ul class="lab-refs">
+      {% for r in d.reading %}
+      <li>
+        <a class="lab-ref-title" href="{{ r.url }}" target="_blank" rel="noopener noreferrer">{{ r.title }}<span aria-hidden="true"> ↗</span></a>
+        <span class="lab-ref-meta">{{ r.source }}</span>
+        <span class="lab-ref-why">{% include t.html en=r.en vi=r.vi %}</span>
+      </li>
+      {% endfor %}
+    </ul>
+  </div>
+
+  <div class="lab-panel" data-panel="posts">
+    <h3 class="lab-ph">{% include t.html en="On this blog" vi="Trên blog này" %}</h3>
+    <ul class="lab-refs">
+      {% for u in d.posts %}
+        {% assign p = site.posts | where: "url", u | first %}
+        {% if p %}
+        {% assign ptv = p.title_vi | default: p.title %}
+        <li>
+          <a class="lab-ref-title" href="{{ p.url | relative_url }}">{% include t.html en=p.title vi=ptv %}</a>
+          <span class="lab-ref-meta">{{ p.date | date: "%Y-%m-%d" }}</span>
+        </li>
+        {% endif %}
+      {% endfor %}
+    </ul>
+  </div>
+</section>

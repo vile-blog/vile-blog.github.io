@@ -26,14 +26,15 @@ description: "Interactive distributed-systems experiments: Raft leader election,
         <h2 class="lab-title"><span data-lang-content="en">Raft: elect a leader, survive a partition</span><span data-lang-content="vi">Raft: bầu leader, sống sót qua phân vùng mạng</span></h2>
         <p class="lab-lede">
           <span data-lang-content="en">Five nodes. Followers wait for heartbeats; if the leader goes quiet, a randomised timer fires and a
-          candidate asks for votes. <strong>Click a node</strong> to crash or revive it, <strong>split the network</strong> to create two
+          candidate asks for votes. <strong>Click a node</strong> to inspect it (and crash or revive it), <strong>split the network</strong> to create two
           isolated sides, then try to <strong>write</strong> — only a side holding a majority can commit.
           (<a href="{{ '/blog/2026/09/15/ddia-chapter-9-consistency-and-consensus/' | relative_url }}">DDIA ch. 9</a>)</span><span data-lang-content="vi">Năm node. Follower chờ heartbeat; nếu leader im lặng, một bộ đếm ngẫu nhiên nổ và một candidate đi xin phiếu.
-          <strong>Bấm vào node</strong> để làm sập hoặc hồi sinh nó, <strong>chia đôi mạng</strong> để tạo hai phía bị cô lập, rồi thử
+          <strong>Bấm vào node</strong> để xem chi tiết (và làm sập hoặc hồi sinh nó), <strong>chia đôi mạng</strong> để tạo hai phía bị cô lập, rồi thử
           <strong>ghi</strong> — chỉ phía có đa số mới commit được.
           (<a href="{{ '/blog/2026/09/15/ddia-chapter-9-consistency-and-consensus/' | relative_url }}">DDIA ch. 9</a>)</span>
         </p>
       </header>
+      {% include lab-exps.html key="raft" %}
       <div class="lab-body">
         <div class="lab-stage"><svg class="lab-svg" data-raft-svg viewBox="0 0 520 380" role="img" aria-label="Raft cluster visualisation"></svg></div>
         <aside class="lab-side">
@@ -50,9 +51,11 @@ description: "Interactive distributed-systems experiments: Raft leader election,
             <span><i class="dot dot-follow"></i> follower</span>
             <span><i class="dot dot-dead"></i> down</span>
           </div>
+          <div class="lab-inspect" data-raft-inspect></div>
           <ol class="lab-log" data-raft-log aria-live="polite"></ol>
         </aside>
       </div>
+      {% include lab-deep.html key="raft" %}
     </article>
 
     <!-- ============================================================ RING -->
@@ -63,13 +66,14 @@ description: "Interactive distributed-systems experiments: Raft leader election,
         <p class="lab-lede">
           <span data-lang-content="en">300 keys are hashed onto a ring; each belongs to the next server clockwise. Add or remove a server and
           see how few keys move — compared with naïve <code>hash(key) mod N</code>, which reshuffles almost everything.
-          Crank up <strong>virtual nodes</strong> to even out the load.
+          Crank up <strong>virtual nodes</strong> to even out the load, and <strong>click a server</strong> or a key to inspect it.
           (<a href="{{ '/blog/2026/09/15/ddia-chapter-6-partitioning/' | relative_url }}">DDIA ch. 6</a>)</span><span data-lang-content="vi">300 key được băm lên một vòng tròn; mỗi key thuộc về server đầu tiên theo chiều kim đồng hồ. Thêm hoặc bớt server
           rồi xem có bao nhiêu key phải chuyển — so với cách <code>hash(key) mod N</code> ngây thơ, vốn xáo trộn gần như tất cả.
-          Tăng <strong>virtual node</strong> để cân bằng tải.
+          Tăng <strong>virtual node</strong> để cân bằng tải, và <strong>bấm vào server</strong> hay một key để xem chi tiết.
           (<a href="{{ '/blog/2026/09/15/ddia-chapter-6-partitioning/' | relative_url }}">DDIA ch. 6</a>)</span>
         </p>
       </header>
+      {% include lab-exps.html key="ring" %}
       <div class="lab-body">
         <div class="lab-stage"><svg class="lab-svg" data-ring-svg viewBox="0 0 420 420" role="img" aria-label="Consistent hash ring"></svg></div>
         <aside class="lab-side">
@@ -86,8 +90,10 @@ description: "Interactive distributed-systems experiments: Raft leader election,
             <div class="lab-bar lab-bar-bad"><i data-ring-naive-bar></i></div>
           </div>
           <div class="lab-load" data-ring-load aria-label="Load per server"></div>
+          <div class="lab-inspect" data-ring-info></div>
         </aside>
       </div>
+      {% include lab-deep.html key="ring" %}
     </article>
 
     <!-- ============================================================ QUORUM -->
@@ -97,14 +103,15 @@ description: "Interactive distributed-systems experiments: Raft leader election,
         <h2 class="lab-title"><span data-lang-content="en">Quorums: when does a read see the latest write?</span><span data-lang-content="vi">Quorum: khi nào một lần đọc thấy bản ghi mới nhất?</span></h2>
         <p class="lab-lede">
           <span data-lang-content="en">A write waits for <b>W</b> of <b>N</b> replicas; a read asks <b>R</b>. If <code>W + R &gt; N</code> the two sets must overlap,
-          so the read can't miss the newest value. Otherwise it might. Write, read, then hit <em>Run 500 trials</em> to measure the
+          so the read can't miss the newest value. Otherwise it might. Click a replica to crash it. Write, read, then hit <em>Run 500 trials</em> to measure the
           real stale-read rate against the maths.
           (<a href="{{ '/blog/2026/09/15/ddia-chapter-5-replication/' | relative_url }}">DDIA ch. 5</a>)</span><span data-lang-content="vi">Một lần ghi chờ <b>W</b> trong <b>N</b> replica; một lần đọc hỏi <b>R</b> replica. Nếu <code>W + R &gt; N</code> thì hai tập
-          buộc phải giao nhau, nên lần đọc không thể bỏ lỡ giá trị mới nhất. Ngược lại thì có thể. Hãy ghi, đọc, rồi bấm
+          buộc phải giao nhau, nên lần đọc không thể bỏ lỡ giá trị mới nhất. Ngược lại thì có thể. Bấm vào replica để làm sập nó. Hãy ghi, đọc, rồi bấm
           <em>Chạy 500 lần thử</em> để đo tỉ lệ đọc dữ liệu cũ thực tế so với công thức.
           (<a href="{{ '/blog/2026/09/15/ddia-chapter-5-replication/' | relative_url }}">DDIA ch. 5</a>)</span>
         </p>
       </header>
+      {% include lab-exps.html key="quorum" %}
       <div class="lab-body">
         <div class="lab-stage lab-stage-flex">
           <div class="q-replicas" data-q-replicas></div>
@@ -123,6 +130,7 @@ description: "Interactive distributed-systems experiments: Raft leader election,
           <div class="lab-stat" data-q-stats></div>
         </aside>
       </div>
+      {% include lab-deep.html key="quorum" %}
     </article>
   </div>
 </section>
