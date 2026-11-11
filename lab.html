@@ -3,7 +3,7 @@ layout: default
 title: "Lab"
 permalink: /lab/
 lab: true
-description: "Interactive distributed-systems experiments: Raft leader election, consistent hashing and quorum reads, running live in your browser."
+description: "Interactive distributed-systems experiments in your browser: Raft, consistent hashing, quorums, gossip and SWIM, CRDTs, and a real leader election between your own tabs."
 ---
 <section class="lab-section">
   <div class="container">
@@ -11,10 +11,10 @@ description: "Interactive distributed-systems experiments: Raft leader election,
       <p class="eyebrow">~/lab</p>
       <h1 class="section-title"><span data-lang-content="en">The Lab</span><span data-lang-content="vi">Phòng thí nghiệm</span></h1>
       <p class="notes-sub">
-        <span data-lang-content="en">Three tiny distributed systems running right here in your browser. Break
-        them on purpose — crash nodes, cut the network, add servers, tune quorums — and watch what the
-        <em>Designing Data-Intensive Applications</em> chapters actually mean in practice.</span><span data-lang-content="vi">Ba hệ thống phân tán thu nhỏ chạy ngay trong trình duyệt của bạn. Cứ phá chúng đi —
-        làm sập node, cắt mạng, thêm server, chỉnh quorum — rồi xem các chương của
+        <span data-lang-content="en">Six tiny distributed systems running right here in your browser, one of them made of your own tabs. Break
+        them on purpose — crash nodes, cut the network, add servers, tune quorums, go offline — and watch what the
+        <em>Designing Data-Intensive Applications</em> chapters actually mean in practice.</span><span data-lang-content="vi">Sáu hệ thống phân tán thu nhỏ chạy ngay trong trình duyệt của bạn, trong đó có một cái làm bằng chính các tab của bạn. Cứ phá chúng đi —
+        làm sập node, cắt mạng, thêm server, chỉnh quorum, ngắt kết nối — rồi xem các chương của
         <em>Designing Data-Intensive Applications</em> thực sự có nghĩa gì.</span>
       </p>
     </div>
@@ -131,6 +131,118 @@ description: "Interactive distributed-systems experiments: Raft leader election,
         </aside>
       </div>
       {% include lab-deep.html key="quorum" %}
+    </article>
+
+    <!-- ============================================================ GOSSIP -->
+    <article class="lab-card" data-lab="gossip" id="gossip">
+      <header class="lab-head">
+        <p class="eyebrow">04 · <span data-lang-content="en">membership</span><span data-lang-content="vi">thành viên cụm</span></p>
+        <h2 class="lab-title"><span data-lang-content="en">Gossip: a rumour crosses 24 nodes with no coordinator</span><span data-lang-content="vi">Gossip: một tin đồn lan qua 24 node mà không cần điều phối viên</span></h2>
+        <p class="lab-lede">
+          <span data-lang-content="en">Nobody is in charge. Each round, every node that knows something tells a few random peers. In <strong>Rumour</strong> mode,
+          click a node to start a rumour and watch it go epidemic. In <strong>Failure detector</strong> mode (SWIM), click nodes to <em>crash</em> them: peers
+          probe each other, ask friends to double-check, suspect, then declare dead, and spread the verdict by piggy-backing it on ordinary messages.
+          Turn the packet loss up to see false alarms get refuted.
+          (<a href="{{ '/blog/2026/09/15/ddia-chapter-8-distributed-systems-trouble/' | relative_url }}">DDIA ch. 8</a>)</span><span data-lang-content="vi">Không ai làm chủ. Mỗi vòng, mọi node biết tin sẽ kể cho vài node ngẫu nhiên. Ở chế độ <strong>Tin đồn</strong>,
+          bấm vào một node để bắt đầu tin đồn và xem nó lan như dịch. Ở chế độ <strong>Phát hiện lỗi</strong> (SWIM), bấm vào node để <em>làm sập</em> nó: các node
+          dò nhau, nhờ bạn kiểm tra lại, nghi ngờ, rồi tuyên bố chết, và lan phán quyết đó bằng cách gắn kèm vào các tin nhắn thường.
+          Tăng tỉ lệ mất gói để xem báo động giả bị bác bỏ ra sao.
+          (<a href="{{ '/blog/2026/09/15/ddia-chapter-8-distributed-systems-trouble/' | relative_url }}">DDIA ch. 8</a>)</span>
+        </p>
+      </header>
+      {% include lab-exps.html key="gossip" %}
+      <div class="lab-body">
+        <div class="lab-stage"><svg class="lab-svg" data-g-svg viewBox="0 0 520 440" role="img" aria-label="Gossip cluster of 24 nodes"></svg></div>
+        <aside class="lab-side">
+          <div class="lab-controls">
+            <div class="lab-seg" role="group" aria-label="Mode">
+              <button type="button" class="lab-btn is-on" data-g-mode="rumor" aria-pressed="true"><span data-lang-content="en">Rumour</span><span data-lang-content="vi">Tin đồn</span></button>
+              <button type="button" class="lab-btn" data-g-mode="swim" aria-pressed="false"><span data-lang-content="en">Failure detector</span><span data-lang-content="vi">Phát hiện lỗi</span></button>
+            </div>
+            <label class="lab-range" data-g-only="rumor"><span data-lang-content="en">Fanout (peers told per round)</span><span data-lang-content="vi">Fanout (số node được kể mỗi vòng)</span> <b data-g-fan-val>1</b>
+              <input type="range" min="1" max="4" step="1" value="1" data-g-fan /></label>
+            <label class="lab-range" data-g-only="rumor"><span data-lang-content="en">Style</span><span data-lang-content="vi">Kiểu</span> <b data-g-style-val>push</b>
+              <input type="range" min="0" max="2" step="1" value="0" data-g-style /></label>
+            <label class="lab-range" data-g-only="swim"><span data-lang-content="en">Indirect probes k</span><span data-lang-content="vi">Số lần dò gián tiếp k</span> <b data-g-k-val>2</b>
+              <input type="range" min="0" max="4" step="1" value="2" data-g-k /></label>
+            <label class="lab-range"><span data-lang-content="en">Packet loss</span><span data-lang-content="vi">Mất gói</span> <b data-g-loss-val>0%</b>
+              <input type="range" min="0" max="60" step="5" value="0" data-g-loss /></label>
+            <label class="lab-range"><span data-lang-content="en">Speed</span><span data-lang-content="vi">Tốc độ</span>
+              <input type="range" min="0.5" max="4" step="0.5" value="1" data-g-speed /></label>
+            <button type="button" class="lab-btn lab-btn-ghost" data-g-reset><span data-lang-content="en">Reset</span><span data-lang-content="vi">Đặt lại</span></button>
+          </div>
+          <div class="lab-legend" data-g-legend></div>
+          <div class="lab-stat" data-g-stats></div>
+          <p class="q-readout" data-g-readout aria-live="polite"></p>
+        </aside>
+      </div>
+      {% include lab-deep.html key="gossip" %}
+    </article>
+
+    <!-- ============================================================ CRDT -->
+    <article class="lab-card" data-lab="crdt" id="crdt">
+      <header class="lab-head">
+        <p class="eyebrow">05 · <span data-lang-content="en">convergence</span><span data-lang-content="vi">hội tụ</span></p>
+        <h2 class="lab-title"><span data-lang-content="en">CRDTs: edit offline, merge without losing anything</span><span data-lang-content="vi">CRDT: sửa offline, gộp lại mà không mất gì</span></h2>
+        <p class="lab-lede">
+          <span data-lang-content="en">Three replicas, no leader, no locks. Toggle a replica <b>offline</b>, change its data, bring it back. Every replica holds the same
+          value twice: once as a <b>CRDT</b> (data shaped so that merging is always safe) and once as a <b>naïve last-write-wins</b> copy.
+          Press <em>+1</em> on all three while they are partitioned and compare what survives.
+          (<a href="{{ '/blog/2026/09/15/ddia-chapter-5-replication/' | relative_url }}">DDIA ch. 5</a>)</span><span data-lang-content="vi">Ba replica, không leader, không khóa. Bật một replica <b>offline</b>, sửa dữ liệu của nó, rồi cho online lại. Mỗi replica giữ cùng một
+          giá trị hai lần: một bản <b>CRDT</b> (dữ liệu có hình dạng sao cho gộp luôn an toàn) và một bản <b>last-write-wins ngây thơ</b>.
+          Bấm <em>+1</em> trên cả ba khi chúng bị chia cắt rồi so sánh cái gì còn sống sót.
+          (<a href="{{ '/blog/2026/09/15/ddia-chapter-5-replication/' | relative_url }}">DDIA ch. 5</a>)</span>
+        </p>
+      </header>
+      {% include lab-exps.html key="crdt" %}
+      <div class="lab-body lab-body-wide">
+        <div class="lab-stage lab-stage-flex">
+          <div class="lab-seg" role="group" aria-label="Data type">
+            <button type="button" class="lab-btn is-on" data-c-type="counter" aria-pressed="true"><span data-lang-content="en">Counter (likes)</span><span data-lang-content="vi">Bộ đếm (lượt thích)</span></button>
+            <button type="button" class="lab-btn" data-c-type="cart" aria-pressed="false"><span data-lang-content="en">Shopping cart (set)</span><span data-lang-content="vi">Giỏ hàng (tập hợp)</span></button>
+          </div>
+          <div class="c-reps" data-c-reps></div>
+          <p class="q-readout" data-c-readout aria-live="polite"></p>
+        </div>
+        <aside class="lab-side">
+          <div class="lab-stat" data-c-verdict></div>
+          <div class="lab-controls">
+            <button type="button" class="lab-btn" data-c-sync><span data-lang-content="en">Sync now</span><span data-lang-content="vi">Đồng bộ ngay</span></button>
+            <button type="button" class="lab-btn lab-btn-ghost" data-c-reset><span data-lang-content="en">Reset</span><span data-lang-content="vi">Đặt lại</span></button>
+          </div>
+          <p class="lab-note" data-c-explain></p>
+        </aside>
+      </div>
+      {% include lab-deep.html key="crdt" %}
+    </article>
+
+    <!-- ============================================================ TABS -->
+    <article class="lab-card" data-lab="tabs" id="tabs">
+      <header class="lab-head">
+        <p class="eyebrow">06 · <span data-lang-content="en">a real cluster</span><span data-lang-content="vi">một cụm thật</span></p>
+        <h2 class="lab-title"><span data-lang-content="en">Tab cluster: every browser tab is a node</span><span data-lang-content="vi">Tab cluster: mỗi tab trình duyệt là một node</span></h2>
+        <p class="lab-lede">
+          <span data-lang-content="en">This one is not a simulation. Open this page in <strong>several tabs</strong>: each tab is a real process that talks to the others over a
+          <code>BroadcastChannel</code> and runs a small Raft-style election. The leader's tab title gets a ♛. <strong>Close the leader's tab</strong> and watch another tab take over,
+          or <strong>crash</strong> this one. Increments go through the leader and commit once a majority has stored them.</span><span data-lang-content="vi">Cái này không phải mô phỏng. Hãy mở trang này ở <strong>nhiều tab</strong>: mỗi tab là một tiến trình thật, nói chuyện với nhau qua
+          <code>BroadcastChannel</code> và chạy một cuộc bầu cử kiểu Raft thu nhỏ. Tiêu đề tab của leader có thêm ♛. <strong>Đóng tab của leader</strong> rồi xem tab khác lên thay,
+          hoặc <strong>làm sập</strong> tab này. Các lần tăng đi qua leader và được commit khi đa số đã lưu.</span>
+        </p>
+      </header>
+      {% include lab-exps.html key="tabs" %}
+      <div class="lab-body">
+        <div class="lab-stage"><svg class="lab-svg" data-t-svg viewBox="0 0 520 380" role="img" aria-label="Cluster of open browser tabs"></svg></div>
+        <aside class="lab-side">
+          <div class="lab-controls">
+            <button type="button" class="lab-btn" data-t-open><span data-lang-content="en">Open another tab</span><span data-lang-content="vi">Mở thêm một tab</span></button>
+            <button type="button" class="lab-btn" data-t-inc><span data-lang-content="en">+1 (via leader)</span><span data-lang-content="vi">+1 (qua leader)</span></button>
+            <button type="button" class="lab-btn lab-btn-ghost" data-t-crash aria-pressed="false"><span data-lang-content="en">Crash this tab</span><span data-lang-content="vi">Làm sập tab này</span></button>
+          </div>
+          <div class="lab-inspect" data-t-info></div>
+          <ol class="lab-log" data-t-log aria-live="polite"></ol>
+        </aside>
+      </div>
+      {% include lab-deep.html key="tabs" %}
     </article>
   </div>
 </section>
