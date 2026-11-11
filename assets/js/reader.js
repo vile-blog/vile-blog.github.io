@@ -928,6 +928,191 @@
   syncFocusLabels();
 
   /* ------------------------------------------------------------------
+     Listen mode: the browser reads the post aloud, paragraph by paragraph,
+     highlighting the sentence block and the word being spoken (CSS Custom
+     Highlight API where available). Uses the Web Speech API: no network, no
+     account, whatever voices the OS ships (English and Vietnamese here).
+  ------------------------------------------------------------------ */
+  var Listen = (function () {
+    if (!("speechSynthesis" in window) || typeof SpeechSynthesisUtterance === "undefined") return null;
+    var synth = window.speechSynthesis;
+    var SPEEDS = [1, 1.25, 1.5, 0.8];
+    var speedIdx = 0, blocks = [], idx = -1, playing = false, token = 0;
+    var bar = null, ui = {};
+    var voices = [];
+    var hasHL = !!(window.CSS && CSS.highlights && typeof Highlight !== "undefined");
+    function loadVoices() { voices = synth.getVoices() || []; }
+    loadVoices();
+    if (synth.addEventListener) synth.addEventListener("voiceschanged", loadVoices);
+
+    var CONTAINERS = "p, li, blockquote, ul, ol, table, pre, figure, h2, h3, h4";
+    function collectBlocks() {
+      var all = Array.prototype.slice.call(content.querySelectorAll("h2, h3, h4, p, li, blockquote"));
+      return all.filter(function (b) {
+        if (!visible(b)) return false;
+        if (b.closest("pre, table, figure, .sn, .rd-ui")) return false;
+        if (b.querySelector(CONTAINERS)) return false;          // read the inner pieces instead
+        return true;
+      });
+    }
+
+    function textMap(block) {
+      var segs = [], text = "";
+      var walker = document.createTreeWalker(block, NodeFilter.SHOW_TEXT, {
+        acceptNode: function (n) {
+          var p = n.parentElement;
+          if (!p || p.offsetParent === null) return NodeFilter.FILTER_REJECT;
+          if (p.closest(".sn, button, script, style, .rd-ui")) return NodeFilter.FILTER_REJECT;
+          return NodeFilter.FILTER_ACCEPT;
+        }
+      });
+      var n;
+      while ((n = walker.nextNode())) { segs.push({ node: n, start: text.length }); text += n.nodeValue; }
+      return { text: text, segs: segs };
+    }
+
+    function rangeAt(map, from, to) {
+      var r = document.createRange(), s = null, e = null, i;
+      for (i = map.segs.length - 1; i >= 0; i--) {
+        if (from >= map.segs[i].start) { s = { n: map.segs[i].node, o: from - map.segs[i].start }; break; }
+      }
+      for (i = map.segs.length - 1; i >= 0; i--) {
+        if (to > map.segs[i].start) { e = { n: map.segs[i].node, o: Math.min(to - map.segs[i].start, map.segs[i].node.nodeValue.length) }; break; }
+      }
+      if (!s || !e) return null;
+      try { r.setStart(s.n, Math.min(s.o, s.n.nodeValue.length)); r.setEnd(e.n, e.o); } catch (err) { return null; }
+      return r;
+    }
+
+    function clearMarks() {
+      if (hasHL) CSS.highlights.delete("tts-word");
+      var prev = content.querySelector(".is-speaking");
+      if (prev) prev.classList.remove("is-speaking");
+    }
+
+    function pickVoice(l) {
+      var pref = l === "vi" ? "vi" : "en";
+      var match = voices.filter(function (v) { return v.lang && v.lang.toLowerCase().indexOf(pref) === 0; });
+      return match.filter(function (v) { return v.localService === false; })[0] || match[0] || null;
+    }
+
+    function paintBar() {
+      if (!bar) return;
+      ui.play.textContent = playing ? "⏸" : "▶";
+      ui.play.setAttribute("aria-label", playing ? T("Pause", "Tạm dừng") : T("Play", "Phát"));
+      ui.speed.textContent = SPEEDS[speedIdx] + "×";
+      ui.pos.textContent = (idx + 1) + " / " + blocks.length;
+    }
+
+    function speak(i) {
+      token++;
+      var my = token;
+      synth.cancel();
+      clearMarks();
+      if (i < 0) i = 0;
+      if (i >= blocks.length) { stop(); toast(T("Finished reading.", "Đã đọc xong.")); return; }
+      idx = i;
+      var block = blocks[i];
+      var map = textMap(block);
+      if (map.text.trim().length < 2) { speak(i + 1); return; }
+      block.classList.add("is-speaking");
+      block.scrollIntoView({ behavior: "smooth", block: "center" });
+      var u = new SpeechSynthesisUtterance(map.text);
+      var l = lang();
+      u.lang = l === "vi" ? "vi-VN" : "en-US";
+      var v = pickVoice(l);
+      if (v) u.voice = v;
+      u.rate = SPEEDS[speedIdx];
+      u.onboundary = function (e) {
+        if (my !== token || !hasHL) return;
+        if (e.name && e.name !== "word") return;
+        var len = e.charLength;
+        if (!len) { var m = /^\S+/.exec(map.text.slice(e.charIndex)); len = m ? m[0].length : 1; }
+        var r = rangeAt(map, e.charIndex, e.charIndex + len);
+        if (r) CSS.highlights.set("tts-word", new Highlight(r));
+      };
+      u.onend = function () { if (my === token && playing) speak(idx + 1); };
+      u.onerror = function (e) { if (my === token && e.error !== "interrupted" && e.error !== "canceled") { stop(); toast(T("Speech failed — no voice for this language?", "Không đọc được — máy chưa có giọng cho ngôn ngữ này?")); } };
+      playing = true;
+      paintBar();
+      setTimeout(function () { if (my === token) synth.speak(u); }, 40);
+    }
+
+    function startIndex() {
+      var sel = window.getSelection && window.getSelection();
+      if (sel && sel.anchorNode && !sel.isCollapsed) {
+        var host = sel.anchorNode.nodeType === 1 ? sel.anchorNode : sel.anchorNode.parentElement;
+        for (var i = 0; i < blocks.length; i++) if (blocks[i].contains(host)) return i;
+      }
+      for (var j = 0; j < blocks.length; j++) if (blocks[j].getBoundingClientRect().top >= 80) return j;
+      return 0;
+    }
+
+    function buildBar() {
+      bar = el("div", "listen-bar rd-ui");
+      bar.setAttribute("role", "group");
+      bar.setAttribute("aria-label", T("Listen to this post", "Nghe bài viết"));
+      function btn(cls, label, fn) { var b = el("button", "listen-btn " + cls, label); b.type = "button"; b.addEventListener("click", fn); bar.appendChild(b); return b; }
+      ui.prev = btn("", "⏮", function () { speak(idx - 1); });
+      ui.play = btn("listen-play", "⏸", function () {
+        if (playing) { playing = false; token++; synth.cancel(); paintBar(); }
+        else { playing = true; speak(idx); }
+      });
+      ui.next = btn("", "⏭", function () { speak(idx + 1); });
+      ui.speed = btn("listen-speed", "1×", function () { speedIdx = (speedIdx + 1) % SPEEDS.length; paintBar(); if (playing) speak(idx); });
+      ui.pos = el("span", "listen-pos", "");
+      bar.appendChild(ui.pos);
+      ui.close = btn("listen-x", "✕", stop);
+      ui.prev.setAttribute("aria-label", T("Previous paragraph", "Đoạn trước"));
+      ui.next.setAttribute("aria-label", T("Next paragraph", "Đoạn sau"));
+      ui.close.setAttribute("aria-label", T("Stop listening", "Dừng nghe"));
+      document.body.appendChild(bar);
+    }
+
+    function start() {
+      blocks = collectBlocks();
+      if (!blocks.length) return;
+      if (!bar) buildBar();
+      bar.classList.add("is-on");
+      playing = true;
+      speak(startIndex());
+    }
+
+    function stop() {
+      token++;
+      playing = false;
+      synth.cancel();
+      clearMarks();
+      if (bar) bar.classList.remove("is-on");
+      syncBtn();
+    }
+
+    var btnEl = el("button", "focus-toggle listen-toggle");
+    btnEl.type = "button";
+    function syncBtn() {
+      var on = bar && bar.classList.contains("is-on");
+      btnEl.textContent = on ? T("Stop listening", "Dừng nghe") : "🔊 " + T("Listen", "Nghe bài");
+      btnEl.setAttribute("aria-pressed", on ? "true" : "false");
+    }
+    function toggle() { if (bar && bar.classList.contains("is-on")) stop(); else start(); syncBtn(); }
+    btnEl.addEventListener("click", toggle);
+    window.addEventListener("pagehide", function () { synth.cancel(); });
+
+    return { button: btnEl, toggle: toggle, stop: stop, sync: syncBtn, active: function () { return !!(bar && bar.classList.contains("is-on")); } };
+  })();
+
+  if (Listen) {
+    var metaRow2 = document.querySelector(".post-meta");
+    if (metaRow2) {
+      var sep2 = el("span", "", "·");
+      sep2.setAttribute("aria-hidden", "true");
+      metaRow2.appendChild(sep2);
+      metaRow2.appendChild(Listen.button);
+    }
+    Listen.sync();
+  }
+
+  /* ------------------------------------------------------------------
      Keyboard shortcuts:  j / k  next / previous section
                           g g / G  top / bottom      f  focus      ?  help
   ------------------------------------------------------------------ */
@@ -953,6 +1138,7 @@
       [["g", "g"], T("jump to the top", "về đầu bài")],
       [["G"], T("jump to the bottom", "xuống cuối bài")],
       [["f"], T("focus mode", "chế độ tập trung")],
+      [["l"], T("listen to the post (text-to-speech)", "nghe bài viết (đọc thành tiếng)")],
       [["Ctrl K", "/"], T("search everything", "tìm kiếm tất cả")],
       [["?"], T("this help", "bảng này")]
     ];
@@ -1000,6 +1186,7 @@
       else lastG = now;
     }
     else if (e.key === "f") { setFocus(!root.classList.contains("focus-mode")); }
+    else if (e.key === "l" && Listen) { Listen.toggle(); }
     else if (e.key === "?") { e.preventDefault(); openKeyHelp(); }
   });
 
@@ -1007,6 +1194,7 @@
      Wire-up
   ------------------------------------------------------------------ */
   function onLangChange() {
+    if (Listen) { Listen.stop(); Listen.sync(); }
     hideToolbar();
     closePopover();
     buildToc();

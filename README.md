@@ -33,6 +33,9 @@ Everything below is plain HTML/CSS/JS — no build step beyond Jekyll itself.
 - **Prev / next + related posts** — book chapters link to the previous / next *chapter* (by `book_chapter_num`); other posts link by date. "If you liked this" ranks other posts by shared tags, weighting rare tags higher (the DDIA tag every chapter carries is ignored).
 - **Roadmap deep links** — `/#roadmap-3` opens milestone 3's details directly; the dialog has a "Copy link" button.
 - **Share image** — `assets/og-default.png` (1200×630) is the default OpenGraph / Twitter card (`image:` in `_config.yml`). Give a post its own with `image:` in its front matter.
+- **The Lab** (`/lab/`) — three interactive distributed-systems simulations: Raft leader election with crashes, network partitions and quorum writes; a consistent-hashing ring with virtual nodes vs. `hash mod N`; and an N/W/R quorum stale-read experiment. Code in `assets/js/lab.js`, styles in `assets/css/lab.css` (loaded only when a page sets `lab: true`).
+- **Listen mode** (posts only) — the "🔊 Listen" link (or `L`) reads the post aloud with the browser's built-in speech synthesis, highlighting the paragraph and the current word, with prev/next/speed controls. English and Vietnamese voices depend on the OS.
+- **Chaos Monkey & kernel panic** — `chaos [seconds]` in the hero terminal (or the palette) "kills" random cards with a 503 that heals with exponential backoff; click one to restart it by hand. `sudo rm -rf /` makes the whole page fall to the bottom of the window (Esc reboots). Code in `assets/js/chaos.js`.
 - **Hidden extras** — the Konami code (↑ ↑ ↓ ↓ ← → ← → B A) or `matrix` in the hero terminal toggles a green-on-black "hacker" theme.
 
 ### Writing callouts and sidenotes

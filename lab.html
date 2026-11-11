@@ -1,0 +1,128 @@
+---
+layout: default
+title: "Lab"
+permalink: /lab/
+lab: true
+description: "Interactive distributed-systems experiments: Raft leader election, consistent hashing and quorum reads, running live in your browser."
+---
+<section class="lab-section">
+  <div class="container">
+    <div class="section-head">
+      <p class="eyebrow">~/lab</p>
+      <h1 class="section-title"><span data-lang-content="en">The Lab</span><span data-lang-content="vi">Phòng thí nghiệm</span></h1>
+      <p class="notes-sub">
+        <span data-lang-content="en">Three tiny distributed systems running right here in your browser. Break
+        them on purpose — crash nodes, cut the network, add servers, tune quorums — and watch what the
+        <em>Designing Data-Intensive Applications</em> chapters actually mean in practice.</span><span data-lang-content="vi">Ba hệ thống phân tán thu nhỏ chạy ngay trong trình duyệt của bạn. Cứ phá chúng đi —
+        làm sập node, cắt mạng, thêm server, chỉnh quorum — rồi xem các chương của
+        <em>Designing Data-Intensive Applications</em> thực sự có nghĩa gì.</span>
+      </p>
+    </div>
+
+    <!-- ============================================================ RAFT -->
+    <article class="lab-card" data-lab="raft" id="raft">
+      <header class="lab-head">
+        <p class="eyebrow">01 · <span data-lang-content="en">consensus</span><span data-lang-content="vi">đồng thuận</span></p>
+        <h2 class="lab-title"><span data-lang-content="en">Raft: elect a leader, survive a partition</span><span data-lang-content="vi">Raft: bầu leader, sống sót qua phân vùng mạng</span></h2>
+        <p class="lab-lede">
+          <span data-lang-content="en">Five nodes. Followers wait for heartbeats; if the leader goes quiet, a randomised timer fires and a
+          candidate asks for votes. <strong>Click a node</strong> to crash or revive it, <strong>split the network</strong> to create two
+          isolated sides, then try to <strong>write</strong> — only a side holding a majority can commit.
+          (<a href="{{ '/blog/2026/09/15/ddia-chapter-9-consistency-and-consensus/' | relative_url }}">DDIA ch. 9</a>)</span><span data-lang-content="vi">Năm node. Follower chờ heartbeat; nếu leader im lặng, một bộ đếm ngẫu nhiên nổ và một candidate đi xin phiếu.
+          <strong>Bấm vào node</strong> để làm sập hoặc hồi sinh nó, <strong>chia đôi mạng</strong> để tạo hai phía bị cô lập, rồi thử
+          <strong>ghi</strong> — chỉ phía có đa số mới commit được.
+          (<a href="{{ '/blog/2026/09/15/ddia-chapter-9-consistency-and-consensus/' | relative_url }}">DDIA ch. 9</a>)</span>
+        </p>
+      </header>
+      <div class="lab-body">
+        <div class="lab-stage"><svg class="lab-svg" data-raft-svg viewBox="0 0 520 380" role="img" aria-label="Raft cluster visualisation"></svg></div>
+        <aside class="lab-side">
+          <div class="lab-controls">
+            <button type="button" class="lab-btn" data-raft-write><span data-lang-content="en">Write a value</span><span data-lang-content="vi">Ghi một giá trị</span></button>
+            <button type="button" class="lab-btn" data-raft-split aria-pressed="false"><span data-lang-content="en">Split network</span><span data-lang-content="vi">Chia đôi mạng</span></button>
+            <button type="button" class="lab-btn lab-btn-ghost" data-raft-reset><span data-lang-content="en">Reset</span><span data-lang-content="vi">Đặt lại</span></button>
+            <label class="lab-range"><span data-lang-content="en">Speed</span><span data-lang-content="vi">Tốc độ</span>
+              <input type="range" min="0.5" max="3" step="0.25" value="1" data-raft-speed /></label>
+          </div>
+          <div class="lab-legend">
+            <span><i class="dot dot-leader"></i> leader</span>
+            <span><i class="dot dot-cand"></i> candidate</span>
+            <span><i class="dot dot-follow"></i> follower</span>
+            <span><i class="dot dot-dead"></i> down</span>
+          </div>
+          <ol class="lab-log" data-raft-log aria-live="polite"></ol>
+        </aside>
+      </div>
+    </article>
+
+    <!-- ============================================================ RING -->
+    <article class="lab-card" data-lab="ring" id="ring">
+      <header class="lab-head">
+        <p class="eyebrow">02 · <span data-lang-content="en">partitioning</span><span data-lang-content="vi">phân mảnh</span></p>
+        <h2 class="lab-title"><span data-lang-content="en">Consistent hashing: add a server, move almost nothing</span><span data-lang-content="vi">Consistent hashing: thêm server, hầu như không phải di chuyển gì</span></h2>
+        <p class="lab-lede">
+          <span data-lang-content="en">300 keys are hashed onto a ring; each belongs to the next server clockwise. Add or remove a server and
+          see how few keys move — compared with naïve <code>hash(key) mod N</code>, which reshuffles almost everything.
+          Crank up <strong>virtual nodes</strong> to even out the load.
+          (<a href="{{ '/blog/2026/09/15/ddia-chapter-6-partitioning/' | relative_url }}">DDIA ch. 6</a>)</span><span data-lang-content="vi">300 key được băm lên một vòng tròn; mỗi key thuộc về server đầu tiên theo chiều kim đồng hồ. Thêm hoặc bớt server
+          rồi xem có bao nhiêu key phải chuyển — so với cách <code>hash(key) mod N</code> ngây thơ, vốn xáo trộn gần như tất cả.
+          Tăng <strong>virtual node</strong> để cân bằng tải.
+          (<a href="{{ '/blog/2026/09/15/ddia-chapter-6-partitioning/' | relative_url }}">DDIA ch. 6</a>)</span>
+        </p>
+      </header>
+      <div class="lab-body">
+        <div class="lab-stage"><svg class="lab-svg" data-ring-svg viewBox="0 0 420 420" role="img" aria-label="Consistent hash ring"></svg></div>
+        <aside class="lab-side">
+          <div class="lab-controls">
+            <button type="button" class="lab-btn" data-ring-add><span data-lang-content="en">+ Add server</span><span data-lang-content="vi">+ Thêm server</span></button>
+            <button type="button" class="lab-btn" data-ring-remove><span data-lang-content="en">− Remove server</span><span data-lang-content="vi">− Bớt server</span></button>
+            <label class="lab-range"><span data-lang-content="en">Virtual nodes per server</span><span data-lang-content="vi">Virtual node mỗi server</span> <b data-ring-vn-val>1</b>
+              <input type="range" min="1" max="40" step="1" value="1" data-ring-vn /></label>
+          </div>
+          <div class="lab-stat">
+            <div class="lab-stat-row"><span data-lang-content="en">Consistent hashing moved</span><span data-lang-content="vi">Consistent hashing đã chuyển</span><b data-ring-moved>—</b></div>
+            <div class="lab-bar"><i data-ring-moved-bar></i></div>
+            <div class="lab-stat-row"><span data-lang-content="en">hash mod N would move</span><span data-lang-content="vi">hash mod N sẽ chuyển</span><b data-ring-naive>—</b></div>
+            <div class="lab-bar lab-bar-bad"><i data-ring-naive-bar></i></div>
+          </div>
+          <div class="lab-load" data-ring-load aria-label="Load per server"></div>
+        </aside>
+      </div>
+    </article>
+
+    <!-- ============================================================ QUORUM -->
+    <article class="lab-card" data-lab="quorum" id="quorum">
+      <header class="lab-head">
+        <p class="eyebrow">03 · <span data-lang-content="en">replication</span><span data-lang-content="vi">sao chép</span></p>
+        <h2 class="lab-title"><span data-lang-content="en">Quorums: when does a read see the latest write?</span><span data-lang-content="vi">Quorum: khi nào một lần đọc thấy bản ghi mới nhất?</span></h2>
+        <p class="lab-lede">
+          <span data-lang-content="en">A write waits for <b>W</b> of <b>N</b> replicas; a read asks <b>R</b>. If <code>W + R &gt; N</code> the two sets must overlap,
+          so the read can't miss the newest value. Otherwise it might. Write, read, then hit <em>Run 500 trials</em> to measure the
+          real stale-read rate against the maths.
+          (<a href="{{ '/blog/2026/09/15/ddia-chapter-5-replication/' | relative_url }}">DDIA ch. 5</a>)</span><span data-lang-content="vi">Một lần ghi chờ <b>W</b> trong <b>N</b> replica; một lần đọc hỏi <b>R</b> replica. Nếu <code>W + R &gt; N</code> thì hai tập
+          buộc phải giao nhau, nên lần đọc không thể bỏ lỡ giá trị mới nhất. Ngược lại thì có thể. Hãy ghi, đọc, rồi bấm
+          <em>Chạy 500 lần thử</em> để đo tỉ lệ đọc dữ liệu cũ thực tế so với công thức.
+          (<a href="{{ '/blog/2026/09/15/ddia-chapter-5-replication/' | relative_url }}">DDIA ch. 5</a>)</span>
+        </p>
+      </header>
+      <div class="lab-body">
+        <div class="lab-stage lab-stage-flex">
+          <div class="q-replicas" data-q-replicas></div>
+          <p class="q-readout" data-q-readout aria-live="polite"></p>
+        </div>
+        <aside class="lab-side">
+          <div class="lab-controls">
+            <label class="lab-range">N <b data-q-n-val>5</b><input type="range" min="3" max="9" step="1" value="5" data-q-n /></label>
+            <label class="lab-range">W <b data-q-w-val>2</b><input type="range" min="1" max="9" step="1" value="2" data-q-w /></label>
+            <label class="lab-range">R <b data-q-r-val>2</b><input type="range" min="1" max="9" step="1" value="2" data-q-r /></label>
+            <div class="lab-verdict" data-q-verdict></div>
+            <button type="button" class="lab-btn" data-q-write><span data-lang-content="en">Write</span><span data-lang-content="vi">Ghi</span></button>
+            <button type="button" class="lab-btn" data-q-read><span data-lang-content="en">Read</span><span data-lang-content="vi">Đọc</span></button>
+            <button type="button" class="lab-btn lab-btn-ghost" data-q-run><span data-lang-content="en">Run 500 trials</span><span data-lang-content="vi">Chạy 500 lần thử</span></button>
+          </div>
+          <div class="lab-stat" data-q-stats></div>
+        </aside>
+      </div>
+    </article>
+  </div>
+</section>

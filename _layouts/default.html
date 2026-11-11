@@ -55,6 +55,7 @@
 <meta name="site-base" content="{{ '/' | relative_url }}" />
 <link rel="stylesheet" href="{{ '/assets/css/style.css' | relative_url }}" />
 <link rel="stylesheet" href="{{ '/assets/css/extras.css' | relative_url }}" />
+{% if page.lab %}<link rel="stylesheet" href="{{ '/assets/css/lab.css' | relative_url }}" />{% endif %}
 {% feed_meta %}
 {% seo %}
 </head>
@@ -84,6 +85,8 @@
 
 <script src="{{ '/assets/js/script.js' | relative_url }}"></script>
 <script src="{{ '/assets/js/extras.js' | relative_url }}"></script>
+<script src="{{ '/assets/js/chaos.js' | relative_url }}"></script>
+{% if page.lab %}<script src="{{ '/assets/js/lab.js' | relative_url }}"></script>{% endif %}
 {% if page.layout == "post" %}<script src="{{ '/assets/js/reader.js' | relative_url }}"></script>{% endif %}
 </body>
 </html>

@@ -155,7 +155,7 @@
     });
   })();
 
-  window.ViSite = { base: base, lang: lang, tr: tr, fold: fold, loadIndex: loadIndex, toggleHacker: toggleHacker };
+  window.ViSite = { base: base, lang: lang, tr: tr, fold: fold, loadIndex: loadIndex, toggleHacker: toggleHacker, flash: flash };
 
   function postTitle(p) {
     return lang() === "vi" ? p.tv || p.t : p.t;
@@ -194,6 +194,9 @@
       { en: "Browse all posts", vi: "Xem tất cả bài viết", icon: "→", kw: "all posts archive", run: function () { goTo(base + "blog/", ""); } },
       { en: "Open the knowledge graph", vi: "Mở đồ thị tri thức", icon: "◎", kw: "graph map tags do thi", run: function () { goTo(base + "blog/", "#graph"); } },
       { en: "Browse book & paper notes", vi: "Xem ghi chú sách & bài báo", icon: "→", kw: "notes ddia books ghi chu", run: function () { goTo(base + "notes/", ""); } },
+      { en: "Open the Lab (Raft, hash ring, quorums)", vi: "Mở phòng Lab (Raft, hash ring, quorum)", icon: "⚗", kw: "lab simulation raft consensus hash ring quorum playground thi nghiem", run: function () { goTo(base + "lab/", ""); } },
+      { en: "Unleash the Chaos Monkey", vi: "Thả Chaos Monkey", icon: "🐒", kw: "chaos monkey netflix break fail 503 resilience", run: function () { if (window.ViChaos) window.ViChaos.monkey(); } },
+      { en: "Trigger a kernel panic", vi: "Gây kernel panic", icon: "☠", kw: "panic gravity crash fall rm rf sap", run: function () { if (window.ViChaos) window.ViChaos.panic(); } },
       { en: "Toggle light / dark theme", vi: "Đổi giao diện sáng / tối", icon: "◐", kw: "theme dark light mode", run: function () { clickIf("[data-theme-toggle]"); } },
       { en: "Switch language (EN / VI)", vi: "Đổi ngôn ngữ (EN / VI)", icon: "文", kw: "language vietnamese english tieng viet", run: function () { clickIf("[data-lang-toggle]"); } },
       { en: "Open GitHub profile", vi: "Mở GitHub", icon: "↗", kw: "github code", run: function () { clickIf('a[href*="github.com/"]'); } },
@@ -508,6 +511,8 @@
           ["search <words>", tr("search every post", "tìm trong mọi bài viết")],
           ["theme [dark|light]", tr("switch theme", "đổi giao diện")],
           ["lang [en|vi]", tr("switch language", "đổi ngôn ngữ")],
+          ["lab", tr("open the simulations", "mở các mô phỏng")],
+          ["chaos [seconds]", tr("release the Chaos Monkey", "thả Chaos Monkey")],
           ["contact", tr("how to reach me", "cách liên hệ")],
           ["clear", tr("clear the screen", "xóa màn hình")]
         ].forEach(function (r) { print("  " + (r[0] + "                              ").slice(0, 30) + r[1], "dim"); });
@@ -568,6 +573,7 @@
           return;
         }
         if (what === "notes") { goTo(base + "notes/", ""); return; }
+        if (what === "lab") { goTo(base + "lab/", ""); return; }
         if (/^\d+$/.test(what)) {
           loadIndex().then(function (posts) {
             var p = posts[parseInt(what, 10) - 1];
@@ -630,8 +636,41 @@
         print(on ? tr("Follow the white rabbit…", "Hãy theo con thỏ trắng…") : tr("Red pill declined.", "Từ chối viên thuốc đỏ."), "hl");
       },
 
+      lab: function () {
+        print(tr("opening the lab…", "đang mở phòng lab…"), "dim");
+        setTimeout(function () { location.href = base + "lab/"; }, 400);
+      },
+
+      chaos: function (args) {
+        if (!window.ViChaos) { print("chaos: " + tr("not loaded", "chưa tải"), "err"); return; }
+        var s = parseInt(args[0], 10);
+        print(tr("Releasing the Chaos Monkey. Click dead services to restart them. Esc to stop.", "Thả Chaos Monkey. Bấm vào dịch vụ đã chết để khởi động lại. Esc để dừng."), "hl");
+        window.ViChaos.monkey(s > 0 && s <= 120 ? s : 20);
+      },
+
+      panic: function () {
+        print("echo c > /proc/sysrq-trigger", "dim");
+        if (window.ViChaos) window.ViChaos.panic();
+      },
+
+      rm: function (args) {
+        var a = args.join(" ");
+        if (/-\w*r\w*f?\w*\s+\/\*?$/.test(a) || /-\w*f\w*r\w*\s+\/\*?$/.test(a)) {
+          print(tr("rm: cannot remove '/': Permission denied. (hint: sudo)", "rm: không thể xóa '/': Bị từ chối. (gợi ý: sudo)"), "err");
+        } else {
+          print("rm: " + tr("this is a portfolio, not a filesystem.", "đây là portfolio, không phải filesystem."), "err");
+        }
+      },
+
       sudo: function (args) {
-        if (fold(args.join(" ")).replace(/\s+/g, " ") === "hire me") {
+        var joined = fold(args.join(" ")).replace(/\s+/g, " ");
+        if (/^rm (-\w+ ?)+\/\*?$/.test(joined)) {
+          print("[sudo] password for recruiter: ********", "dim");
+          print(tr("Removing /usr/lib/gravity …", "Đang xóa /usr/lib/gravity …"), "err");
+          if (window.ViChaos) setTimeout(function () { window.ViChaos.panic(); }, 500);
+          return;
+        }
+        if (joined === "hire me") {
           print("[sudo] password for recruiter: ********", "dim");
           print(tr("Permission granted. Opening contact…", "Đã cấp quyền. Đang mở phần liên hệ…"), "hl");
           setTimeout(function () { goTo(base, "#contact"); }, 700);
